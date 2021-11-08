@@ -68,7 +68,7 @@ for s = 1:nstims
     else
         indsearly = find((centers>(pre_stim+win_after_onset)/1000) & (centers<(pre_stim+win_after_onset)/1000+0.1));   % First 100 ms
         indslate = find((centers>(pre_stim+win_after_onset+stim_len(stims(s)))/1000-0.1) & (centers<(pre_stim+win_after_onset+stim_len(stims(s)))/1000));
-
+        
         ssrateearly(s) = mean(rates(indsearly));   % First 100 ms
         ssratelate(s) = mean(rates(indslate));   % Last 100 ms
         

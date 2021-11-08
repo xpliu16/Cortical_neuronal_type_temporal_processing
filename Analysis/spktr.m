@@ -301,10 +301,10 @@ percISI5ratio = percISI5/percISI5poiss;
 
 % Hartigan's Dip Test
 nboot = 10000;   % was 1500, but want fewer 0's
-temp = log_ISI_list(log_ISI_list<4);
-xpdf = sort(temp);
+xpdf = sort(log_ISI_list);
 if length(xpdf)==0
     dip_p_value = NaN;
+    dip = NaN;
 else
     [dip, dip_p_value, xlow,xup]=HartigansDipSignifTest(xpdf,nboot);
 end
