@@ -9,10 +9,10 @@ xlsrange = {'A1:JZ657','A1:JZ400'};
 animalID = {'M7E', 'M117B'};
 
 %ana_type = 'Neuron type classification';
-%ana_type = 'SAM rate';
+ana_type = 'SAM rate';
 %ana_type = 'Vocalization responses';
 %ana_type = 'Neuron type properties';
-ana_type = 'Duration';
+%ana_type = 'Duration';
 clear eval;
 
 pool_protocols = 1;    % Pool up to first 5 protocols per unit for AP waveform 
@@ -74,6 +74,7 @@ switch ana_type
                     'dip_pval_cropped',         'col_dip_p_cropped',            'num';...
                     'adaptratio',               'col_adaptratio',               'num';...
                     'latency',                  'col_latency',                  'num';...
+                    'latency_calc',             'col_latency_calc',             'num';...
                     'BRR',                      'col_BRR',                      'num';...
                     'ramp_slope',               'col_rampslope',                'num';...
                     'intraburst_freq_p',        'col_intraburst_freq_p',        'num';...
@@ -122,7 +123,8 @@ switch ana_type
                     'z_score_tw',               'col_z_score_tw',               'num';...
                     'pairconf',                 'col_pairconf',                 'vector';...
                     'H',                        'col_H',                        'vector';...
-                    'intraburst_freq_p',        'col_intraburst_freq_p',        'num'};
+                    'intraburst_freq_p',        'col_intraburst_freq_p',        'num';...
+                    'Bu_sub',                   'col_Bu_sub',                   'num'};
 
     case 'Neuron type properties'
         T_var =     {'filestart',               'col_fs_UM',                    'num';...
@@ -269,6 +271,7 @@ for i = 1:length(data_log_file)
     col_z_score_tw = find(cellfun (@(x) strcmp('z-score_twitter',x),dlUM_raw{i}(1,:)));
     col_spike_amp = find(cellfun (@(x) strcmp('Peak-to-peak_ampl',x),dlUM_raw{i}(1,:)));
     col_latency = find(cellfun (@(x) strcmp('latency',x),dlUM_raw{i}(1,:)));
+    col_latency_calc = find(cellfun (@(x) strcmp('latency_calc',x),dlUM_raw{i}(1,:)));
     col_p2mISI = find(cellfun (@(x) strcmp('Peak_to_mean_ISI',x),dlUM_raw{i}(1,:)));
     col_MI = find(cellfun (@(x) strcmp('Monotonicity Index',x),dlUM_raw{i}(1,:)));
     col_TTP_p = find(cellfun (@(x) strcmp('TTP_ms_pooled',x),dlUM_raw{i}(1,:)));
@@ -370,7 +373,7 @@ switch ana_type
     end
     for i = 1:length(filestart)
         if ~isnan(acmetric(i))
-            a = sum([(acmetric(i) > 0.5), (peakmsISI(i) < 8), logISIdrop(i)>0.2]);
+            a = sum([(acmetric(i) > 0.5), (peakmsISI(i) < 10), logISIdrop(i)>0.2]);
             if a==3
                 burster(i) = 1;  
             elseif a <= 1
@@ -464,12 +467,120 @@ switch ana_type
     
     inds1 = find((burster_prestim==1) & (intraburst_freq_p>500));
     inds2 = find((burster_prestim==1) & (intraburst_freq_p<=500));
-    Buinds = union(inds1,inds2);
+    Buinds_prestim = union(inds1,inds2);
+    Buinds = find((groupnumcrit == 2) | (groupnumcrit == 6));
     groupIDcrit_plusprestim = [groupIDcrit; repmat({'Prestim burster1'},length(inds1),1)];
     groupIDcrit_plusprestim = [groupIDcrit_plusprestim; repmat({'Prestim burster2'},length(inds2),1)];
     groupIDcrit_plusprestim(cellfun(@(x) ~ischar(x),groupIDcrit_plusprestim)) = {''};  
     CImax_plusprestim = [CImax; CImax(inds1); CImax(inds2)];
     groupnumcrit_plusprestim = [groupnumcrit; 7*ones(length(find((burster_prestim==1))),1)]; 
+    
+    length(find(burster_prestim(inds)==1))   
+    
+    supp_spont = figure;
+    set(gcf, 'PaperUnits', 'inches');
+    set(gcf, 'PaperSize', [17.2*0.3937, 5.5*0.3937]);
+    set(gcf,'PaperPositionMode','manual')
+    set(gcf,'PaperPosition', [0 0 17.2*0.3937, 5.5*0.3937]);
+    set(gcf,'Units','inches');
+    set(gcf,'Position',[0 0 17.2*0.3937, 5.5*0.3937]);
+    lmargin = 0.06;
+    rmargin = 0.05;
+    intercol = 0.075;
+    
+    ax2_1 = axes(supp_spont,'Position',[lmargin,0.2,(1-lmargin-rmargin-3*intercol)/4, 0.65]);
+    plot_raster ({'M117B0636'}, 4, '11:26', '1:10', '', '', '', 'single', 1, 0, 0, [], fig1, 1,'diamond',1);
+    ax2_1.Position(4) = 0.8*ax2_1.Position(4); 
+    rectangle('Position',[520,(24-11)+0.1*(7-1)-0.2,40,0.1+0.4],'EdgeColor',RSColor,'LineWidth',1);
+    rectangle('Position',[509,(22-11)+0.1*(5-1)-0.2,40,0.1+0.4],'EdgeColor',FSColor,'LineWidth',1);
+    ylabel('Frequency (kHz)');
+    
+    ax2_2 = axes(supp_spont,'Position',[ax2_1.Position(1), ax2_1.Position(2)+ax2_1.Position(4)+0.05,ax2_1.Position(3)*0.45, ax2_1.Position(4)*0.15/0.8]);
+    plot_raster({'M117B0636'}, 4, '24', '7', '', '', '', 'single', 1, 0, 0, [], fig1, 1,'vertical tick',0.5);
+    xlim([534 546]);
+    ylim([0.2 0.6]);
+    ax2_2.XColor = RSColor;
+    ax2_2.YColor = RSColor;
+    set(ax2_2,'xtick',[]);
+    set(ax2_2,'ytick',[]);
+    ax2_2.LineWidth = 1;
+    box on
+    %rectangle('Position',[534,(24-11)+0.1*7,12,0.1]);
+    
+    ax2_3 = axes(supp_spont,'Position',[ax2_1.Position(1)+ax2_1.Position(3)*0.55, ax2_1.Position(2)+ax2_1.Position(4)+0.05,ax2_1.Position(3)*0.45, ax2_1.Position(4)*0.15/0.8]);
+    plot_raster({'M117B0636'}, 4, '22', '5', '', '', '', 'single', 1, 0, 0, [], fig1, 1,'vertical tick',0.5);
+    xlim([523 535]);
+    ylim([0.2 0.6]);
+    plot([529 534],[0.25 0.25],'-k','LineWidth',2);
+    text(mean([529, 534]), 0.35, '5 ms','FontName',figparams.fontchoice,'FontSize',figparams.fsize-1,'HorizontalAlignment','center');
+    ax2_3.XColor = FSColor;
+    ax2_3.YColor = FSColor;
+    set(ax2_3,'xtick',[]);
+    set(ax2_3,'ytick',[]);
+    ax2_3.LineWidth = 1;
+    box on
+    
+    D = eval ('M117B0636');
+    stims = 1:31;
+    reps = 1:10;
+    axes(ax2_1);
+    col_freq = find(strcmp(D.stimulus_tags_ch1,' tone Hz'));
+    freqs = D.stimulus_ch1(11:26,col_freq);
+    yticks(0.5:5:19.5);
+    yticklabels(round(freqs(1:5:20)/100)/10);
+    
+    [outputs, centers, N, centers2,N2,log_ISI_list,prestim_total_time,...
+    nint] = spktr(D,mfilename,ch,stims,reps,0.5,50,'all',1,0); 
+    ax2_4 = axes(supp_spont,'Position',[lmargin+ax2_1.Position(3)+intercol, 0.2,(1-lmargin-rmargin-ax2_1.Position(3))/3-0.05, 0.65]); 
+    bar([-1*fliplr(outputs.xautocorr),0, outputs.xautocorr],[fliplr(outputs.yautocorr),0, outputs.yautocorr], 1,'FaceColor',FSColor,'FaceAlpha',0.7,'EdgeColor','none');
+    xlim([-30 30]);
+    xticks([-30 0 30]);
+    %yl = ylim;
+    %ylim([yl(1) yl(2)*1.15]);
+    xlabel('Time (ms)');
+    ylabel('Counts');
+    title('All epochs');
+    [peaks(1),peakinds(1)] = max(outputs.yautocorr);
+    
+    [outputs, centers, N, centers2,N2,log_ISI_list,prestim_total_time,...
+    nint] = spktr(D,mfilename,ch,stims,reps,0.5,50,'pre',1,0); 
+    ax2_5 = axes(supp_spont,'Position',[lmargin+2*ax2_1.Position(3)+2*intercol, 0.2,(1-lmargin-rmargin-ax2_1.Position(3))/3-0.05, 0.65]); 
+    bar([-1*fliplr(outputs.xautocorr),0, outputs.xautocorr],[fliplr(outputs.yautocorr),0, outputs.yautocorr], 1,'FaceColor',FSColor,'FaceAlpha',0.7,'EdgeColor','none');
+    %xlim([0 log(16)]);
+    xlim([-30 30]);
+    xticks([-30 0 30]);
+    %yl = ylim;
+    %ylim([yl(1) yl(2)*1.15]);
+    xlabel('Time (ms)');
+    title('Pre-stimulus only');
+    [peaks(2),peakinds(2)] = max(outputs.yautocorr);
+    
+    D = eval ('M117B0645');
+    stims = 1;
+    reps = 1:10;
+    [outputs, centers, N, centers2,N2,log_ISI_list,prestim_total_time,...
+    nint] = spktr(D,mfilename,ch,stims,reps,0.5,50,'all',1,0); 
+    ax2_6 = axes(supp_spont,'Position',[lmargin+3*ax2_1.Position(3)+3*intercol+0.01, 0.2,(1-lmargin-rmargin-ax2_1.Position(3))/3-0.05, 0.65]); 
+    bar([-1*fliplr(outputs.xautocorr),0, outputs.xautocorr],[fliplr(outputs.yautocorr),0, outputs.yautocorr], 1,'FaceColor',FSColor,'FaceAlpha',0.7,'EdgeColor','none');
+    %xlim([0 log(16)]);
+    xlim([-30 30]);
+    xticks([-30 0 30]);
+    %yl = ylim;
+    %ylim([yl(1) yl(2)*1.15]);
+    xlabel('Time (ms)');
+    title('100 s spontaneous');
+    [peaks(3),peakinds(3)] = max(outputs.yautocorr);
+    
+    xshift = 0.06;
+    yshift = 0.03;
+    annotation('textbox',[ax2_1.Position(1)-xshift, 0.2+0.65+yshift, .05, .1],'String','A','EdgeColor','none',fontstr_l{:});
+    annotation('textbox',[ax2_4.Position(1)-xshift, ax2_4.Position(2)+ax2_4.Position(4)+yshift, .05, .1],'String','B','EdgeColor','none',fontstr_l{:});
+    annotation('textbox',[ax2_5.Position(1)-xshift+0.02, ax2_5.Position(2)+ax2_5.Position(4)+yshift, .05, .1],'String','C','EdgeColor','none',fontstr_l{:});
+    annotation('textbox',[ax2_6.Position(1)-xshift+0.01, ax2_6.Position(2)+ax2_6.Position(4)+yshift, .05, .1],'String','D','EdgeColor','none',fontstr_l{:});  
+    
+    set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold','TickDir','out')
+  
+    print([figdir 'Supp/spont_burst.tif'],'-dtiff',['-r' num2str(figparams.res)]); 
     
     fig2 = figure;
     set(gcf, 'PaperUnits', 'inches');
@@ -504,7 +615,7 @@ switch ana_type
     xl = get(gca,'xlim');
     yl = get(gca,'ylim');
     plot([0.5 0.5], yl, '--', 'Color', [0.6 0.6 0.6]);
-    plot(xl, [8 8], '--', 'Color', [0.6 0.6 0.6]);
+    plot(xl, [10 10], '--', 'Color', [0.6 0.6 0.6]);
     legend('Bursting','Non-bursting','Location',[0.145+xshift 0.585 0.093 0.086]);
     legend boxoff
     
@@ -526,7 +637,7 @@ switch ana_type
     xl = get(gca,'xlim');
     yl = get(gca,'ylim');
     plot([0.2 0.2], yl, '--', 'Color', [0.6 0.6 0.6]);
-    plot(xl, [8 8], '--', 'Color', [0.6 0.6 0.6]);
+    plot(xl, [10 10], '--', 'Color', [0.6 0.6 0.6]);
     
     oldpos = get(axf2p2,'Position');
     axf2p2b = axes(gcf,'Position',[oldpos(1)+oldpos(3)+0.02, oldpos(2), 0.22*oldpos(3), oldpos(4)]);
@@ -650,7 +761,7 @@ switch ana_type
     yl = get(gca,'ylim');
     plot([2 2], yl, '--', 'Color', [0.6 0.6 0.6]);
     
-    [f,xi] = ksdensity(F50(burster==0)/1000,centers,'Bandwidth',0.13);
+    [f,xi] = ksdensity(F50(burster==0)/1000,centers,'Bandwidth',0.15);
     ph = plot(xi,f*h3.BinWidth*length(h3.Data),'r-','LineWidth',1);
     ph.Color(4) = 0.5;
     
@@ -673,7 +784,7 @@ switch ana_type
     set(gca,'TickLength',[0.05 0.025]);
     hold on
     
-    [f,xi] = ksdensity(F50(burster==1)/1000,centers,'Bandwidth',0.13);
+    [f,xi] = ksdensity(F50(burster==1)/1000,centers,'Bandwidth',0.15);
     ph = plot(xi,f*h4.BinWidth*length(h4.Data),'r-','LineWidth',1);    
     ph.Color(4) = 0.5;
     
@@ -984,6 +1095,7 @@ switch ana_type
     X_bur = [intraburst_freq(Buinds), logISIdrop(Buinds), latency(Buinds)];
     X_bur = X_bur-mean(X_bur,1,'omitnan');   % Standardize
     X_bur = X_bur./std(X_bur,1,'omitnan');
+    Y_bur = [];
 
     for i = 1:20
         rng(i);
@@ -1100,7 +1212,7 @@ switch ana_type
     hold on
     plot (ncomp, AIC(ncomp),'o-.','LineWidth',1.5,'MarkerSize',figparams.msize,'Color',[0.7 0.7 0.7]);
     set(gca,'xtick',ncomp);
-    get(gca,'xlim',[0.5, 7.5]);
+    set(gca,'xlim',[0.5, 7.5]);
     xlabel('Number of clusters',fontstr{:});
     ylabel('Model AIC/BIC',fontstr{:});
     ax = gca;
@@ -1205,6 +1317,7 @@ switch ana_type
        
     p1 = 0.001;
     p2 = 0.001;
+    p3 = 0.0475;
     
     fig6 = figure;
     set(gcf, 'PaperUnits', 'inches');
@@ -1231,7 +1344,7 @@ switch ana_type
     set(gca, 'xticklabels',{'RS','FS','Bu1','Bu2', 'PBu', 'Unclassified'});
     set(gca, 'ylim',[-0.05 1.35]);
     hold on
-    sigstar({[1 3],[2 3]},[p1 p2]);   
+    sigstar({[1 3],[2 3],[3 4]},[p1 p2 p3]);   
     set(findobj(ax1,'type','Scatter'),'SizeData',8);
     q = findobj(ax1,'type','Patch');   
     q(14).FaceColor = RSColor;
@@ -1341,21 +1454,23 @@ switch ana_type
     ax5.Position(4) = 0.97*ax5.Position(4);
    
     % tBMF
-    [val,ind] = max(rayleigh,[],2);
-    ind(val<=13.8) = NaN;   % Nonsignificant
+    [val,ind] = max(VS,[],2);
+    %ind(val<=13.8) = NaN;   % Nonsignificant
     %ptfcolor = [FSColor;Bu1Color;RSColor;[1 1 1];[1 1 1];Bu2Color];
     ptfcolor = {FSColor;Bu1Color;RSColor;'none';'none';Bu2Color};
-    rayleigh_sig = nan(size(rayleigh));
+    VS_sig = nan(size(VS));
     tBMF = nan(size(rayleigh,1),1);
     for i = 1:length(ind)
         if length(rayleigh(i,~isnan(rayleigh(i,:)))>=13.8)>2
-            rayleigh_sig(i,rayleigh(i,:)>=13.8)=rayleigh(i,rayleigh(i,:)>=13.8);
-            weighted = nan(1,length(SAMrates));
-            SAMind = 1:length(SAMrates);
-            %weighted(~isnan(rayleigh_sig(i,:))) = SAMrates(~isnan(rayleigh_sig(i,:))).^(rayleigh_sig(i,~isnan(rayleigh_sig(i,:))));
-            weights = (rayleigh_sig(i,~isnan(rayleigh_sig(i,:))));
-            weighted(~isnan(rayleigh_sig(i,:))) = SAMind(~isnan(rayleigh_sig(i,:))).*weights;
-            indBMF(i) = sum(weighted,'omitnan')/(sum(weights));
+            VS_sig(i,rayleigh(i,:)>=13.8)=VS(i,rayleigh(i,:)>=13.8);
+            indmin = max(ind(i)-1,1);
+            indmax = min(ind(i)+1,length(SAMrates));
+            weights{i} = VS_sig(i,indmin:indmax);
+            %weighted = nan(1,length(VS_sub{i}));
+            SAMind = indmin:indmax;
+            %weights = VS_sub{i}(~isnan(VS_sub{i}));
+            weighted = SAMind.*weights{i};
+            indBMF(i) = sum(weighted,'omitnan')/sum(weights{i},'omitnan');
             tBMF(i) = 2^(indBMF(i));
         else
             tBMF(i) = NaN;
@@ -1367,51 +1482,25 @@ switch ana_type
     end
     
     nanmean(tBMF(RSinds))
+    nanstd(tBMF(RSinds))/sqrt(length(find(RSinds)))
     nanmean(tBMF(FSinds))
+    nanstd(tBMF(FSinds))/sqrt(length(find(FSinds)))
     nanmean(tBMF(Bu1inds))
+    nanstd(tBMF(Bu1inds))/sqrt(length(find(Bu1inds)))
     nanmean(tBMF(Bu2inds))
+    nanstd(tBMF(Bu2inds))/sqrt(length(find(Bu2inds)))
+    
+    nanstd(tBMF(RSinds))/sqrt(length(find(~isnan(tBMF(RSinds)))))
+    nanstd(tBMF(FSinds))/sqrt(length(find(~isnan(tBMF(FSinds)))))
+    nanstd(tBMF(Bu1inds))/sqrt(length(find(~isnan(tBMF(Bu1inds)))))
+    nanstd(tBMF(Bu2inds))/sqrt(length(find(~isnan(tBMF(Bu2inds)))))
     
     rayleigh_RS = rayleigh(RSinds & strcmp(SAMtype4Hz,'Sync'),:);
     rayleigh_FS = rayleigh(FSinds & strcmp(SAMtype4Hz,'Sync'),:);
     rayleigh_Bu1 = rayleigh(Bu1inds & strcmp(SAMtype4Hz,'Sync'),:);
     rayleigh_Bu2 = rayleigh(Bu2inds & strcmp(SAMtype4Hz,'Sync'),:);
-    
-    figure(fig6)
-    ax3 = subplot(3,3,3);
-    ax3.Position(3) = ax3.Position(3)*0.9; 
-    ax3.Position(1) = ax3.Position(1)+2*xshift+xshift2;
-    violinplot(tBMF,groupIDcrit,'GroupOrder',{'RS','FS','Burster_h','Burster_l','Unclassified','Insufficient spikes'});
-    set(gca, 'YScale', 'linear');
-    set(gca, 'xlim',[0.5,4.5]);
-    ylabel('tBMF (Hz)','FontSize',figparams.fsize,'FontName',figparams.fontchoice);
-    ax3.FontSize = figparams.fsize;
-    xticklabels({'RS','FS','Bu1','Bu2', 'PBu', 'Unclassified'});
-    yl = get(gca,'ylim');
-    yl(2) = yl(2)*1.25;
-    set(gca,'ylim',yl);
-    hold on
-    %sigstar({[3 4],[1 3],[1 2]},[p9 p10 p11]);    
-    set(findobj(ax3,'type','Scatter'),'SizeData',8);
-    q = findobj(ax3,'type','Patch');   
-    q(14).FaceColor = RSColor;
-    q(12).FaceColor = FSColor;
-    q(10).FaceColor = Bu1Color;
-    q(8).FaceColor = Bu2Color;
-    q(6).FaceColor = PBuColor;
-    q2 = findobj(ax3,'type','Scatter'); 
-    q2(28).MarkerFaceColor = RSColor;
-    q2(24).MarkerFaceColor = FSColor;
-    q2(20).MarkerFaceColor = Bu1Color;
-    q2(16).MarkerFaceColor = Bu2Color;
-    q2(12).MarkerFaceColor = BuColor;    
-    q3 = findobj(ax3,'type','Line');
-    q3(1).LineWidth = 1;
-    q3(2).LineWidth = 1;
-    q3(3).LineWidth = 1;
-    q3(4).LineWidth = 1;
-    q3(5).LineWidth = 1;
-    
-    % Vector strength by GMM
+     
+    % Vector strength
     VS_RS = mean(VS_plusprestim(RSinds_gmm,:),1,'omitnan');
     VS_FS = mean(VS_plusprestim(FSinds_gmm,:),1,'omitnan');
     VS_Bu1 = mean(VS_plusprestim(Buinds_gmm &(Bu_sub==1),:),1,'omitnan');
@@ -1456,10 +1545,10 @@ switch ana_type
     errorbar(SAMrates,VS_Bu2,VS_Bu2_stderr,'-','Color',Bu2Color,'CapSize',3,'LineWidth',1);
     errorbar(SAMrates,VS_Bu1,VS_Bu1_stderr,'-','Color',Bu1Color,'CapSize',3,'LineWidth',1);
    
-    text('Units','normalized','Position',[0.84,0.93,0],'HorizontalAlignment','left','String','RS','Color',RSColor,'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold');
-    text('Units','normalized','Position',[0.84,0.84,0],'HorizontalAlignment','left','String','FS','Color',FSColor,'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold');
-    text('Units','normalized','Position',[0.84,0.75,0],'HorizontalAlignment','left','String','Bu1','Color',Bu1Color,'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold');
-    text('Units','normalized','Position',[0.84,0.66,0],'HorizontalAlignment','left','String','Bu2','Color',PBuColor,'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold');
+    text('Units','normalized','Position',[0.67,0.93,0],'HorizontalAlignment','left','String',['RS (' num2str(VS_RS_n) ')'],'Color',RSColor,'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold');
+    text('Units','normalized','Position',[0.67,0.84,0],'HorizontalAlignment','left','String',['FS (' num2str(VS_FS_n) ')'],'Color',FSColor,'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold');
+    text('Units','normalized','Position',[0.67,0.75,0],'HorizontalAlignment','left','String',['Bu1 (' num2str(VS_Bu1_n) ')'],'Color',Bu1Color,'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold');
+    text('Units','normalized','Position',[0.67,0.66,0],'HorizontalAlignment','left','String',['Bu2 (' num2str(VS_Bu2_n) ')'],'Color',PBuColor,'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold');
     set(gca,'XTick',[1E0 1E1 1E2 1E3]);
     set(gca,'xlim',[1E0 1E3]);
     set(gca,'ylim',[-0.05 0.8]);
@@ -1536,12 +1625,14 @@ switch ana_type
     % Levene test for equal variance (reject null)
     p = vartestn(maxsync(1:length(groupIDgmm)),groupIDgmm,'TestType','LeveneAbsolute')  
     
-    p9 = 0.035;
-    p10 = 0.012;
-    p11 = 0.022;
+    p9 = 0.0277;
+    p10 = 0.0079;
+    p11 = 0.0214;
     
     figure(fig6);
-    
+    ax3 = subplot(3,3,3);
+    ax3.Position(3) = ax3.Position(3)*0.9; 
+    ax3.Position(1) = ax3.Position(1)+2*xshift+xshift2;
     violinplot(maxsync_plusprestim,groupIDcrit_plusprestim,'GroupOrder',{'RS','FS','Burster_h','Burster_l','Prestim burster','Unclassified','Insufficient spikes'});
     set(gca, 'YScale', 'linear');
     set(gca, 'xlim',[0.5,4.5]);
@@ -1897,7 +1988,7 @@ switch ana_type
     maxsync_PBu = maxsync_plusprestim(PBuinds);
     maxsync_BuCrit = maxsync_plusprestim(Buinds_crit);
     
-    p9 = 0.029;
+    p9 = 0.0356;
     
     figure(suppl);
     ax3 = subplot(2,3,3);
@@ -2095,10 +2186,10 @@ switch ana_type
 
         figure(fig8)
         % From Python Pingouin Games-Howell post-hoc test
-        p1 = 0.009;
-        p2 = 0.018;
-        p3 = 0.001147;
-        p4 = 0.004;
+        p1 = 0.0088;
+        p2 = 0.0178;
+        p3 = 0.0011;
+        p4 = 0.0038;
         sigstar({[2 3],[1 3],[2 4],[1 2]},[p1 p2 p3 p4]);
 
         CImax_RS_GMM = CImax(strcmp(groupIDgmm_plusprestim,'RS'));
@@ -2128,16 +2219,19 @@ switch ana_type
         set(gca,'xlim',[0.5,9.5]);
         xlabel('   Criteria                           GMM  ',fontstr{:});
 
-        text(1,2,num2str(length(find(~isnan(CImax_RS)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
-        text(2,2,num2str(length(find(~isnan(CImax_FS)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
-        text(3,2,num2str(length(find(~isnan(CImax_Bu1)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
-        text(4,2,num2str(length(find(~isnan(CImax_Bu2)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
-        text(5,2,num2str(length(find(~isnan(CImax_PBu)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
+        % Doesn't fit on shortest bars
+        %{
+        text(1,3,num2str(length(find(~isnan(CImax_RS)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
+        text(2,3,num2str(length(find(~isnan(CImax_FS)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
+        text(3,3,num2str(length(find(~isnan(CImax_Bu1)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
+        text(4,3,num2str(length(find(~isnan(CImax_Bu2)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
+        text(5,3,num2str(length(find(~isnan(CImax_PBu)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
 
-        text(7,2,num2str(length(find(~isnan(CImax_RS_GMM)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);   
-        text(8,2,num2str(length(find(~isnan(CImax_FS_GMM)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
-        text(9,2,num2str(length(find(~isnan(CImax_Bu_GMM)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
-
+        text(7,3,num2str(length(find(~isnan(CImax_RS_GMM)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);   
+        text(8,3,num2str(length(find(~isnan(CImax_FS_GMM)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
+        text(9,3,num2str(length(find(~isnan(CImax_Bu_GMM)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
+        %}
+        
         axf8p2 = axes(fig8,'Position',[lmargin+0.37+2*intercol tmargin-ywidth 0.35 ywidth]);
         [B,CImaxsortind] = sort(CImax,'descend','MissingPlacement','last');
 
@@ -2350,7 +2444,7 @@ switch ana_type
         
         [spk_ms, D, stim_len, pre_stim, post_stim, stims, stim_file, analysis_type, last_rep_complete, last_rep_stims, stimulus_ch1,reps, stimulus_ch2] = get_spikes_xpl ('M117B0334', 4, 1:20, 1:10);
 
-        [q_opt_334, perc_correct_opt, pc_334, z_334, H_334] =  sim_classify2 (spk_ms, D, stim_len, pre_stim, post_stim,  1:20, 1:10,params.q,1:20,params.nsims,0,params.nhsims)
+        [q_opt_334, perc_correct_opt, pc_334, z_334, H_334] =  call_classify (spk_ms, D, stim_len, pre_stim, post_stim,  1:20, 1:10,params.q,1:20,0)
 
         axvp2 = axes(fig8,'Position',[lmargin, bmargin, xwidth, ywidth])
 
@@ -2359,19 +2453,19 @@ switch ana_type
         hold on
       
         [spk_ms, D, stim_len, pre_stim, post_stim, stims, stim_file, analysis_type, last_rep_complete, last_rep_stims, stimulus_ch1,reps, stimulus_ch2] = get_spikes_xpl ('M7E1425', 1, 1:20, 1:10);
-        [q_opt_1425, perc_correct_opt, pc_1425, z_1425, H_1425] =  sim_classify2 (spk_ms, D, stim_len, pre_stim, post_stim,  1:20, 1:10,params.q,1:20,params.nsims,0,params.nhsims)
+        [q_opt_1425, perc_correct_opt, pc_1425, z_1425, H_1425] =  call_classify (spk_ms, D, stim_len, pre_stim, post_stim,  1:20, 1:10,params.q,1:20,0)
 
         h2 = plot(params.q,H_1425/max(H_1425), '-','LineWidth', 1,'Color',r2);
 
         [spk_ms, D, stim_len, pre_stim, post_stim, stims, stim_file, analysis_type, last_rep_complete, last_rep_stims, stimulus_ch1,reps, stimulus_ch2] = get_spikes_xpl ('M117B0760', 5, 1:20, 1:10);
 
-        [q_opt_760, perc_correct_opt, pc_760, z_760, H_760] =  sim_classify2 (spk_ms, D, stim_len, pre_stim, post_stim,  1:20, 1:10,params.q,1:20,params.nsims,0,params.nhsims)
+        [q_opt_760, perc_correct_opt, pc_760, z_760, H_760] =  call_classify (spk_ms, D, stim_len, pre_stim, post_stim,  1:20, 1:10,params.q,1:20,0)
 
         h3 = plot(params.q,H_760/max(H_760), '-','LineWidth', 1,'Color',g2)
 
         [spk_ms, D, stim_len, pre_stim, post_stim, stims, stim_file, analysis_type, last_rep_complete, last_rep_stims, stimulus_ch1,reps, stimulus_ch2] = get_spikes_xpl ('M117B0646', 4, 1:20, 1:10);
 
-        [q_opt_646, perc_correct_opt, pc_646, z_646, H_646] =  sim_classify2 (spk_ms, D, stim_len, pre_stim, post_stim,  1:20, 1:10,params.q,1:20,params.nsims,0,params.nhsims)
+        [q_opt_646, perc_correct_opt, pc_646, z_646, H_646] =  call_classify (spk_ms, D, stim_len, pre_stim, post_stim,  1:20, 1:10,params.q,1:20,0)
 
         h4 = plot(params.q,H_646/max(H_646), '-','LineWidth', 1,'Color',g1)
 
@@ -2643,7 +2737,8 @@ switch ana_type
         CV_plusprestim = [CV; CV([inds; inds2])];
         reg_parikh_plusprestim = [reg_parikh; reg_parikh([inds; inds2])];
         MI_plusprestim = [MI; MI([inds; inds2])];
-        
+        split_bu = 1;
+
         groupinds.RSinds = strcmp(groupIDcrit_plusprestim,'RS');
         groupinds.FSinds = strcmp(groupIDcrit_plusprestim,'FS');
         groupinds.Bu2inds = strcmp(groupIDcrit_plusprestim,'Burster_l');
@@ -2678,7 +2773,7 @@ switch ana_type
         hold on
         xl = get(gca,'xlim');
         set(gca,'ylim',[0 85]);
-        plot(xl, [8 8], '--', 'Color', [0.7 0.7 0.7]);
+        plot(xl, [10 10], '--', 'Color', [0.7 0.7 0.7]);
         s1.Title.Units = 'normalized';
         s1.Title.VerticalAlignment = 'top';
         s1.Title.Position=[0.5 1.2 0];
@@ -3058,7 +3153,7 @@ switch ana_type
             set(gca,'xtick',[0.2,0.4,0.6],'Tickdir','out');
             set(gca,'xticklabels',[]);
             if i == 3
-                th = text(0.88,maxRS*1.5*0.8,{['RS (' num2str(length(find(~isnan(PSTH.RS{1}(:,1))))) ')']},'Color',RSColor,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
+                th = text(0.88,maxRS*1.5*0.8,{'RS'},'Color',RSColor,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
             end
             if i == 1
                 th1 = text('Units','inches','Position', [-0.34, 3.67],'String','A',fontstr_l{:});
@@ -3076,6 +3171,7 @@ switch ana_type
             old_pos(4) = old_pos(4)*frac_y;
             set(ax(i),'Position',old_pos);
         end
+        PSTH_RS_n = length(find(~isnan(PSTH.RS{1}(:,1))));
         
         prev_shrink = 0;
         for i = 1:length(showdurs)
@@ -3104,7 +3200,7 @@ switch ana_type
                 set(ylh1,'Position',[-0.07,25,pos(3)]);
             end
             if i == 3
-                text(0.88,maxFS*1.5*0.8,{['FS (' num2str(length(find(~isnan(PSTH.FS{1}(:,1))))) ')']},'Color',FSColor,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
+                text(0.88,maxFS*1.5*0.8,{'FS'},'Color',FSColor,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
             end
 
             %{
@@ -3120,6 +3216,7 @@ switch ana_type
             set(ax2(i),'Position',old_pos);
             %}
         end
+        PSTH_FS_n = length(find(~isnan(PSTH.FS{1}(:,1))));
         
         prev_shrink = 0;
         for i = 1:length(showdurs)
@@ -3158,9 +3255,10 @@ switch ana_type
             set(ax3(i),'Position',old_pos);
             %}
             if i == 3
-                text(0.88,maxBu1*1.5*0.8,{['Bu1 (' num2str(length(find(~isnan(PSTH.Bu1{1}(:,1))))) ')']},'Color',Bu1Color,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
+                text(0.88,maxBu1*1.5*0.8,{'Bu1'},'Color',Bu1Color,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
             end
         end
+        PSTH_Bu1_n = length(find(~isnan(PSTH.Bu1{1}(:,1))));
         
         prev_shrink = 0;
         for i = 1:length(showdurs)
@@ -3203,9 +3301,10 @@ switch ana_type
             set(ax4(i),'Position',old_pos);
             %}
             if i == 3
-                text(0.88,maxBu2*1.5*0.8,{['Bu2 (' num2str(length(find(~isnan(PSTH.Bu2{1}(:,1))))) ')']},'Color',Bu2Color,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
+                text(0.88,maxBu2*1.5*0.8,{'Bu2'},'Color',Bu2Color,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
             end
         end
+        PSTH_Bu2_n = length(find(~isnan(PSTH.Bu2{1}(:,1))));
         %linkaxes([ax(1),ax2(1),ax3(1),ax4(1)],'x');
         %linkaxes([ax(2),ax2(2),ax3(2),ax4(2)],'x');
         %linkaxes([ax(3),ax2(3),ax3(3),ax4(3)],'x');
@@ -3261,7 +3360,10 @@ switch ana_type
             %thdur(i) = text(0.2+0.5*durations(showdurs(i))/1000,maxRS*1.8,[num2str(durations(showdurs(i))) ' ms'],'HorizontalAlignment','center',fontstr{:});
             thdur(i) = text(0.2,maxRS*1.8,[num2str(durations(showdurs(i))) ' ms'],'HorizontalAlignment','left',fontstr{:});
             if i == 3
-                th = text(0.66,maxRS*1.5*0.8,{['RS (' num2str(length(find(~isnan(PSTH.RS{1}(:,1))))) ')']},'Color',RSColor,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
+                th = text(0.66,maxRS*1.5*0.8,'RS','Color',RSColor,...
+                    'HorizontalAlignment','left',...
+                    'FontName',figparams.fontchoice,...
+                    'FontSize',figparams.fsize,'FontWeight','Bold'); 
             end
             if i == 1
                 th1 = text('Units','inches','Position', [-0.34, 3.67],'String','A',fontstr_l{:});
@@ -3307,7 +3409,11 @@ switch ana_type
                 set(ylh1,'Position',[-0.07,25,pos(3)]);
             end
             if i == 3
-               text(0.66,maxFS*1.5*0.8,{['FS (' num2str(length(find(~isnan(PSTH.FS{1}(:,1))))) ')']},'Color',FSColor,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
+               text(0.66,maxFS*1.5*0.8,'FS','Color',FSColor,...
+                   'HorizontalAlignment','left',...
+                   'FontName',figparams.fontchoice,...
+                   'FontSize',figparams.fsize,...
+                   'FontWeight','Bold'); 
             end
 
             old_pos = get(ax2(i),'Position');
@@ -3356,7 +3462,11 @@ switch ana_type
             old_pos(4) = old_pos(4)*frac_y;
             set(ax3(i),'Position',old_pos);
             if i == 3
-                text(0.66,maxBu1*1.5*0.8,{['Bu1 (' num2str(length(find(~isnan(PSTH.Bu1{1}(:,1))))) ')']},'Color',BuColor,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
+                text(0.66,maxBu1*1.5*0.8,'Bu1','Color',BuColor,...
+                    'HorizontalAlignment','left',...
+                    'FontName',figparams.fontchoice,...
+                    'FontSize',figparams.fsize,...
+                    'FontWeight','Bold'); 
             end
         end
         
@@ -3393,7 +3503,7 @@ switch ana_type
             old_pos(4) = old_pos(4)*frac_y;
             set(ax4(i),'Position',old_pos);
             if i == 3
-                text(0.66,maxBu2*1.5*0.8,{['Bu2 (' num2str(length(find(~isnan(PSTH.Bu2{1}(:,1))))) ')']},...
+                text(0.66,maxBu2*1.5*0.8,'Bu2',...
                     'Color',BuColor,'HorizontalAlignment','left','FontName',figparams.fontchoice,...
                     'FontSize',figparams.fsize,'FontWeight','Bold'); 
             end
@@ -3465,18 +3575,18 @@ switch ana_type
         figure(fig5)
         
         p1 = 0.001;
-        p2 = 0.010;
-        p3 = 0.001;
+        p2 = 0.0098;
+        p3 = 0.0037;
         sigstar({[2 3],[1 3],[2,4]},[p1 p2 p3]);
        
         temp2 = ax4(1).Position;
         temp3 = ax5(1).Position;
         ax7 = axes('Position',[temp2(1),temp2(2)-0.2, 0.15, 0.15]); 
         hold on
-        errorbar(durations_ext,RS_dur_rate,RS_dur_rate_stderr,'-','Color',RSColor,'CapSize',3,'LineWidth',0.8);
-        errorbar(durations_ext,FS_dur_rate,FS_dur_rate_stderr,'-','Color',FSColor,'CapSize',3,'LineWidth',0.8);
-        errorbar(durations_ext,Bu1_dur_rate,Bu1_dur_rate_stderr,'-','Color',Bu1Color,'CapSize',3,'LineWidth',0.8);
-        errorbar(durations_ext,Bu2_dur_rate,Bu2_dur_rate_stderr,'-','Color',Bu2Color,'CapSize',3,'LineWidth',0.8);
+        errorbar(durations_ext,RS_dur_rate,RS_dur_rate_stderr,'-','Color',RSColor,'CapSize',3,'LineWidth',1);
+        errorbar(durations_ext,FS_dur_rate,FS_dur_rate_stderr,'-','Color',FSColor,'CapSize',3,'LineWidth',1);
+        errorbar(durations_ext,Bu1_dur_rate,Bu1_dur_rate_stderr,'-','Color',Bu1Color,'CapSize',3,'LineWidth',1);
+        errorbar(durations_ext,Bu2_dur_rate,Bu2_dur_rate_stderr,'-','Color',Bu2Color,'CapSize',3,'LineWidth',1);
         xlabel('Duration (ms)');
         ylh2 = ylabel('Rel mean rate');    % Driven rate
         ylh2.Position(2) = 0.9;
@@ -3503,10 +3613,10 @@ switch ana_type
         end
         hold on
         
-        errorbar(ramprates,PSTHramp.RS_max_mean,PSTHramp.RS_max_stderr,'Color',RSColor,'CapSize',3,'LineWidth',0.8);
-        errorbar(ramprates,PSTHramp.FS_max_mean,PSTHramp.FS_max_stderr,'Color',FSColor,'CapSize',3,'LineWidth',0.8);
-        errorbar(ramprates,PSTHramp.Bu2_max_mean,PSTHramp.Bu2_max_stderr,'Color',Bu2Color,'CapSize',3,'LineWidth',0.8);
-        errorbar(ramprates,PSTHramp.Bu1_max_mean,PSTHramp.Bu1_max_stderr,'Color',Bu1Color,'CapSize',3,'LineWidth',0.8);
+        errorbar(ramprates,PSTHramp.RS_max_mean,PSTHramp.RS_max_stderr,'Color',RSColor,'CapSize',3,'LineWidth',1);
+        errorbar(ramprates,PSTHramp.FS_max_mean,PSTHramp.FS_max_stderr,'Color',FSColor,'CapSize',3,'LineWidth',1);
+        errorbar(ramprates,PSTHramp.Bu2_max_mean,PSTHramp.Bu2_max_stderr,'Color',Bu2Color,'CapSize',3,'LineWidth',1);
+        errorbar(ramprates,PSTHramp.Bu1_max_mean,PSTHramp.Bu1_max_stderr,'Color',Bu1Color,'CapSize',3,'LineWidth',1);
 
         set(gca, 'Xtick', ramprates);
         set(gca, 'TickLength',[0.04 0.025]);

@@ -37,13 +37,13 @@ targetinds = targetinds(:);   % Relative stimulus numbers
 resplen = repmat(stim_len(stims)-win_after_onset+win_after_offset,1,nreps)';
 resplen = resplen(:);
 output = zeros(nreps*nstims,200);
-perc_correct = NaN(length(q),nhsims);
+perc_correct = NaN(length(q));
     
 for s = 1:length(q)
         cost = q(s);
-        perc_correct_temp = NaN(1,nhsims);
-        conf_after_elim_temp = zeros(nstims,nstims,nhsims);
-        eliminatedstims = cell(1,nhsims);
+        perc_correct_temp = NaN;
+        conf_after_elim_temp = zeros(nstims,nstims);
+        eliminatedstims = cell(1);
 
         [dist, eliminatedstimstmp] = dvpcrop(trains_all,target,trains_stims, resplen, pre_stim+win_after_onset,cost);
         conf = zeros(nstims);
@@ -56,12 +56,11 @@ for s = 1:length(q)
             end
         end
 
-        conf_after_elim_temp(:,:,hsim) = conf(~ismember(stims,eliminatedstimstmp),~ismember(stims,eliminatedstimstmp));
-        eliminatedstims{hsim} = eliminatedstimstmp;
+        conf_after_elim_temp(:,:) = conf(~ismember(stims,eliminatedstimstmp),~ismember(stims,eliminatedstimstmp));
        
         % Abramson 1963 transmitted information from confusion matrix
         tmp = 0;
-        C = conf_after_elim_temp(:,:,hsim);
+        C = conf_after_elim_temp(:,:);
         C = C+0.0001;
         for a = 1:nstims
             for b = 1:nstims
@@ -69,9 +68,8 @@ for s = 1:length(q)
             end
         end
         H(s) = 1/length(trains_all)* tmp;
-        perc_correct_temp(hsim) = trace(conf_after_elim_temp(:,:,hsim))/sum(sum(conf_after_elim_temp(:,:,hsim)));    
+        perc_correct_temp = trace(conf_after_elim_temp(:,:))/sum(sum(conf_after_elim_temp(:,:)));    
 
-        eliminatedstims = eliminatedstims{1};
         conf_after_elim(:,:,s) = mean(conf_after_elim_temp,3);
         if plotornot
                figure

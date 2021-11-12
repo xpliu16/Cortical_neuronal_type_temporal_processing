@@ -1,5 +1,5 @@
 function [outputs, centers, N, centers2,N2,log_ISI_list,prestim_total_time,...
-    nint,logISIskewness] = spktr(D,file,ch,stims,reps,binsize_ms,min_intervals,ana_period,plotornot)
+    nint] = spktr(D,file,ch,stims,reps,binsize_ms,min_intervals,ana_period,calc_params,plotornot)
 % SPKTR Spike train autocorrelation and other analyses
 % Compute all-order spike interval histogram
 
@@ -145,6 +145,7 @@ if (nint < min_intervals) || (notconsec == 1)
     outputs.logISIdrop = NaN;
     outputs.centers2 = NaN;
     outputs.N2 = NaN;
+    outputs.logISIskewness = NaN;
     return
 end
     
@@ -157,7 +158,7 @@ edges2 = 0:0.1:10;
 [N2,edges2] = histcounts(log_ISI_list,edges2);
 centers2 = mean([edges2(1:end-1);edges2(2:end)]);
 
-if max(strcmp(ana_period,{'pre','post'}))   
+if calc_params == 0  
     % Don't calculate these before pooling across files, 
     % since each ana_period likely has inadequate intervals
     outputs.yautocorr = NaN;
@@ -179,6 +180,7 @@ if max(strcmp(ana_period,{'pre','post'}))
     outputs.dip = NaN;
     outputs.percISI5ratio = NaN;
     outputs.logISIdrop = NaN;
+    outputs.logISIskewness = NaN;
     return
 end
 
@@ -362,6 +364,7 @@ outputs.dip_p_value = dip_p_value;
 outputs.dip = dip;
 outputs.percISI5ratio = percISI5ratio;
 outputs.logISIdrop = logISIdrop;
+outputs.logISIskewness = logISIskewness;
 
 % Based on Rohan Parikh (2018) Appendix
 % Regularity - variance of the ratio between consecutive ISIs
