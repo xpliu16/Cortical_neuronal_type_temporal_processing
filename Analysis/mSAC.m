@@ -1,4 +1,4 @@
-function [CI_max, CI_avg, CI_log, baseline_rate_mean, responsive_stims, outlier_rejected, response_rate_mean] = mSAC(inputs)
+function [CI_max, CI_avg, CI_log, baseline_rate_mean, responsive_stims, rateresp_len, PSTHresp_len, outlier_rejected, response_rate_mean, top_20_frac] = mSAC(inputs)
 % Shuffled autocorrelogram calculation based on Joris et al., 2003, 2006
 % Checked with Joris 2006 code outputs
 
@@ -17,9 +17,7 @@ catch
 end
 
 filedir = ['C:\Experiments\' file(1:end-4) '\Spikes'];
-if ~exist(filedir,'dir')
-    filedir = ['C:\Users\Seth\Desktop\Experiments\' file(1:5) '\Spikes'];
-end
+
 cd (filedir)
 unitID = [file 'ch' num2str(ch)];
 
@@ -105,11 +103,12 @@ centers1 = centers1(2:end);
 Nnorm = N / length(events_per_bin);
 lambdahat = poissfit(events_per_bin);
 
+response_PSTH_all = [];
 for s = 1:nstims   
     % Decide whether the unit is responsive to this stimulus
     response = psth_cells{s} ((psth_cells{s}(:,1)>((pre_stim+win_after_onset)/1000))...
         &(psth_cells{s}(:,1)<(pre_stim+stim_len(stims(s))+win_after_offset)/1000),2);
-    
+    response_PSTH_all = [response_PSTH_all;response];
     if plotornot
         figure;
         bar(centers1,Nnorm);      
@@ -132,11 +131,16 @@ for s = 1:nstims
     rate_thresh_dec = baseline_rate_mean2-3*(scaled_baseline_rate_std/sqrt(nreps));
     if strcmp(response_type, 'excited')
         rateresp(s) = response_rate_mean(s)> rate_thresh_inc;
+    elseif strcmp (response_type, 'inhibited')
+        rateresp(s) = response_rate_mean(s) < rate_thresh_dec;
     elseif strcmp(response_type, 'modulated')
         rateresp(s) = response_rate_mean(s) > rate_thresh_inc || ...
             response_rate_mean(s) < rate_thresh_dec;
     end
-        
+    
+    rateresp_len = length(find(rateresp));
+    PSTHresp_len = length(find(PSTHresp));
+    
     responsive(s) = PSTHresp(s)||rateresp(s) && enough_spikes(s);
     
     CI_log(s,1) = stims(s);
@@ -182,6 +186,8 @@ for s = 1:nstims
         end
     end
 end
+
+top_20_frac = 1-prctile(response_PSTH_all,5)/length(response_PSTH_all);
 
 responsive_stims = stims(find(responsive));
 

@@ -3,8 +3,7 @@ tuning_stims_opt = {'10','3','3'};
 units_lessopt = {'M7E0488ch1','M7E2129ch1','M7E2256ch1'};   % Less optimal stimulus
 tuning_stims_lessopt = {'11','22','5'};
 
-units_std_tuning = {'M7E0483ch1','M7E2129ch1','M7E2255ch1'};
-
+units_std_tuning = {{'M7E0484ch1','M7E0485ch1'},{'M7E2129ch1'},{'M7E2255ch1'}};
 
 units_call_types = {'M7E0499ch1','M7E2130ch1','M7E2254ch1'};
 
@@ -115,25 +114,33 @@ end
 for i = 1:length(units_std_tuning)
     pos_row1 = get(ax_row1b(i),'Position');
     ax_row2(i) = axes('Position', [pos_row1(1), pos_row1(2)-((pos_row1(4)+yexpand)*0.7)-interrow, pos_row1(3), (pos_row1(4)+yexpand)*0.76]);
-     
-    file = units_std_tuning{i}(1:end-3); channel = str2num(units_std_tuning{i}(end)); stims = 1:31; reps = 1:10;
-    try
-        D = eval (file);
-    catch
-        mfilename_m = strcat(file, '.m');
-        D=header_reader_mfile(mfilename_m);    % If file is incomplete so data matrix is irregular shaped, use this alternative reader, ignores final incomplete data line
+    xautocorr = [];
+    yautocorr = [];
+    for j = 1:length(units_std_tuning{i})    
+        file = units_std_tuning{i}{j}(1:end-3); channel = str2num(units_std_tuning{i}{j}(end)); stims = 1:31; reps = 1:10;
+        if i == 1
+            reps = 1:7;
+        end
+        try
+            D = eval (file);
+        catch
+            mfilename_m = strcat(file, '.m');
+            D=header_reader_mfile(mfilename_m);    % If file is incomplete so data matrix is irregular shaped, use this alternative reader, ignores final incomplete data line
+        end
+        [outputs, centers, N,centers2,N2,log_ISI_list,prestim_total_time,nint]...
+        = spktr(D,file,channel,stims,reps,0.5,50,'all',1,0,0.5); 
+        xautocorr(j,:) = [-1*fliplr(outputs.xautocorr) outputs.xautocorr];
+        yautocorr(j,:) = [fliplr(outputs.yautocorr) outputs.yautocorr];
     end
-    [outputs, centers, N,centers2,N2,log_ISI_list,prestim_total_time,nint]...
-    = spktr(D,file,channel,stims,reps,0.5,50,'all',1,0); 
-    xautocorr = [-1*fliplr(outputs.xautocorr) 0 outputs.xautocorr];
-    yautocorr = [fliplr(outputs.yautocorr) 0 outputs.yautocorr];
+    xautocorr = sum(xautocorr,1);
+    yautocorr= sum(yautocorr,1);
     hb = bar(xautocorr,yautocorr,1,'FaceColor',Color_i{i},'FaceAlpha',0.7);
     ax_row2(i).FontSize = figparams.fsize;
     ax_row2(i).FontName = figparams.fontchoice;
     set(gca,'xlim',[-50 50]);
     [val,ind] = max(find(outputs.xautocorr<= 50));
     set(gca,'ylim',[0 max(outputs.yautocorr(1:ind))*1.1]);
-    set(gca,'xtick',[0,10,20,30,40,50]);
+    set(gca,'xtick',[-50,0,50]);
     lh = xlabel('ms');
     set(lh,'Units','normalized');
     lh_pos = get(lh,'Position');
@@ -153,7 +160,7 @@ for i = 1:length(units_std_tuning)
     hb2 = bar(centers2,N2,1,'FaceColor',Color_i{i},'FaceAlpha',0.7,'EdgeColor','none');
     ax_row3(i).FontSize = figparams.fsize;
     ax_row3(i).FontName = figparams.fontchoice;
-    set(gca,'xlim',[-0.3,4]);
+    set(gca,'xlim',[0,4]);
     set(gca,'XTick', [0 2 4]);
     set(gca,'ylim',[0 max(N2(centers2<4))*1.1]);
     
@@ -176,17 +183,28 @@ for i = 1:length(units_std_tuning)
     pos_row3 = get(ax_row3(i),'Position');
     ax_row4(i) = axes('Position', [pos_row3(1), pos_row3(2)-pos_row2(4)-interrow, pos_row3(3)*0.3, pos_row3(4)]);
 
-    file = units_std_tuning{i}(1:end-3); channel = str2num(units_std_tuning{i}(end)); stims = 1:31; reps = 1:10;
+    for j = 1:length(units_std_tuning{i}) 
+        file = units_std_tuning{i}{j}(1:end-3); channel = str2num(units_std_tuning{i}{j}(end)); stims = 1:31; reps = 1:10;
+        ad2_file = {['C:\Experiments\' file(1:end-4) '\Ad2\' file '.ad2']};
+        if i == 1
+            reps = 1:6;
+        end
+        [traces,psth_cells,output] = plotad2 (ad2_file, stims, reps, 'spikes', 0, channel, ms_after_peak_nospike, 0, 'extra', [file 'ch' num2str(channel)], 10, 1,0);
+        sp_wave(j,:) = output.sp_wave;
+        sp_wave_count(j) = output.sp_wave_count;
+        ttp(j) = output.ttp_ms;
+    end
     
-    [traces,psth_cells,output] = plotad2 ({['C:\Experiments\' file(1:end-4) '\Ad2\' file '.ad2']}, stims, reps, 'spikes', 0, channel, ms_after_peak_nospike, 0, 'extra', [file 'ch' num2str(channel)], 10, 1,0);
-                          
+    sp_wave_avg = sp_wave_count*sp_wave./sum(sp_wave_count);
+    TTP = mean(ttp);
+     
     output.t_shifted = output.t_shifted-0.3;
-    plot(output.t_shifted(100:180),output.sp_wave(100:180), 'color',Color_i{i},'LineWidth',0.8);
+    plot(output.t_shifted(100:180),sp_wave_avg(100:180), 'color',Color_i{i},'LineWidth',0.8);
     ax_row4(i).FontSize = figparams.fsize;
     ax_row4(i).FontName = figparams.fontchoice;
     set(gca,'xlim',[output.t_shifted(100) output.t_shifted(180)]);
-    ymin = min(output.sp_wave(100:180));
-    ymax = max(output.sp_wave(100:180));
+    ymin = min(sp_wave_avg(100:180));
+    ymax = max(sp_wave_avg(100:180));
     set(gca,'ylim',[ymin-0.1*(ymax-ymin), ymax+0.1*(ymax-ymin)]);  
     
     set(gca,'xtick',[0 1]);
@@ -202,9 +220,9 @@ for i = 1:length(units_std_tuning)
         lh4 = ylabel('Spike','FontSize', figparams.fsize_big);
         txh = annotation('textbox','Position',[ax_row1(1).Position(1)-0.17*ax_row1(1).Position(3),ax_row4(1).Position(2)+ax_row4(1).Position(4)+0.03,0,0],'String','B','FontSize',figparams.fsize+2,'FontName',figparams.fontchoice, 'FontWeight','Bold','EdgeColor','none');       
         hold on
-        TTP = output.ttp_ms;     % Peakfinder fails on the broad toothy peak here, so calculated using max and min
+        %TTP = output.ttp_ms;     % Peakfinder fails on the broad toothy peak here, so calculated using max and min
         an = annotation('doublearrow');
-        [val,ind] = min(output.sp_wave);
+        [val,ind] = min(sp_wave_avg);
         tmin = output.t_shifted(ind);
         an.Parent = gca;
         an.Position = [tmin, val*1.05, TTP,0];
@@ -262,7 +280,7 @@ end
 for i = 1:length(units_call_types)
     pos_row5 = get(ax_row5(i),'Position');
     pos_row1 = get(ax_row1(i),'Position');
-    ax_row6(i) = axes('Position', [pos_row1(1), pos_row5(2)-(pos_row1(4)+yexpand+0.02)-interrow, pos_row1(3), pos_row1(4)+yexpand+0.04]);
+    ax_row6(i) = axes('Position', [pos_row1(1), pos_row5(2)-(pos_row1(4)+yexpand+0.02)-interrow-0.02, pos_row1(3), pos_row1(4)+yexpand+0.04]);
     
     plot_raster ({units_call_types{i}(1:end-3)}, str2num(units_call_types{i}(end)), '1:20', '1:10', '', '', '', 'single', 1, 0, 0, [], fig1, 1,'diamond',1);
     ax_row6(i).FontSize = figparams.fsize;
