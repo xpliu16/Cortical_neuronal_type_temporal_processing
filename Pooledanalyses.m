@@ -2144,7 +2144,7 @@ switch ana_type
         figparams.msize = 7;
         figparams.res = 300;
         figparams.fontchoice = 'Arial';
-        lmargin = 0.09;
+        lmargin = 0.075;
         tmargin = 0.958;
         xwidth = 0.285;
         ywidth = 0.21;
@@ -2152,7 +2152,7 @@ switch ana_type
         interrow = 0.03;
         intercol = 0.03;
         
-        axf8p1 = axes(fig8,'Position',[lmargin tmargin-ywidth 0.2222 ywidth]);
+        axf8p1 = axes(fig8,'Position',[lmargin tmargin-ywidth 0.245 ywidth]);
         
         resp_len_RS = resp_stims_rate_len(RSinds)/20;
         resp_len_FS = resp_stims_rate_len(FSinds)/20;
@@ -2165,27 +2165,29 @@ switch ana_type
         
         hold on
         error_format = {'Color',[0.45 0.45 0.45],'LineWidth',0.8,'CapSize',3};
-        bar(1.1, nanmean(resp_len_RS),0.7,'FaceColor',RSColor,'FaceAlpha',0.7,'EdgeColor','none');
-        errorbar(1.1,nanmean(resp_len_RS),nanstd(resp_len_RS)/sqrt(length(find(~isnan(resp_len_RS)))),error_format{:});
-        bar(1.9, nanmean(resp_len2_RS),0.7,'FaceColor',RSColor,'FaceAlpha',0.3,'EdgeColor','none');
-        errorbar(1.9,nanmean(resp_len2_RS),nanstd(resp_len2_RS)/sqrt(length(find(~isnan(resp_len2_RS)))),error_format{:});    
-        bar(3.1, nanmean(resp_len_FS),0.7,'FaceColor',FSColor,'FaceAlpha',0.7,'EdgeColor','none');
-        errorbar(3.1,nanmean(resp_len_FS),nanstd(resp_len_FS)/sqrt(length(find(~isnan(resp_len_FS)))),error_format{:});
-        bar(3.9, nanmean(resp_len2_FS),0.7,'FaceColor',FSColor,'FaceAlpha',0.3,'EdgeColor','none');
-        errorbar(3.9,nanmean(resp_len2_FS),nanstd(resp_len2_FS)/sqrt(length(find(~isnan(resp_len2_FS)))),error_format{:});    
-        bar(5.1, nanmean(resp_len_Bu1),0.7,'FaceColor',Bu1Color,'FaceAlpha',0.7,'EdgeColor','none');
-        errorbar(5.1,nanmean(resp_len_Bu1),nanstd(resp_len_Bu1)/sqrt(length(find(~isnan(resp_len_Bu1)))),error_format{:});
-        bar(5.9, nanmean(resp_len2_Bu1),0.7,'FaceColor',Bu1Color,'FaceAlpha',0.3,'EdgeColor','none');
-        errorbar(5.9,nanmean(resp_len2_Bu1),nanstd(resp_len2_Bu1)/sqrt(length(find(~isnan(resp_len2_Bu1)))),error_format{:}); 
-        bar(7.1, nanmean(resp_len_Bu2),0.7, 'FaceColor',Bu2Color,'FaceAlpha',0.7,'EdgeColor','none');
-        errorbar(7.1,nanmean(resp_len_Bu2),nanstd(resp_len_Bu2)/sqrt(length(find(~isnan(resp_len_Bu2)))),error_format{:});
-        bar(7.9, nanmean(resp_len2_Bu2),0.7,'FaceColor',Bu2Color,'FaceAlpha',0.3,'EdgeColor','none');
-        errorbar(7.9,nanmean(resp_len2_Bu2),nanstd(resp_len2_Bu2)/sqrt(length(find(~isnan(resp_len2_Bu2)))),error_format{:});
+        bar(1, nanmean(resp_len_RS),0.7,'FaceColor',RSColor,'FaceAlpha',0.5,'EdgeColor','none');
+        errorbar(1,nanmean(resp_len_RS),nanstd(resp_len_RS)/sqrt(length(find(~isnan(resp_len_RS)))),error_format{:});
+        bar(5.5, nanmean(resp_len2_RS),0.7,'FaceColor',RSColor,'FaceAlpha',0.5,'EdgeColor','none');
+        errorbar(5.5,nanmean(resp_len2_RS),nanstd(resp_len2_RS)/sqrt(length(find(~isnan(resp_len2_RS)))),error_format{:});    
+        bar(2, nanmean(resp_len_FS),0.7,'FaceColor',FSColor,'FaceAlpha',0.5,'EdgeColor','none');
+        errorbar(2,nanmean(resp_len_FS),nanstd(resp_len_FS)/sqrt(length(find(~isnan(resp_len_FS)))),error_format{:});
+        bar(6.5, nanmean(resp_len2_FS),0.7,'FaceColor',FSColor,'FaceAlpha',0.5,'EdgeColor','none');
+        errorbar(6.5,nanmean(resp_len2_FS),nanstd(resp_len2_FS)/sqrt(length(find(~isnan(resp_len2_FS)))),error_format{:});    
+        bar(3, nanmean(resp_len_Bu1),0.7,'FaceColor',Bu1Color,'FaceAlpha',0.5,'EdgeColor','none');
+        errorbar(3,nanmean(resp_len_Bu1),nanstd(resp_len_Bu1)/sqrt(length(find(~isnan(resp_len_Bu1)))),error_format{:});
+        bar(7.5, nanmean(resp_len2_Bu1),0.7,'FaceColor',Bu1Color,'FaceAlpha',0.5,'EdgeColor','none');
+        errorbar(7.5,nanmean(resp_len2_Bu1),nanstd(resp_len2_Bu1)/sqrt(length(find(~isnan(resp_len2_Bu1)))),error_format{:}); 
+        bar(4, nanmean(resp_len_Bu2),0.7, 'FaceColor',Bu2Color,'FaceAlpha',0.5,'EdgeColor','none');
+        errorbar(4,nanmean(resp_len_Bu2),nanstd(resp_len_Bu2)/sqrt(length(find(~isnan(resp_len_Bu2)))),error_format{:});
+        bar(8.5, nanmean(resp_len2_Bu2),0.7,'FaceColor',Bu2Color,'FaceAlpha',0.5,'EdgeColor','none');
+        errorbar(8.5,nanmean(resp_len2_Bu2),nanstd(resp_len2_Bu2)/sqrt(length(find(~isnan(resp_len2_Bu2)))),error_format{:});
 
         lh1 = ylabel('Fraction calls responsive');   % Clarify rate responsive
-        set(gca,'xlim',[0.5 8.5],'xtick',[1.5,3.5,5.5,7.5],'xticklabels',{'RS','FS','Bu1','Bu2'},'ytick',[0 0.1 0.2 0.3 0.4 0.5]);
+        set(gca,'xlim',[0.5 9],'xtick',[1,2,3,4,5.5,6.5,7.5,8.5],'xticklabels',{'RS','FS','Bu1','Bu2','RS','FS','Bu1','Bu2'},...
+            'ytick',[0 0.1 0.2 0.3 0.4 0.5]);
+        xl1 = xlabel('Mean rate              PSTH   ',fontstr{:});
         
-        axf8p2 = axes(fig8,'Position',[lmargin+axf8p1.Position(3)+2*(intercol+0.011) tmargin-ywidth axf8p1.Position(3)*9/8 ywidth]);
+        axf8p2 = axes(fig8,'Position',[lmargin+axf8p1.Position(3)+2*(intercol+0.011) tmargin-ywidth axf8p1.Position(3) ywidth]);
           
         CImax_RS = CImax_plusprestim(RSinds);
         hb1 = bar(1, mean(CImax_RS,'omitnan'),0.7);
@@ -2265,7 +2267,7 @@ switch ana_type
         ylabel('CI_M_A_X',fontstr{:});
         set(gca,'Xtick',[1,2,3,4,5,6.5,7.5,8.5],'XTickLabel',{'RS', 'FS', 'Bu1', 'Bu2', 'PBu', 'RS', 'FS', 'Bu'},fontstr{:});
         set(gca,'xlim',[0.5,9]);
-        xlabel('   Criteria                       GMM  ',fontstr{:});
+        xlabel('   Criteria                      GMM  ',fontstr{:});
 
         % Doesn't fit on shortest bars
         %{
@@ -2280,7 +2282,7 @@ switch ana_type
         text(9,3,num2str(length(find(~isnan(CImax_Bu_GMM)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
         %}
         
-        axf8p3 = axes(fig8,'Position',[lmargin+axf8p1.Position(3)+axf8p2.Position(3)+3*(intercol+0.025) tmargin-ywidth 0.265 ywidth]);
+        axf8p3 = axes(fig8,'Position',[lmargin+axf8p1.Position(3)+axf8p2.Position(3)+3*(intercol+0.025) tmargin-ywidth 0.26 ywidth]);
         [B,CImaxsortind] = sort(CImax,'descend','MissingPlacement','last');
 
         groupnumsorted = groupnumcrit(CImaxsortind);
@@ -2477,10 +2479,10 @@ switch ana_type
                 
         ywidth = 0.2;
         ywidth2 = 0.23;
-        xwidthr = 0.2025; 
-        xwidth = 0.26;
+        xwidthr = 0.2052; 
+        xwidth = 0.265;
         bmargin = 0.08;
-        lmargin = 0.09;
+        lmargin = 0.075;
         intercol = 0.03;
         intercol2 = 0.06;
         interrow = 0.12;
@@ -2490,7 +2492,7 @@ switch ana_type
         g2=  [133 195 10]/255;
         g1=  [0,132,55]/255;
         
-        figure(fig8);        
+        figure(fig8);   
         
         [spk_ms, D, stim_len, pre_stim, post_stim, stims, stim_file, analysis_type, last_rep_complete, last_rep_stims, stimulus_ch1,reps, stimulus_ch2] = get_spikes_xpl ('M117B0334', 4, 1:20, 1:10);
 
