@@ -1,11 +1,27 @@
 function [r,f,centers,bf] = raster_heatmap (spk_ms, D, stim_len, pre_stim, post_stim, channel, stims, reps, t_binsize, t_alignment, level, bf_recenter, ana_window, normalize, plotornot)
-% Plot heatmap of average response, recenters to best frequency if
-% bf_recenter is 1
+% raster_heatmap.m Calculate and plot heatmap of smoothed average response, 
 
-% t_binsize (ms) - time bin for histogram
-% t_alignment - align responses to stimulus 'onset' or 'offset'
-% t_smooth_span - # of points used to calculate each smoothed point
-% Normalize - scale peak rate at BF to 1
+% Inputs:
+%   spk_ms       : timestamps of each spike taken from lab 
+%                  standard format (matrix in cell array)
+%                  columns are: 
+%                       stimulus, repetition, MSD channel, time
+%   D            : spike times all data and header (struct)
+%   stim_len     : stimulus duration in ms (scalar)
+%   pre_stim     : pre-stimulus time in ms (scalar)
+%   post_stim    : post-stimulus time in ms (scalar)
+%   channel      : channel of spike trigger to use (scalar) 
+%   stims        : stimulus numbers to use (vector)
+%   reps         : repetition numbers to use (vector)
+%   t_binsize    : time bin for histogram in ms (scalar)
+%   t_alignment  : align responses to stimulus 'onset' or 'offset'
+%   level        : use only stimuli with this sound level (scalar)
+%   bf_recenter  : recenter to best frequency (logical)
+%   ana_window   : analysis window [ms after start of stimulus, ms after end] 
+%   normalize    : scale peak rate at BF to 1 (logical)
+%   plotornot    : make figures or suppress for batch (logical)
+
+
 % For BF recentered, f returned are ratios to BF, with f = 1 being BF
 
 % If FRA, extract particular sound level response from it

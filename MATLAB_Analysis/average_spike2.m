@@ -1,32 +1,25 @@
 function  [spike_avg, spike_t_shifted, spike_t_shifted2, spike_count] = average_spike2(spk_ms, traces, t, SR_ms, stimindices, repindices, pre_stim, post_stim, stim_len, options)
-% average_spike.m Computes average spike waveform
+% average_spike2.m Computes average spike waveform
 
 % Inputs:
 %   options     : a struct containing 
 %       multispikes   : 1 to allow spikes with adjacent spikes, 0 for only isolated spikes
-%       ms_after_peak :
 %       plotornot     : plot outputs for debugging and checking, turn off for batch
 %
 % Outputs:
-
-
-% options
-%   spk_ms   : matrix with timestamps of each spike in lab standard format
-%              columns are:    
-% spike_t_shifted: matrix with shifted traces of each qualifying spike
-
-% spike_t_shifted2: same, but filtered at 100 to 10000 Hz rather than 1 to
-% 10000 Hz
-
+%   spike_avg        : average spike waveform (vector)
+%   spike_t_shifted  : spike_t_shifted  : time shifted traces of each qualifying spike, filtered 1 Hz to 10 kHz (matrix)
+%   spike_t_shifted2 : shifted traces of each spike, filtered 100 Hz to 5 kHz (matrix)
+%   spike_count      : number of qualifying spikes (scalar)
 
 % set window around the peak
 
 file_n = size(traces,1);
-ms_after_peak = options.ms_after_peak;
 align_win = options.align_win;
 multispikes = options.multispikes;
 ms_before_peak = options.ms_before_peak;     % for TTP
 ms_before_peak_nospike = options.ms_before_peak_nospike;
+ms_after_peak_nospike = options.ms_after_peak_nospike
 if options.long == 1
     ms_before_peak = options.ms_before_peak_long;     
     ms_before_peak_nospike = options.ms_before_peak_nospike_long;
@@ -68,19 +61,17 @@ for i = 1:length(stimindices)
                 if multispikes == 1
                     postnospike = 0;      % Post spikes permitted (for seeing bursts on bursting neurons)
                 else
-                    postnospike = ms_after_peak;   % no following spikes within ms_after_peak (better for calculating PTP)
+                    postnospike = ms_after_peak_nospike;   % no following spikes within x ms (better for calculating PTP)
                 end
                 
-                if (isi(k)>ms_before_peak_nospike) && (isi(k+1)>postnospike) && (spk_ms_sub(k,4)>ms_before_peak) && (spk_ms_sub(k,4)< (t{i}(end)-ms_after_peak))    
-                    spike_t = t{i}(ind-round(ms_before_peak*SR_ms): ind+round(ms_after_peak*SR_ms));
-
-                    % check that there aren't multiple spikes in this
-                    % window
+                if (isi(k)>ms_before_peak_nospike) && (isi(k+1)>postnospike) && (spk_ms_sub(k,4)>ms_before_peak) && (spk_ms_sub(k,4)< (t{i}(end)-ms_after_peak_nospike))    
+                    spike_t = t{i}(ind-round(ms_before_peak*SR_ms): ind+round(ms_after_peak_nospike*SR_ms));
+                    % Check that there aren't multiple spikes in this window
                     
                     tr_filt = filtfilt(B_Spike,1,tr);    % Zero phase
                     tr_filt2 = filtfilt(B_Spike2,1,tr);    % Narrower
-
-                    spike_seg = tr_filt(ind-round(align_win*SR_ms): ind+round(align_win*SR_ms));   
+                    spike_seg = tr_filt(ind-round(align_win*SR_ms): ind+round(align_win*SR_ms));
+                    
                     % Align by max slope
                     [maxdifftemp,ind2] = max(diff(spike_seg));
                     [mindifftemp,ind3] = min(diff(spike_seg));
@@ -88,7 +79,7 @@ for i = 1:length(stimindices)
                     ind_shift_up = ceil(length(spike_seg)/2)-ind2;
                     ind_shift_down = ceil(length(spike_seg)/2)-ind3;
                     if ((ind-round(ms_before_peak*SR_ms)-ind_shift_up) <= 0) || ((ind-round(ms_before_peak*SR_ms)-ind_shift_down) <= 0) ...
-                            || (ind+round(ms_after_peak*SR_ms)-ind_shift_up)>length(tr_filt) || (ind+round(ms_after_peak*SR_ms)-ind_shift_down>length(tr_filt)) 
+                            || (ind+round(ms_after_peak_nospike*SR_ms)-ind_shift_up)>length(tr_filt) || (ind+round(ms_after_peak_nospike*SR_ms)-ind_shift_down>length(tr_filt)) 
                         continue
                     end
                     if multispikes == 0
@@ -119,11 +110,11 @@ for i = 1:length(stimindices)
                     maxdiff(spike_count) = maxdifftemp;
                     mindiff(spike_count) = mindifftemp;
 
-                    spike_t_shifted_up(spike_count,:) = tr_filt(ind-round(ms_before_peak*SR_ms)-ind_shift_up: ind+round(ms_after_peak*SR_ms)-ind_shift_up);                        
-                    spike_t_shifted_down(spike_count,:) = tr_filt(ind-round(ms_before_peak*SR_ms)-ind_shift_down: ind+round(ms_after_peak*SR_ms)-ind_shift_down);                        
+                    spike_t_shifted_up(spike_count,:) = tr_filt(ind-round(ms_before_peak*SR_ms)-ind_shift_up: ind+round(ms_after_peak_nospike*SR_ms)-ind_shift_up);                        
+                    spike_t_shifted_down(spike_count,:) = tr_filt(ind-round(ms_before_peak*SR_ms)-ind_shift_down: ind+round(ms_after_peak_nospike*SR_ms)-ind_shift_down);                        
                     
-                    spike_t_shifted_up2(spike_count,:) = tr_filt2(ind-round(ms_before_peak*SR_ms)-ind_shift_up: ind+round(ms_after_peak*SR_ms)-ind_shift_up);                        
-                    spike_t_shifted_down2(spike_count,:) = tr_filt2(ind-round(ms_before_peak*SR_ms)-ind_shift_down: ind+round(ms_after_peak*SR_ms)-ind_shift_down);                        
+                    spike_t_shifted_up2(spike_count,:) = tr_filt2(ind-round(ms_before_peak*SR_ms)-ind_shift_up: ind+round(ms_after_peak_nospike*SR_ms)-ind_shift_up);                        
+                    spike_t_shifted_down2(spike_count,:) = tr_filt2(ind-round(ms_before_peak*SR_ms)-ind_shift_down: ind+round(ms_after_peak_nospike*SR_ms)-ind_shift_down);                        
                 end
             end    
         end

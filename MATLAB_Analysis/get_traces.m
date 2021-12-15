@@ -10,8 +10,18 @@ function [traces, t, SR_ms, spk_ms, pre_stim, post_stim, stim_len, spont_rate, i
 %
 % Outputs:
 %   traces       : file x stimulus (cell array)
+%   SR_ms        : sampling rate in samples / ms (scalar)
+%   spk_ms       : matrix with timestamps of each spike taken from lab 
+%                  standard format (matrix in cell array)
+%                  columns are: 
+%                       stimulus, repetition, MSD channel, time     
+%   pre_stim     : pre-stimulus time in ms (scalar)
+%   post_stim    : post-stimulus time in ms (scalar)
+%   stim_len     : stimulus duration in ms (scalar)
 %   spont_rate   : spontaneous firing rate (spk/s)
 %   id_str       : file name and datetime (array of strings)
+%
+
 
 if iscell(filename)
     file_n = max(size(filename));

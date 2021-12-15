@@ -1,10 +1,20 @@
 function [outputs, centers, N, centers2,N2,log_ISI_list,prestim_total_time,...
     nint] = spktr(D,file,ch,stims,reps,binsize_ms,min_intervals,ana_period,calc_params,plotornot,ac_shift)
-% SPKTR Spike train autocorrelation and other analyses
-% Compute all-order spike interval histogram
+% spktr.m Spike train autocorrelation and other spike timing analyses
+% 
+% Inputs:
+%   D              : data and info from evaluating data file name (struct)
+%   file           : filename (string)
+%   ch             : MSD spike trigger channel (scalar)
+%   stims          : stimulus numbers to use (vector)
+%   reps           : repetition numbers to use (vector)
+%   binsize_ms     : bin size for ISI analysis  (scalar)
+%   min_intervals  : minimum number of ISI's to qualify for analysis (scalar)
+%   ana_period     : what portion to analyze: 'all', 'pre','stim', or 'post'
+%   calc_params    : do not calculate if pooling first (logical)
+%   plotornot      : make plots or not (for batch processing) (logical)
+%   ac_shift       : shift autocorrelogram bins for better visualization 
 
-% spk_ms_cont is from D = eval('xxxx.m') - not unwrapped by trial, unless
-% to separate by stim and prestim
 
 % Centers2 and N2 are x and y for log(ISI) histogram
 

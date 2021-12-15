@@ -23,9 +23,6 @@ for j = 1:nstims
         trains_stims{j} = trains_stims{j}(trains_stims{j}>((pre_stim+win_after_onset)));
         try
         trains_stims{j} = trains_stims{j}(trains_stims{j}<(pre_stim+stim_len(stims(j))+win_after_offset));
-        catch
-            display('foo');
-        end 
         i = i+1;
     end
 end

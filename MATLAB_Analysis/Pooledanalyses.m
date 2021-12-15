@@ -1,10 +1,12 @@
+% Pooledanalyses.m Final data analysis pooling multiple subjects
+% Select analysis mode with ana_type
+
 data_log_dir = 'C:/Users/Ping/Desktop/AC_type_project';
 data_log_file = {[data_log_dir '/data/M7E_unit_log.xlsx']...
                 ,[data_log_dir './data/M117B_unit_log.xlsx']};
             
 mat_dir = 'C:/Users/Ping/Desktop/Analysis_practice/';
 figdir = 'C:/Users/Ping/Desktop/Wang_lab/Paper_writing/Figures/';
-%figdir = '.\Figures\';
 xlsrange = {'A1:JZ657','A1:JZ400'};
 animalID = {'M7E', 'M117B'};
 

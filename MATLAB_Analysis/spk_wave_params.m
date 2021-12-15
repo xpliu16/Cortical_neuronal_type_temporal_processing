@@ -2,13 +2,17 @@ function [output] = spk_wave_params (spike_avg, spike_t_shifted, spike_t_shifted
 % spk_wave_params.m Extracts spike waveform features from average spike 
 %
 % Inputs:
-%   avg_spk     : a vector containing the average spike waveform
-%   SR_ms          : a scalar describing sampling rate (samples/ms) 
+%   spike_avg        : average spike waveform (vector)
+%   spike_t_shifted  : time shifted traces of each qualifying spike, filtered 1 Hz to 10 kHz (matrix)
+%   spike_t_shifted2 : shifted traces of each spike, filtered 100 Hz to 5 kHz
+%   spike_count      : number of qualifying spikes (scalar)
+%   spike_avg_long   : average spike, longer segment, for FFT baseline
+%   SR_ms            : a scalar describing sampling rate (samples/ms) 
 %
 % Outputs:
-%
+%   output           : spike waveform parameters (struct)
 
-search_win = 2.5;   % Look for peaks within +/- this window (ms)
+search_win = options.search_win;   % Look for peaks within +/- this window (ms)
 ms_before_peak = options.ms_before_peak;
 ms_before_peak_long = options.ms_before_peak_long;
 search_seg = spike_avg(round((ms_before_peak-search_win)*SR_ms):round((ms_before_peak+search_win)*SR_ms));
@@ -21,7 +25,6 @@ if plotornot    % For plotting sample of individual spikes
 end
 
 if isempty(spike_avg)
-    % goes off of first stim for simplicity
     output.spupdown = NaN;
     output.ptp_amp = NaN;
     output.ptp_ms = NaN;
@@ -74,16 +77,12 @@ end
 
 if (abs(min(peakmagdown)-mode) > abs(max(peakmagup)-mode))
     output.spupdown = -1;    
-    'down'
 elseif abs(min(peakmagdown)-mode) < abs(max(peakmagup)-mode)
     output.spupdown = 1;
-    'up'
 elseif ~isempty(peakmagdown) && isempty(peakmagup)
     output.spupdown = -1;   
-    'down'
 elseif isempty(peakmagdown) && ~isempty(peakmagup)
     output.spupdown = 1;
-    'up'
 else
     output.spupdown = NaN;
 end
@@ -175,6 +174,7 @@ elseif output.spupdown == 1
     else
         output.ptp2_ms = peakind/SR_ms; 
     end
+    
     % Half-amplitude duration
     xq = 0:0.05:length(search_seg);
     s10x = spline(1:length(search_seg),search_seg,xq);
@@ -185,7 +185,7 @@ elseif output.spupdown == 1
         plot(xq,s10x,'.r');
     end
     if halfampptp == 1   % Calculate based on PTP and only for noninverted spikes)
-        output.halfampdur = NaN;     % Doesn't make sense to compute for inverted spikes   
+        output.halfampdur = NaN;       
     elseif ~isempty(peakvaldown) & (peakinddown > peakindup) & (peakvaldown < pre_baseline)  % Make sure you pick the right down peak, should be after peak up for inverted spike
         halfamp = peakvaldown+(pre_baseline-peakvaldown)/2;     % Calculate for negative peak back to baseline
         [val,peakinddown10x] = min(s10x); 
@@ -238,12 +238,15 @@ end
 
 ind_max_backg = min(find(t_shifted>min(t_shifted)+ms_before_peak-3));
 
+% Signal-to-noise
 if ~exist('sp_wave','var')   % Computing from file, not from collated avg spike
-    output.SNR = 20*log10(mean(max(spike_t_shifted2,[],2)-min(spike_t_shifted2,[],2))/mean(std(spike_t_shifted2(:,1:ind_max_backg),0,2)));    % Peak-to-peak amplitude of spike divided by STD of background
+    output.SNR = 20*log10(mean(max(spike_t_shifted2,[],2)-min(spike_t_shifted2,[],2))/mean(std(spike_t_shifted2(:,1:ind_max_backg),0,2)));    
+    % Peak-to-peak amplitude of spike divided by STD of background,
+    % filtered 100 Hz to 5 kHz
 end
 output.SNR_avg = 20*log10(output.ptp_amp/std(spike_avg(1:ind_max_backg)));
 
-% FFT resolution
+% Spike spectrum
 spk_seg_fft = spike_avg_long((t_shifted_long>-2) & (t_shifted_long<6));
 wind = hann(length(spk_seg_fft));
 Y = fft(spk_seg_fft.*wind',4*length(wind));      % zero pad
@@ -296,7 +299,7 @@ if plotornot
     ylabel('|P1(f)|')
 end
 
- output.centroid = sum(pxx_spike.*f)/sum(pxx_spike);
+output.centroid = sum(pxx_spike.*f)/sum(pxx_spike);
 ind = length(find(f<4000));
 
 inds = find(f > 400);   % Greater than ~400 Hz - often weird noise peaks below that
@@ -334,6 +337,7 @@ fscrop = fs(fs>fslow & fs<fshigh);
 foo = fscrop(ind);
 output.fspsp = 1/foo;
 
+% Plot aligned example spikes
 if plotornot
     figure
     plot_every_nth = ceil(spike_count/(display_rows*display_columns));    % These spike counts are for averaged in spikes, which eliminates many candidate spikes, so don't use to get firing rate

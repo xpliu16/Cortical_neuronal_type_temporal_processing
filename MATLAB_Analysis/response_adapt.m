@@ -1,6 +1,20 @@
 function [adaptratio, nss] = response_adapt(file,ch,stims,reps,ana_window,binsize,plotornot)
-% Analyze response duration
-% Adaptratio: metric of sustained versus transient response
+% response_adapt.m Analyze response duration and adaptation
+% 
+% Inputs:
+%   file         : executable filename of .m file (string)
+%   ch           : channel of spike trigger to use (scalar) 
+%   stims        : stimulus numbers to use (vector)
+%   reps         : repetition numbers to use (vector)
+%   ana_window   : analysis window [ms after stim onset, ms after stim offset]
+%   binsize      : bin size for PSTH in ms (scalar)
+%   plotornot    : make plots, turn off for batch processing (logical)
+%
+% Outputs:
+%   adaptratio: index of sustained versus transient response
+%      (rateearly(s)-ratelate(s))/(rateearly(s)+ratelate(s))
+%   nss: sustained response relative to spontaneous rate
+%      (ssratelate(s)/spontaneous)   
 
 win_after_onset = ana_window(1);      
 win_after_offset = ana_window(2);     
@@ -64,7 +78,7 @@ for s = 1:nstims
     stimrate(s) = mean(rates(inds));
     if stimrate(s) < 3/nreps/((stim_len(s)-win_after_onset+win_after_offset)/1000)   
         adaptratio(s) = NaN;
-        NSS = NaN;
+        nss(s) = NaN;
     else
         indsearly = find((centers>(pre_stim+win_after_onset)/1000) & (centers<(pre_stim+win_after_onset)/1000+0.1));   % First 100 ms
         indslate = find((centers>(pre_stim+win_after_onset+stim_len(stims(s)))/1000-0.1) & (centers<(pre_stim+win_after_onset+stim_len(stims(s)))/1000));

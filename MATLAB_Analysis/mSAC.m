@@ -1,5 +1,5 @@
 function [CI_max, CI_avg, CI_log, baseline_rate_mean, responsive_stims, rateresp_len, PSTHresp_len, outlier_rejected, response_rate_mean, top_20_frac] = mSAC(inputs)
-% Shuffled autocorrelogram calculation based on Joris et al., 2003, 2006
+% Compute shuffled autocorrelograms and correlation index based on Joris et al., 2003, 2006
 % Checked with Joris 2006 code outputs
 
 file = inputs.file;
