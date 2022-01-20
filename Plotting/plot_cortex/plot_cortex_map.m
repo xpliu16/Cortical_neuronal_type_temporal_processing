@@ -1,4 +1,5 @@
-function plot_cortex_map (monkey_name, hole_location_struct_file, data_log_file, prop_name, xlsrange, fliphem, cm, plot_circles)
+function plot_cortex_map (monkey_name, hole_location_struct_file, data_log_file, ...
+    prop_name, xlsrange, fliphem, cm, plot_circles, showscale, interactive, ax)
 
 % prop_name   Column name of the property in the worksheet that you want
 %             plotted e.g., best frequency, latency, spontaneous rate
@@ -11,8 +12,10 @@ FSColor = [0    0.1    0.7410];
 Bu1Color = [0.05    0.4    0.0];
 Bu2Color = [0.4    0.8    0.3];
 BuColor = [0.2392    0.5608    0.0784];
-backcolor = [1 1 1];
 alpha = 0.7;
+msize = 8;
+fsize = 8;
+%msize = 13;
 
 
 plot_path = 'C:\Users\Ping\Documents\MATLAB\Xblaster3_Chamber3_GIT\XPL_code\plot_cortex\';
@@ -32,8 +35,12 @@ else
     H.ls = [];
 end
 
-c = input('Input new data? (1) or (0)');
-
+if interactive
+    c = input('Input new data? (1) or (0)');
+else
+    c = 0;
+end
+    
 if c
     H = cortex_map_input (H, plot_dir);
 
@@ -49,7 +56,11 @@ end
 matfilename = fliplr(strtok(fliplr(data_log_file),'\'));
 matfilename = strtok(matfilename,'.');
 
-c = input('Load log from .mat file (1) or reload from .xlsx file (0)?'); 
+if interactive
+    c = input('Load log from .mat file (1) or reload from .xlsx file (0)?'); 
+else
+    c = 1
+end
 if c && (exist([plot_path matfilename '.mat'], 'file') == 2)
     load([plot_path matfilename '.mat']);
 else
@@ -98,13 +109,17 @@ xp = H.hole_centers(:,1); yp = H.hole_centers(:,2);
 r = H.hole_radius;
 
 %Recalculate coordinates
-scaleup = 10     % scale up to increase resolution
+scaleup = 10;     % scale up to increase resolution
 P = H.photo_file;
 cd(plot_dir);
 h2 = figure('Color',[1 1 1]);
 [I,map] = imread(P);
 imshow(I,map);   % doubleclick in crop rectangle
-c = input('Crop image area (1) or (0)');
+if interactive
+    c = input('Crop image area (1) or (0)');
+else
+    c = 0;
+end
 if c
     [Icr,rect] = imcrop(I);
     %[Icr, rect] = imcrop(I,[218,90,181,135]);
@@ -122,7 +137,6 @@ if ~isempty(H.ls)
 end
 r = scaleup*r;
 
-% Flip LR for visualization of left / right hemispheres
 if exist('fliphem', 'var') && (fliphem==1)
     Icr = flipdim(Icr,2);
     xp = scaleup*rect(3)-xp;
@@ -131,11 +145,19 @@ if exist('fliphem', 'var') && (fliphem==1)
     end
 end
 close(h2);
-h2 = figure('Color',[1 1 1]);
-hi = imshow(Icr);
-set(gca,'Position',[0.05 0.05 0.9 0.9])
+% Flip LR for visualization of left / right hemispheres
+if exist('ax')    
+    % Making subplots into given handle
+    % Don't mess with plotting image into axis and aspect ratio issues
+    axes(ax(1));
+    set(gca, 'YDir','reverse');    % To match axes in images
+else
+    h2 = figure('Color',[1 1 1]);
+    hi = imshow(Icr);
+    set(gca,'Position',[0.05 0.05 0.9 0.9]);
+end
 hold on
-    
+
 H_fn = fieldnames(H);
 temp = cellfun(@(x) regexp(x, '^H\d+$'),H_fn, 'uni', false);
 H_inds = not(cellfun('isempty', temp));
@@ -212,13 +234,13 @@ for n = 1:nHoles
                
         if isnumeric(prop_vals_n{m})
             if strcmp(prop_name,'bf') || strcmp(prop_name,'latency')
-                scatter(xn(m),yn(m),10,log(prop_vals_n{m}),'o','filled');
+                scatter(xn(m),yn(m),msize-3,log(prop_vals_n{m}),'o','filled');
             elseif strcmp(prop_name,'CImax')
-                scatter(xn(m),yn(m),9,prop_vals_n{m},'o','filled');
+                scatter(xn(m),yn(m),msize-4,prop_vals_n{m},'o','filled');
             elseif strcmp(prop_name,'q_Opt')
-                scatter(xn(m),yn(m),10,prop_vals_n{m},'o','filled');
+                scatter(xn(m),yn(m),msize-3,prop_vals_n{m},'o','filled');
             else
-                scatter(xn(m),yn(m),10,prop_vals_n{m},'o','filled');
+                scatter(xn(m),yn(m),msize-3,prop_vals_n{m},'o','filled');
             end
             % Store propval, x, y (unjittered) for regression
             x_all = [x_all; ncoorm(1)*r + xp(n)];
@@ -230,8 +252,10 @@ for n = 1:nHoles
                     {RSColor, FSColor, Bu1Color, Bu2Color, BuColor});
                 symbols = containers.Map({'RS','FS','Burster_h','Burster_l','Burster'}, ...
                     {'o','s','^','d','^'});
+                sizes = containers.Map({'RS','FS','Burster_h','Burster_l','Burster'}, ...
+                    [msize-3,msize,msize-1,msize-1,msize-1]);   % circle symbol disproportionately large
                 if isKey (colors, prop_vals_n{m})
-                    scatter(xn(m),yn(m),10,colors(prop_vals_n{m}),...
+                    scatter(xn(m),yn(m),sizes(prop_vals_n{m}),colors(prop_vals_n{m}),...
                         symbols(prop_vals_n{m}),...
                         'filled',...                           
                         'MarkerFaceAlpha', alpha)    
@@ -239,8 +263,13 @@ for n = 1:nHoles
                         %'MarkerFaceColor', [1 1 1]-([1 1 1]-colors(prop_vals_n{m}))*0.7,...
                         %'LineWidth', 1,...
                                
-                    x_all = [x_all; ncoorm(1)*r + xp(n)];
-                    y_all = [y_all; (-1*(ncoorm(2)*r) + yp(n))];
+                    % x_all = [x_all; ncoorm(1)*r + xp(n)];
+                    % y_all = [y_all; (-1*(ncoorm(2)*r) + yp(n))];
+                    % Pass jitters on so projection is aligned, and also
+                    % fewer overlapping points
+                    x_all = [x_all; xn(m)];
+                    y_all = [y_all; yn(m)];
+
                     prop_vals_all = [prop_vals_all; prop_vals_n{m}];
                     if isnumeric(CImax_vals_n{m})
                         CImax_vals_all = [CImax_vals_all; CImax_vals_n{m}];
@@ -258,13 +287,13 @@ for n = 1:nHoles
                     case 'non'        % Not auditory responsive
                         %text(xn(m), yn(m),'x','Color','y','FontSize',16)
                         %scatter(xn(m),yn(m),30,[1 1 1], 'x', 'sizedata',16)
-                        plot(xn(m),yn(m),'x','MarkerEdgeColor',[0.7 0.7 0.7], 'MarkerSize',6);
+                        plot(xn(m),yn(m),'x','MarkerEdgeColor',[0.7 0.7 0.7], 'MarkerSize',msize-7);
                     case 'non v'   % Non responsive to vocalizations
-                        plot(xn(m),yn(m),'x','MarkerEdgeColor',[0.7 0.7 0.7], 'MarkerSize',6);
+                        plot(xn(m),yn(m),'x','MarkerEdgeColor',[0.7 0.7 0.7], 'MarkerSize',msize-7);
                     case 'CI0'     % CI 0 - likely not enough spikes
-                        plot(xn(m),yn(m),'o','MarkerEdgeColor',[0.7 0.7 0.7], 'MarkerSize',4);
+                        plot(xn(m),yn(m),'o','MarkerEdgeColor',[0.7 0.7 0.7], 'MarkerSize',msize-7);
                     case 'H'     % High spont rate (putative FS neurons)
-                        plot(xn(m),yn(m),'^','MarkerEdgeColor',[0.7 0.7 0.7], 'MarkerSize',4);
+                        plot(xn(m),yn(m),'^','MarkerEdgeColor',[0.7 0.7 0.7], 'MarkerSize',msize-7);
 
                 end
             end
@@ -274,14 +303,27 @@ for n = 1:nHoles
 end
 title(['Property:' prop_name],'Interpreter', 'none');
 
+xl(1) = min(x_all)-0.05*(max(x_all)-min(x_all));
+xl(2) = max(x_all)+0.05*(max(x_all)-min(x_all));
+xlim(xl);
+ax_this = gca;
+% Preserve aspect ratio
+yrange = (xl(2)-xl(1))/ax_this.Position(3)*ax_this.Position(4);
+yl(1) = (max(y_all)+min(y_all))/2 - 0.5*yrange;
+yl(2) = (max(y_all)+min(y_all))/2 + 0.5*yrange;
+ylim(yl);
+xticks([]);
+yticks([]);
+box on
+
 switch prop_name
     case 'bf'
         minmax = [log(0.5) log(32)];
         ticks = log([0.5 1 2 4 8 16 32]);
         ticklabels = [0.5 1 2 4 8 16 32];
         yunits = 'kHz';
-        titlestr = 'Best frequency';
-        f=get(gca,'Children');
+        title('Best frequency','FontSize',fsize+2);
+        %f=get(gca,'Children');
         %legend([f(3)],'no response to auditory stimuli','AutoUpdate', 'off');
     case 'latency'
         minmax = [log(10) log(200)];
@@ -325,7 +367,6 @@ switch prop_name
         % Lateral sulcus line
         %quiver(midx+30,midy+100,H.ls(2,1)-H.ls(1,1),H.ls(2,2)-H.ls(1,2), 'LineWidth',2,'MaxHeadSize',0.5, 'Color', 'k');
  
-        
         %v = [grad(1), grad(2)];
         v = [H.ls(2,1)-H.ls(1,1), H.ls(2,2)-H.ls(1,2)]; 
         normv = norm(v);
@@ -373,8 +414,7 @@ switch prop_name
         
     case {'groupIDcriteria','groupIDgmm'}
         minmax = NaN;   % Categorical does not need color axis
-        titlestr = 'Unit type based on criteria';
-         
+        title('Unit type','FontSize',fsize+2); 
         v = [H.ls(2,1)-H.ls(1,1), H.ls(2,2)-H.ls(1,2)]/(2*r); 
         v = v/norm(v)*sign(v(1));
         for i = 1:length(x_all)
@@ -386,41 +426,34 @@ switch prop_name
         proj_all = proj_all-shift;
         colors_all = cell2mat(cellfun(@(x) colors(x), prop_vals_all,'UniformOutput', false));
         symbols_all = cellfun(@(x) symbols(x), prop_vals_all,'UniformOutput', false);
-        main_fig = gcf;
-        xl(1) = min(x_all)-0.05*(max(x_all)-min(x_all));
-        xl(2) = max(x_all)+0.1*(max(x_all)-min(x_all));
-        xlim(xl);
+        sizes_all = cell2mat(cellfun(@(x) sizes(x), prop_vals_all,'UniformOutput', false));
         xl_main = xlim;
-        xl_trans = xl_main/(2*r) - shift;
+        xl_trans = xl_main/(2*r)-shift;
         ax_main = gca;
-        pos_main = ax_main.Position;
-        proj_fig1 = figure;
+        
+        if exist('ax')
+            proj_fig1 = ax(2);
+            axes(ax(2));
+        else
+            proj_fig1 = figure;
+        end
         for i = 1:length(proj_all)    % Can't pass in array of marker symbols
-            scatter(proj_all(i), CImax_vals_all(i), 10, colors_all(i,:),...
+            scatter(proj_all(i), CImax_vals_all(i), sizes_all(i), colors_all(i,:),...
                 symbols_all{i},'filled','MarkerFaceAlpha',alpha);
             hold on
         end
-        xlabel('Anterior-posterior location on sulcal axis (mm)');
+        xlabel('Relative Position (mm)','FontSize',fsize+1);
+        ylabel('CI_M_A_X','FontSize',fsize+1);
         xlim(xl_trans);
+        ylim([0 1.1*max(CImax_vals_all)]);
+        ax_this = gca;
+        ax_this.FontSize = fsize;
         xl = xlim;
         yl = ylim;
-        %xticks(0:1:xl(2));
-        set(gca,'Position',pos_main);
-    
-        patch([xl fliplr(xl)], [yl(1) yl(1) yl(2) yl(2)], backcolor);
-        ax = gca;
-        uistack(ax.Children(1),'bottom');
-        proj_fig2 = figure;
-        for i = 1:length(proj_all)
-            scatter(proj_all(i), BF_vals_all(i), 10, colors_all(i,:),...
-                symbols_all{i},'filled','MarkerFaceAlpha',alpha);
-            hold on
-        end
-        xlim(xl_trans);
-        xl = xlim;
-        yl = ylim;
-        set(gca,'Position',pos_main);
-        figure (main_fig);
+        title('Sulcal Projection','FontSize',fsize+2); 
+        box off
+       
+        axes(ax_main);
        
     otherwise
         prop_vals_num = dl_num(3:end, col_prop);
@@ -438,15 +471,13 @@ if ~isnan(minmax)
     c=colorbar;
     set(c,'YTick',ticks)
     set(c,'YTickLabel',ticklabels)
-    set(c,'FontSize',14)
+    set(c,'FontSize',fsize)
     cpos = get(c,'Position');
-    cpos = [0.875 0.12 0.03 0.8];
+    cpos = [ax(1).Position(1)+0.8, ax(1).Position(2),...
+        ax(1).Position(3)/21.86, ax(1).Position(4)];
     set(c,'Position',cpos);
 
-    axpos = get(gca,'Position');
-    set(c,'Position',cpos)
-    set(gca,'Position',axpos);
-    ylabel(c,yunits,'FontSize',16)
+    ylabel(c,yunits,'FontSize',fsize+1)
 else
     %[types, I] = unique(prop_vals_all);
     %types(types=="Burster_h") = "Bu1";
@@ -458,64 +489,74 @@ else
     indBu1 = find(strcmp(prop_vals_all, 'Burster_h'),1);
     indBu2 = find(strcmp(prop_vals_all, 'Burster_l'),1);
     inds = [indRS, indFS, indBu1, indBu2];
-    legend(p(inds),{'RS','FS','Bu1','Bu2'},...
-        'AutoUpdate','off','Location',[0.65, 0.8, 0.2, 0.2]);
-    
-    legend boxoff;
+    [lh] = legend(p(inds),{'RS','FS','Bu1','Bu2'},...
+        'AutoUpdate','off','Location',[0.3, 0.2, 0.2, 0.2]);
+    lh.FontSize = fsize;
+    lh.ItemTokenSize(1) = 8;
+    lh.Position(4)= 0.13;
+    %icons(5).Children.MarkerSize = 4;
+    %icons(6).Children.MarkerSize = 4;
+    %icons(7).Children.MarkerSize = 4;
+    %icons(8).Children.MarkerSize = 4;
+    lh.Box = 'off';
     % set gca 'Color' doesn't work if axes are visible off
     xl = xlim;
     yl = ylim;
-    patch([xl fliplr(xl)], [yl(1) yl(1) yl(2) yl(2)], [backcolor]);
-    ax = gca;
-    uistack(ax.Children(1),'bottom');
 end
 
-ti = title(titlestr);
+%ti = title(titlestr,'FontSize',fsize+2,'Position', [0.5, 1.1, 0]);
+%{
 if fliphem
     set(ti,'Position',[0.25*scaleup*rect(3), 0.1*scaleup*rect(4)]);
 else 
     set(ti,'Position',[0.50*scaleup*rect(3), 0.1*scaleup*rect(4)]);
 end
-set(ti,'FontSize',16);
+%}
 
-set (hi,'visible','off');
+if exist ('hi')
+    set (hi,'visible','off');
+end
 %set(gca, 'visible', 'on')
 %set(gca,'color',[0.9,0.9,0.9]);
 %set(gca, 'TickLength',[0 0]);
 
 % Draw lateral sulcus line
 if ~isempty(H.ls)
-    line(H.ls(:,1),H.ls(:,2),'LineStyle','--','Color',[0.5,0.5,0.5],'LineWidth',2.5);
+    line(H.ls(:,1),H.ls(:,2),'LineStyle','--','Color',[0.7,0.7,0.7],'LineWidth',1);
 end
+ax_this = gca;
+uistack(ax_this.Children(1),'bottom');
 % Show scale bar (2r is 1 mm)
-mm = 2; 
-scaley = round(0.95*scaleup*rect(4));
-if fliphem
-    scalex = round(0.6*scaleup*rect(3));
-else
-    scalex = round(0.2*scaleup*rect(3));
+if showscale
+    mm = 2; 
+    yl = ylim;
+    scaley = 0.9*(yl(2)-yl(1))+yl(1);
+    if fliphem
+        scalex = round(0.6*scaleup*rect(3));
+    else
+        scalex = round(0.2*scaleup*rect(3));
+    end
+    scaledx = mm*2*r;
+    if exist('fliphem', 'var') && (fliphem==1)
+        t(1) = text(scalex-0.03*scaleup*rect(3),scaley-0.12*scaleup*rect(4),'Left-right flipped');
+        set(t(1),'FontSize', fsize);
+    end
+    t(2) = text(scalex+0.25*scaledx,scaley-0.05*scaleup*rect(4),[num2str(mm) ' mm']);
+    line([scalex,scalex+scaledx],[scaley, scaley],'Color','k','LineWidth',2);
+    set(t(2),'FontSize', fsize);
 end
-scaledx = mm*2*r;
-if exist('fliphem', 'var') && (fliphem==1)
-    t(1) = text(scalex-0.03*scaleup*rect(3),scaley-0.12*scaleup*rect(4),'Left-right flipped');
-    set(t(1),'FontSize', 16);
-end
-t(2) = text(scalex+0.25*scaledx,scaley-0.05*scaleup*rect(4),[num2str(mm) ' mm']);
-line([scalex,scalex+scaledx],[scaley, scaley],'Color','k','LineWidth',4);
-set(t(2),'FontSize', 16);
-
+    
 set(gca,...
     'FontUnits','points',...
     'FontWeight','normal',...
-    'FontSize',15,...
     'FontName','Calibri');
 
 set(gcf, 'PaperUnits', 'inches');
 set(gcf, 'PaperPosition', [0 0 6 3.692]);
 set(gcf, 'renderer', 'painters');
 
-print([monkey_name '_' prop_name '_map'],'-dpng','-painters');
-
+% saveas(gcf,[monkey_name '_' prop_name '_map.png']);
+% Somehow this resizes the subplot
 
 
 
