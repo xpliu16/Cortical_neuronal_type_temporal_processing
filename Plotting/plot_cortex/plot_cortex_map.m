@@ -12,7 +12,7 @@ FSColor = [0    0.1    0.7410];
 Bu1Color = [0.05    0.4    0.0];
 Bu2Color = [0.4    0.8    0.3];
 BuColor = [0.2392    0.5608    0.0784];
-alpha = 0.7;
+alpha = 0.6;
 msize = 8;
 fsize = 8;
 %msize = 13;
@@ -301,7 +301,7 @@ for n = 1:nHoles
         c = colormap(gca,eval(cm));       
     end
 end
-title(['Property:' prop_name],'Interpreter', 'none');
+%title(['Property:' prop_name],'Interpreter', 'none');
 
 xl(1) = min(x_all)-0.05*(max(x_all)-min(x_all));
 xl(2) = max(x_all)+0.05*(max(x_all)-min(x_all));
@@ -309,8 +309,8 @@ xlim(xl);
 ax_this = gca;
 % Preserve aspect ratio
 yrange = (xl(2)-xl(1))/ax_this.Position(3)*ax_this.Position(4);
-yl(1) = (max(y_all)+min(y_all))/2 - 0.5*yrange;
-yl(2) = (max(y_all)+min(y_all))/2 + 0.5*yrange;
+yl(1) = (max(y_all)+min(y_all))/2 - 0.42*yrange;
+yl(2) = (max(y_all)+min(y_all))/2 + 0.58*yrange;
 ylim(yl);
 xticks([]);
 yticks([]);
@@ -322,7 +322,8 @@ switch prop_name
         ticks = log([0.5 1 2 4 8 16 32]);
         ticklabels = [0.5 1 2 4 8 16 32];
         yunits = 'kHz';
-        title('Best frequency','FontSize',fsize+2);
+        th = text(0.05,0.11,'Best Frequency','Units','normalized','FontSize',fsize+1,...
+            'HorizontalAlignment','left');
         %f=get(gca,'Children');
         %legend([f(3)],'no response to auditory stimuli','AutoUpdate', 'off');
     case 'latency'
@@ -414,7 +415,8 @@ switch prop_name
         
     case {'groupIDcriteria','groupIDgmm'}
         minmax = NaN;   % Categorical does not need color axis
-        title('Unit type','FontSize',fsize+2); 
+        text(0.05,0.11,'Unit Type','Units','normalized','FontSize',fsize+1,...
+             'HorizontalAlignment','left');
         v = [H.ls(2,1)-H.ls(1,1), H.ls(2,2)-H.ls(1,2)]/(2*r); 
         v = v/norm(v)*sign(v(1));
         for i = 1:length(x_all)
@@ -442,15 +444,14 @@ switch prop_name
                 symbols_all{i},'filled','MarkerFaceAlpha',alpha);
             hold on
         end
-        xlabel('Relative Position (mm)','FontSize',fsize+1);
+        xlabel('Sulcal Projection (mm)','FontSize',fsize+1);
         ylabel('CI_M_A_X','FontSize',fsize+1);
         xlim(xl_trans);
-        ylim([0 1.1*max(CImax_vals_all)]);
+        ylim([0 1.05*max(CImax_vals_all)]);
         ax_this = gca;
         ax_this.FontSize = fsize;
         xl = xlim;
         yl = ylim;
-        title('Sulcal Projection','FontSize',fsize+2); 
         box off
        
         axes(ax_main);
@@ -473,11 +474,13 @@ if ~isnan(minmax)
     set(c,'YTickLabel',ticklabels)
     set(c,'FontSize',fsize)
     cpos = get(c,'Position');
-    cpos = [ax(1).Position(1)+0.8, ax(1).Position(2),...
-        ax(1).Position(3)/21.86, ax(1).Position(4)];
+    cpos = [ax(1).Position(1)+0.86, ax(1).Position(2),...
+        ax(1).Position(3)/26, ax(1).Position(4)];
     set(c,'Position',cpos);
 
-    ylabel(c,yunits,'FontSize',fsize+1)
+    yl = ylabel(c,yunits,'FontSize',fsize+1);
+    yl.Position(1)= yl.Position(1)-2;
+    
 else
     %[types, I] = unique(prop_vals_all);
     %types(types=="Burster_h") = "Bu1";
@@ -490,7 +493,8 @@ else
     indBu2 = find(strcmp(prop_vals_all, 'Burster_l'),1);
     inds = [indRS, indFS, indBu1, indBu2];
     [lh] = legend(p(inds),{'RS','FS','Bu1','Bu2'},...
-        'AutoUpdate','off','Location',[0.3, 0.2, 0.2, 0.2]);
+        'AutoUpdate','off','Location',[ax(1).Position(1)+0.88, ...
+        ax(1).Position(2)+0.5*ax(1).Position(4), 0.2, 0.2]);
     lh.FontSize = fsize;
     lh.ItemTokenSize(1) = 8;
     lh.Position(4)= 0.13;

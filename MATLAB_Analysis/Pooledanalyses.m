@@ -1,5 +1,16 @@
+function pooledanalyses (ana_type, ploth)
+
 % Pooledanalyses.m Final data analysis pooling multiple subjects
-% Select analysis mode with ana_type
+%
+% Select analysis mode with ana_type, options are:
+%    ana_type = 'Neuron type classification';
+%    ana_type = 'SAM rate';
+%    ana_type = 'Vocalization responses';
+%    ana_type = 'Neuron type properties';
+%    ana_type = 'Neuron type properties subpanel';
+%    ana_type = 'Duration';
+%
+% Pass in optional plot handle
 
 data_log_dir = 'C:/Users/Ping/Desktop/AC_type_project';
 data_log_file = {[data_log_dir '/data/M7E_unit_log.xlsx']...
@@ -10,11 +21,6 @@ figdir = 'C:/Users/Ping/Desktop/Wang_lab/Paper_writing/Figures/';
 xlsrange = {'A1:JZ657','A1:JZ400'};
 animalID = {'M7E', 'M117B'};
 
-%ana_type = 'Neuron type classification';
-%ana_type = 'SAM rate';
-ana_type = 'Vocalization responses';
-%ana_type = 'Neuron type properties';
-%ana_type = 'Duration';
 clear eval;
 
 pool_protocols = 1;    % Pool up to first 5 protocols per unit for AP waveform 
@@ -160,9 +166,18 @@ switch ana_type
                     'MI',                       'col_MI',                       'num';...
                     'dip_pval_cropped',         'col_dip_p_cropped',            'num';...
                     'intraburst_freq',          'col_intraburst_freq',          'num'};
+                
+    case 'Neuron type properties subpanel'
+        T_var =    {'filestart',                'col_fs_UM',                    'num';...
+                    'channel',                  'col_ch_UM',                    'num';...
+                    'groupIDcrit',              'col_groupIDcrit',              'string';...
+                    'groupIDgmm',               'col_groupIDgmm',               'string';...
+                    'groupnumcrit',             'col_groupnumcrit',             'num';...
+                    'bf',                       'col_bf',                       'num';...
+                    'depth',                    'col_depth',                    'num'};
         
     case 'Duration'
-        T_var = {'filestart',                   'col_fs_UM',                    'num';...
+        T_var =   {'filestart',                 'col_fs_UM',                    'num';...
                    'channel',                   'col_ch_UM',                    'num';...
                    'groupIDcrit',               'col_groupIDcrit',              'string';...
                    'groupIDgmm',                'col_groupIDgmm',               'string';...
@@ -320,6 +335,7 @@ for i = 1:length(data_log_file)
     col_Bu_sub = find(cellfun (@(x) strcmp('Bu_sub',x),dlUM_raw{i}(1,:)));
     col_depth = find(cellfun (@(x) strcmp('depthRel',x),dlUM_raw{i}(1,:)));
     col_rayleigh = find(cellfun (@(x) strcmp('Rayleigh statistic',x),dlUM_raw{i}(1,:)));
+    col_bf = find(cellfun (@(x) strcmp('bf',x),dlUM_raw{i}(1,:)));
     
     for j = 1:length(T_var.varname)
         toappend = eval(['dlUM_raw{i}(2:end,' T_var.colnames{j} ')']);   % first two rows is column heading
@@ -4065,12 +4081,60 @@ switch ana_type
         set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold','TickDir','out','box','off');
         
         print([figdir 'Fig 5/Fig5.tif'],'-dtiff',['-r' num2str(figparams.res)]);
+
+    case 'Neuron type properties subpanel'
+        figparams.fsize = 7;
+        figparams.msize = 3;
+        
+        groupIDcrit(cellfun(@(x) ~ischar(x),groupIDcrit)) = {''};  % make NaN's into chars
+         
+        groupinds.RSinds = strcmp(groupIDcrit,'RS');
+        groupinds.FSinds = strcmp(groupIDcrit,'FS');
+        groupinds.Bu2inds = strcmp(groupIDcrit,'Burster_l');
+        groupinds.Bu1inds = strcmp(groupIDcrit,'Burster_h');
+        
+        groupord = {'RS','FS','Burster_h','Burster_l','Unclassified','Insufficient spikes',};
+        groupcolors = [RSColor; FSColor; BuColor; PBuColor; BuColor1; BuColorBright];
+       
+        figparams.s = ploth(1);
+        figparams.boxcolor = [0.3 0.3 0.3];
+        ct_properties_subplot(bf, groupIDcrit, groupinds, groupord, groupcolors, 'linear', 'BF (kHz)', figparams);
+        hold on
+        xlim([0.5 4.5]);
+        xticks([1,2,3,4]);
+        xticklabels({'RS','FS','Bu1','Bu2'});
+        %xl = get(gca,'xlim');
+        %set(gca,'ylim',[0 85]);
+        %s1.Title.Units = 'normalized';
+        %s1.Title.VerticalAlignment = 'top';
+        %s1.Title.Position=[0.5 1.2 0];
+        h = findobj(ploth(1),'type','Scatter','MarkerFaceColor', [1 1 1],'Marker','o');
+        for i = 1:length(h)
+            h(i).SizeData = 6;
+        end
+        
+        figparams.s = ploth(2);
+        ct_properties_subplot(depth, groupIDcrit, groupinds, groupord, groupcolors, 'linear', 'Depth (um)', figparams);
+        hold on
+        xlim([0.5 4.5]);
+        xticks([1,2,3,4]);
+        xticklabels({'RS','FS','Bu1','Bu2'});
+        
+        h = findobj(ploth(2),'type','Scatter','MarkerFaceColor', [1 1 1],'Marker','o');
+        for i = 1:length(h)
+            h(i).SizeData = 6;
+        end
+    end
 end
 
 function ct_properties_subplot(prop, groupID, groupinds, groupord, groupcolors, logorlinear, ylabelstr, figparams)
 global RSColor FSColor BuColor PBuColor BuColorBright BuColor1 
 
-v = violinplot(prop,groupID,'GroupOrder',groupord);
+axes(figparams.s);
+if ~isfield(figparams,'boxcolor')
+    figparams.boxcolor = [0.5 0.5 0.5];
+end
+v = violinplot(prop,groupID,'GroupOrder',groupord,'BoxColor',figparams.boxcolor);
 set(gca, 'YScale', logorlinear);
 set(gca,'xlim',[0.5,6.5]);
 th = title(ylabelstr,'FontSize',figparams.fsize);
