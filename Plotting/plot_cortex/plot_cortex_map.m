@@ -12,7 +12,7 @@ FSColor = [0    0.1    0.7410];
 Bu1Color = [0.05    0.4    0.0];
 Bu2Color = [0.4    0.8    0.3];
 BuColor = [0.2392    0.5608    0.0784];
-alpha = 0.6;
+alpha = 0.65;
 msize = 8;
 fsize = 8;
 %msize = 13;
@@ -164,6 +164,31 @@ H_inds = not(cellfun('isempty', temp));
 H_nums = cellfun(@(x) str2num(x(2:end)),H_fn(H_inds));
 nHoles = length(H_nums);
 
+% Separate these so circles are plotted under markers
+x_all = [];
+y_all = [];
+if iscellstr(prop_vals)
+    prop_vals_all = {};
+    CImax_vals_all = [];
+    BF_vals_all = [];
+else
+    prop_vals_all = [];
+end
+
+rng(0);
+
+% Rotate to make sulcus horizontal
+v = [H.ls(2,1)-H.ls(1,1), H.ls(2,2)-H.ls(1,2)]; 
+theta = atan(abs(v(2))/abs(v(1)));
+R = [cos(theta) -sin(theta); sin(theta) cos(theta)];   % Counterclockwise theta rotation
+
+R_cent = [mean([max(xp),min(xp)]); mean([max(yp),min(yp)])];  % center of rotation
+h_centers = [xp';yp'] - R_cent;   % Image is plotted with y upside down, so angle is reversed
+h_centers = R*h_centers + R_cent;
+xp = h_centers(1,:)';
+yp = h_centers(2,:)';
+H.ls = (R*(H.ls'-R_cent) + R_cent)';
+
 for n = 1:nHoles
     if (n==11) && strcmp(monkey_name,'M7E')
         continue
@@ -177,29 +202,8 @@ for n = 1:nHoles
     end
 end
 
-% Separate these so circles are plotted under markers
-x_all = [];
-y_all = [];
-if iscellstr(prop_vals)
-    prop_vals_all = {};
-    CImax_vals_all = [];
-    BF_vals_all = [];
-else
-    prop_vals_all = [];
-end
-
-rng(1);
-
-% Rotate to make sulcus horizontal
-v = [H.ls(2,1)-H.ls(1,1), H.ls(2,2)-H.ls(1,2)]; 
-theta = atan(abs(v(2))/abs(v(1)));
-R = [cos(theta) -sin(theta); sin(theta) cos(theta)];
-R_cent = [mean([max(xp),min(xp)]); mean([max(yp),min(yp)])];  % center of rotation
-h_centers = [xp';yp'] - R_cent;
-h_centers = R*h_centers + R_cent;
-xp = h_centers(1,:)';
-yp = h_centers(2,:)';
-H.ls = (R*(H.ls'-R_cent) + R_cent)';
+R = [cos(-theta) -sin(-theta); sin(-theta) cos(-theta)];  
+% Rotation for unit circle coordinates are not reversed
 
 for n = 1:nHoles
     ncoor = eval(['H.H' num2str(n) '.coor']);    % x, y coords of trks on unit circle
@@ -211,6 +215,9 @@ for n = 1:nHoles
     CImax_vals_n = CImax_vals(find(hole_vals == n));
     BF_vals_n = BF_vals(find(hole_vals == n));
     track_vals_n = track_vals(find(hole_vals == n));
+    if n ==6
+        display('foo')
+    end
     
     for m = 1:length(prop_vals_n) 
         if isnan(track_vals)      % track value blank
@@ -226,8 +233,8 @@ for n = 1:nHoles
         jitoffx = randsample([-1, 1],1)*r*(0.1+0.2*(rand(1)));
         jitoffy = randsample([-1, 1],1)*r*(0.1+0.2*(rand(1)));
         unitsintrack = length(find(track_vals_n == track_vals_n(m)));
-        %jitoffx = jitr*cos(-m*2*pi/(unitsintrack-1));     % made angle negative to offset two points from two tracks that overlaid
-        %jitoffy = jitr*sin(-m*2*pi/(unitsintrack-1));
+        %jitoffx = jitr*cos(-m*2*pi/(unitsintrack));     % made angle negative to offset two points from two tracks that overlaid
+        %jitoffy = jitr*sin(-m*2*pi/(unitsintrack));
         
         xn(m) = (ncoorm(1)*r + xp(n))+jitoffx;
         yn(m) = (-1*(ncoorm(2)*r) + yp(n))+jitoffy; 
@@ -287,7 +294,7 @@ for n = 1:nHoles
                     case 'non'        % Not auditory responsive
                         %text(xn(m), yn(m),'x','Color','y','FontSize',16)
                         %scatter(xn(m),yn(m),30,[1 1 1], 'x', 'sizedata',16)
-                        plot(xn(m),yn(m),'x','MarkerEdgeColor',[0.7 0.7 0.7], 'MarkerSize',msize-7);
+                        plot(xn(m),yn(m),'x','MarkerEdgeColor',[0.7 0.7 0.7], 'MarkerSize',msize-6);
                     case 'non v'   % Non responsive to vocalizations
                         plot(xn(m),yn(m),'x','MarkerEdgeColor',[0.7 0.7 0.7], 'MarkerSize',msize-7);
                     case 'CI0'     % CI 0 - likely not enough spikes
@@ -302,6 +309,15 @@ for n = 1:nHoles
     end
 end
 %title(['Property:' prop_name],'Interpreter', 'none');
+
+% Tuck x's to back
+ax_this = gca;
+objlist = findobj(ax_this, 'type','Line')
+for i = 1:length(objlist)
+    if strcmp(objlist(i).Marker,'x')
+        uistack(objlist(i),'bottom');
+    end
+end
 
 xl(1) = min(x_all)-0.05*(max(x_all)-min(x_all));
 xl(2) = max(x_all)+0.05*(max(x_all)-min(x_all));
