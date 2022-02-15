@@ -21,7 +21,6 @@ for j = 1:nstims
         trains_all{i} = trains_stims{j}(trains_stims{j}(:,2)==reps(r),4); 
         trains_stims{j} = trains_stims{j}(:,4); 
         trains_stims{j} = trains_stims{j}(trains_stims{j}>((pre_stim+win_after_onset)));
-        try
         trains_stims{j} = trains_stims{j}(trains_stims{j}<(pre_stim+stim_len(stims(j))+win_after_offset));
         i = i+1;
     end
@@ -40,9 +39,9 @@ for s = 1:length(q)
         cost = q(s);
         perc_correct_temp = NaN;
         conf_after_elim_temp = zeros(nstims,nstims);
-        eliminatedstims = cell(1);
+        eliminatedstims = [];
 
-        [dist, eliminatedstimstmp] = dvpcrop(trains_all,target,trains_stims, resplen, pre_stim+win_after_onset,cost);
+        [dist] = dvpcrop(trains_all,target,trains_stims, resplen, pre_stim+win_after_onset,cost);
         conf = zeros(nstims);
 
         for i = 1:length(trains_all)
@@ -53,7 +52,7 @@ for s = 1:length(q)
             end
         end
 
-        conf_after_elim_temp(:,:) = conf(~ismember(stims,eliminatedstimstmp),~ismember(stims,eliminatedstimstmp));
+        conf_after_elim_temp(:,:) = conf(~ismember(stims,eliminatedstims),~ismember(stims,eliminatedstims));
        
         % Abramson 1963 transmitted information from confusion matrix
         tmp = 0;

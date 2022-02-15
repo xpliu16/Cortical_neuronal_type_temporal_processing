@@ -1,4 +1,4 @@
-function pooledanalyses (ana_type, ploth)
+function Pooledanalyses (ana_type, ploth)
 
 % Pooledanalyses.m Final data analysis pooling multiple subjects
 %
@@ -6,6 +6,7 @@ function pooledanalyses (ana_type, ploth)
 %    ana_type = 'Neuron type classification';
 %    ana_type = 'SAM rate';
 %    ana_type = 'Vocalization responses';
+%    ana_type = 'Vocalization pop decode';
 %    ana_type = 'Neuron type properties';
 %    ana_type = 'Neuron type properties subpanel';
 %    ana_type = 'Duration';
@@ -15,7 +16,8 @@ function pooledanalyses (ana_type, ploth)
 data_log_dir = 'C:/Users/Ping/Desktop/AC_type_project';
 data_log_file = {[data_log_dir '/data/M7E_unit_log.xlsx']...
                 ,[data_log_dir './data/M117B_unit_log.xlsx']};
-            
+decode_dir = 'C:/Users/Ping/Desktop/Analysis_practice/';      
+
 mat_dir = 'C:/Users/Ping/Desktop/Analysis_practice/';
 figdir = 'C:/Users/Ping/Desktop/Wang_lab/Paper_writing/Figures/';
 xlsrange = {'A1:JZ657','A1:JZ400'};
@@ -135,7 +137,11 @@ switch ana_type
                     'Bu_sub',                   'col_Bu_sub',                   'num';...
                     'resp_stims_rate_len'       'col_rs_rate',                  'num';...
                     'resp_stims_PSTH_len'       'col_rs_PSTH',                  'num'};
-
+                
+    case 'Vocalization pop decode'
+        T_var =     {'filestart',               'col_fs_UM',                    'num';...
+                    'channel',                  'col_ch_UM',                    'num'};
+                
     case 'Neuron type properties'
         T_var =     {'filestart',               'col_fs_UM',                    'num';...
                     'channel',                  'col_ch_UM',                    'num';...
@@ -215,6 +221,7 @@ switch ana_type
                    'intraburst_freq',           'col_intraburst_freq',          'num';...
                    'Bu_sub',                    'col_Bu_sub',                   'num'};  
 end
+
 T_var = array2table(T_var,'VariableNames',{'varname','colnames','vartype'});
 
 for i = 1:length(T_var.varname)
@@ -381,10 +388,50 @@ for i = 1:length(data_log_file)
     end
     
     animal = [animal; repmat({animalID{i}},size(filestart,1),1)];
-              
+    
+    if strcmp(ana_type,'Vocalization pop decode')
+        callhist_all = [];
+        callhist_type_all = [];
+        for i = 1:length(animalID)
+            f = fullfile(decode_dir,[animalID{i},'_batch'],'decode.mat');
+            load(f);
+            callhist_all = cat(4,callhist_all, callhist);
+            callhist_type_all = [callhist_type_all, callhist_type];
+            clear('callhist');
+            clear('callhist_type');
+        end
+    end
 end
 
 switch ana_type
+    %% Simple population decoding
+    case 'Vocalization pop decode'
+       
+        conf_all = popdecode(callhist_all, size(callhist_all,4), 0);
+    
+        % Subset Bu units
+        
+        n_units = [5,10,25,50,54];
+
+        callhist_bu = [];
+        for i = 1:size(callhist_all,4)
+            if any(strcmp(callhist_type_all{i}, {'Burster_h','Burster_l'}))
+                callhist_bu = cat(4,callhist_bu, callhist_all(:,:,:,i));
+            end
+        end
+        temp = mean(callhist_bu(7,:,:,:),2);
+        temp = squeeze(temp);
+        figure;
+        heatmap(temp');
+            
+        for k = 1:length(n_units)
+            conf_bu = popdecode(callhist_bu, n_units(k), 0);
+        end
+        
+        % Subset RS units, equal number, randomly selected
+            
+    
+    
     %% Neuron type classification
     case 'Neuron type classification'
     
@@ -4095,6 +4142,14 @@ switch ana_type
         
         groupord = {'RS','FS','Burster_h','Burster_l','Unclassified','Insufficient spikes',};
         groupcolors = [RSColor; FSColor; BuColor; PBuColor; BuColor1; BuColorBright];
+        
+        p1 = vartestn(bf(ismember(groupnumcrit,[3,1,2,6])),groupnumcrit(ismember(groupnumcrit,[3,1,2,6])),'TestType','LeveneAbsolute');
+        % Not significant
+        p2 = anova1(bf(ismember(groupnumcrit,[3,1,2,6])),groupnumcrit(ismember(groupnumcrit,[3,1,2,6])));
+        % Not significant
+        p3 = vartestn(depth(ismember(groupnumcrit,[3,1,2,6])),groupnumcrit(ismember(groupnumcrit,[3,1,2,6])),'TestType','LeveneAbsolute');
+        % Not significant
+        p4 = anova1(depth(ismember(groupnumcrit,[3,1,2,6])),groupnumcrit(ismember(groupnumcrit,[3,1,2,6])));
        
         figparams.s = ploth(1);
         figparams.boxcolor = [0.3 0.3 0.3];
@@ -4159,4 +4214,71 @@ q3(1).LineWidth = 1;
 q3(2).LineWidth = 1;
 q3(3).LineWidth = 1;
 q3(4).LineWidth = 1;
+end
+
+
+function conf = popdecode(callhist_all, nunits, plotornot)
+    nsims = 50;
+    nstims = size(callhist_all,1);    
+    conf = zeros(nstims,nstims);
+        
+    for i = 1:nsims   
+        % Leave one rep out for each unit
+        % Pseudopopulation - select random subset of units
+        rand_units = randsample(size(callhist_all,4), nunits);
+        rand_rep = randsample(size(callhist_all,2), nunits, true);
+        leftout = nan(size(callhist_all,1),1,size(callhist_all,3),nunits);
+        leftin = nan(size(callhist_all,1),size(callhist_all,2)-1,size(callhist_all,3),nunits);
+        for unit = 1:length(rand_units)
+            leftout(:,:,:,unit) = callhist_all(:,rand_rep(unit),:,rand_units(unit));
+            %leftout = callhist_all(:,i,:,:);
+            temp = callhist_all(:,:,:,rand_units(unit));
+            temp(:,rand_rep(unit),:) = [];
+            leftin (:,:,:,unit) = temp;
+        end
+        % Average
+        leftin = mean(leftin, 2);   % Should we just average?
+
+        % Vectorize as time-unit features
+        leftout = reshape(leftout,[size(leftout,3)*size(leftout,4),size(leftout,1)]);
+        leftin = reshape(leftin,[size(leftin,3)*size(leftin,4),size(leftin,1)]);
+
+        % Normalize
+        leftout = leftout / norm(leftout);  
+        leftin = leftin / norm (leftin);
+
+        % Confusion matrix all units
+        dist = nan(nstims,nstims);
+        for j = 1:nstims
+            for k = 1:nstims
+                dist(j,k) = sqrt(sum((leftout(:,j)-leftin(:,k)).^2));
+                % Checked against norm(leftout(:,1)-leftin(:,3))
+                % dist(j,k) = dtw(leftout(:,j),leftin(:,k));
+            end
+        end
+        if plotornot
+            figure;
+            colormap('cool');
+            imagesc(dist);
+            colorbar;
+            set(gca,'XTick',1:nstims);
+            set(gca,'YTick',1:nstims);
+            set(gca,'xaxisLocation','top');
+            xlabel('Mean response stimulus #');
+            ylabel('Left out trial stimulus #');
+        end
+
+        % Find nearest neighbor and assign
+
+        for j = 1:nstims
+            val = min(dist(j,:));   
+            % If multiple equal minimums, MATLAB "min" will take only first index, but we want to distribute credit evenly   
+            inds = find(dist(j,:)==val);
+            for k = 1:length(inds)
+                conf(j, inds(k)) = conf(j, inds(k))+1/length(inds);
+            end
+        end
+    end
+    figure;
+    imagesc(conf);
 end
