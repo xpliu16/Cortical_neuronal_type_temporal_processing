@@ -393,7 +393,7 @@ for i = 1:length(data_log_file)
         callhist_all = [];
         callhist_type_all = [];
         for i = 1:length(animalID)
-            f = fullfile(decode_dir,[animalID{i},'_batch'],'decode.mat');
+            f = fullfile(decode_dir,[animalID{i},'_batch'],'decode_10ms.mat');
             load(f);
             callhist_all = cat(4,callhist_all, callhist);
             callhist_type_all = [callhist_type_all, callhist_type];
@@ -428,10 +428,151 @@ switch ana_type
             conf_bu = popdecode(callhist_bu, n_units(k), 0);
         end
         
-        % Subset RS units, equal number, randomly selected
-            
-    
-    
+        % Ended up going to Python
+        % Load outputs from Python to make consistent figures in MATLAB
+        load('C:\Users\Ping\Desktop\AC_type_project\MAT\decode_figdata.mat');
+        decode_fig = figure;
+        set(gcf, 'PaperUnits', 'inches');
+        set(gcf, 'PaperSize', [12*0.3937, 11*0.3937]);
+        set(gcf,'PaperPositionMode','manual')
+        set(gcf,'PaperPosition', [0 0 12*0.3937, 11*0.3937]);
+        set(gcf,'Units','inches');
+        set(gcf,'Position',[0 0 12*0.3937, 11*0.3937]);
+        lmargin = 0.1;
+        rmargin = 0.05;
+        intercol = 0.15;
+        height = 0.35;
+        width = height;
+        intermini = 0.025;
+       
+        axd_A1 = axes(decode_fig,'Position',...
+            [lmargin+0.04,0.55+(height-intermini)/2+intermini,...
+            (width-intermini)/2,(height-intermini)/2]);
+        imagesc(conf54_RS_mcc);
+        set(gca,'FontSize',figparams.fsize,'FontName',figparams.fontchoice);
+        set(gca,'XTick',[]);
+        set(gca,'YTick',[1,10,20]);
+        set(gca,'xaxisLocation','top');
+        ylA1 = text('String','Actual','FontSize',figparams.fsize+1,...
+            'FontName',figparams.fontchoice,'FontWeight','bold',...
+            'Position',[-10, 23.0, 1.0],'Rotation',90,...
+            'HorizontalAlignment','center');
+        ylA1.Position(2)=23;
+        xlabel('MCC');
+        ylabel('RS');
+        th1 = text('Units','normalized','Position', [-0.65,1.3],'String','A',fontstr_l{:});
+        
+        axd_A2 = axes(decode_fig,'Position',...
+            [lmargin+(width-intermini)/2+intermini+0.04,...
+            0.55+(height-intermini)/2+intermini,...
+            (width-intermini)/2,(height-intermini)/2]);
+        imagesc(conf54_RS_lda);
+        set(gca,'FontSize',figparams.fsize,'FontName',figparams.fontchoice);
+        set(gca,'XTick',[]);
+        set(gca,'YTick',[]);
+        set(gca,'xaxisLocation','top');
+        xlabel('LDA');
+          
+        axd_A3 = axes(decode_fig,'Position',...
+            [lmargin+0.04,0.55,...
+            (width-intermini)/2,(height-intermini)/2]);
+        imagesc(conf54_bu_mcc);
+        set(gca,'FontSize',figparams.fsize,'FontName',figparams.fontchoice);
+        set(gca,'XTick',[1,10,20]);
+        set(gca,'YTick',[1,10,20]);
+        %set(gca,'xaxisLocation','top');
+        ylabel('Bu');
+        xlh = text('String','Predicted','FontSize',figparams.fsize+1,...
+            'FontName',figparams.fontchoice,'FontWeight','bold',...
+            'Position',[23.0000,30,1.0],'HorizontalAlignment','center');
+        
+        axd_A4 = axes(decode_fig,'Position',...
+            [lmargin+(width-intermini)/2+intermini+0.04,...
+            0.55,...
+            (width-intermini)/2,(height-intermini)/2]);
+        imagesc(conf54_bu_lda);
+        set(gca,'FontSize',figparams.fsize,'FontName',figparams.fontchoice);
+        set(gca,'XTick',[1,10,20]);
+        set(gca,'YTick',[]);
+        
+        axd_B = axes(decode_fig,'Position',...
+            [lmargin+width+intercol+0.06,0.55,...
+            width-0.02, height]);
+        nunits_list = [10, 25, 54, 110, 160]
+        hold on
+        formatstr = {'-o','LineWidth',1.5,'MarkerSize',5};
+        set(gca,'FontSize',figparams.fsize,'FontName',figparams.fontchoice);
+        plot(nunits_list(1:length(accu_bu)),accu_bu,formatstr{:},'Color',BuColor);
+        plot(nunits_list(1:length(accu_RS)),accu_RS,formatstr{:},'Color',RSColor);
+        plot(nunits_list(1:length(accu_mixed)),accu_mixed,formatstr{:},'Color',nBuColor);
+        leg = legend({'Bu only', 'RS only', 'Mixed'},'Location','southeast',...
+            'FontSize',figparams.fsize+1,'FontName',figparams.fontchoice);
+        set(leg,'Box','off');
+        yl = ylabel('Accuracy','FontSize',figparams.fsize+1,'FontWeight','bold',...
+            'FontName',figparams.fontchoice,'Units','normalized',...
+            'VerticalAlignment','middle');
+        set(ylA1,'Units','normalized');
+        yl.Position(1) = ylA1.Position(1)*axd_A1.Position(3)/axd_B.Position(3);
+        xl = xlabel('Number of units','FontSize',figparams.fsize+1,'FontWeight','bold',...
+            'FontName',figparams.fontchoice);
+        set(xl,'Units','normalized','VerticalAlignment','middle');
+        set(xlh,'Units','normalized');
+        xl.Position(2)=xlh.Position(2)*axd_A3.Position(4)/axd_B.Position(4);
+        xlim([0,170]);
+        ylim([0,1]);
+        desiredypos = th1.Position(2)*axd_A1.Position(4)+axd_A1.Position(2);
+        th2 = text('Units','normalized','Position', [-0.31,(desiredypos-axd_B.Position(2))/axd_B.Position(4),0],'String','B',fontstr_l{:});
+        
+        axd_C = axes(decode_fig,'Position',...
+            [lmargin+0.04,0.14,...
+            width, height-0.12]);
+        bar([1,2,3],[accu_RS(3),accu_RS_t_collapse(3),accu_RS_unit_collapse],...
+            0.7,'FaceAlpha',0.6,'FaceColor',RSColor,'EdgeColor','none');
+        hold on
+        bar([5,6,7],[accu_bu(3),accu_bu_t_collapse(3),accu_bu_unit_collapse],...
+            0.7,'FaceAlpha',0.6,'FaceColor',BuColor,'EdgeColor','none');
+        yl = ylabel('Accuracy','FontSize',figparams.fsize+1,'FontWeight','bold',...
+            'FontName',figparams.fontchoice,'VerticalAlignment','middle',...
+            'Units','normalized');
+        yl.Position(1) = ylA1.Position(1)*axd_A1.Position(3)/axd_C.Position(3);
+        set(gca,'XTick',[1,2,3,5,6,7]);
+        set(gca,'FontSize',figparams.fsize,'FontName',figparams.fontchoice);
+        xticklabels({'Original','Avg time','Avg units','Original','Avg time','Avg units'});
+        xtickangle(45);
+        text(0.7, 0.95, 'Bu','FontSize',figparams.fsize,'FontName',figparams.fontchoice,...
+            'FontWeight','bold','HorizontalAlignment','left','Color',BuColor);
+        text(0.7, 0.85, 'RS','FontSize',figparams.fsize,'FontName',figparams.fontchoice,...
+            'FontWeight','bold','HorizontalAlignment','left','Color',RSColor);
+        desiredxpos = th1.Position(1)*axd_A1.Position(3)+axd_A1.Position(1);
+        th3 = text('Units','normalized','Position', [(desiredxpos-axd_C.Position(1))/axd_C.Position(3),1.15,0],'String','C',fontstr_l{:});
+        xlim([0.5 7.5]);
+        
+        axd_D = axes(decode_fig,'Position',...
+            [lmargin+width+intercol+0.06,0.14,...
+            width-0.02, height-0.12]);
+        plot([5,10,25,50], [accu_bu5ms,accu_bu(3),accu_bu25ms,accu_bu50ms],...
+            '-o','Color',BuColor,'LineWidth',1.5,'MarkerSize',5);
+        hold on
+        plot([5,10,25,50], [accu_RS5ms,accu_RS(3),accu_RS25ms,accu_RS50ms],...
+            '-o','Color',RSColor,'LineWidth',1.5,'MarkerSize',5);
+        set(gca,'FontSize',figparams.fsize,'FontName',figparams.fontchoice);
+        yl = ylabel('Accuracy','FontSize',figparams.fsize+1,'FontWeight','bold',...
+            'FontName',figparams.fontchoice,'VerticalAlignment','middle',...
+            'Units','normalized');
+        yl.Position(1) = ylA1.Position(1)*axd_A1.Position(3)/axd_D.Position(3);
+        xl = xlabel('Time bin (ms)','FontSize',figparams.fsize+1,'FontWeight','bold',...
+            'FontName',figparams.fontchoice,'Units','normalized',...
+            'VerticalAlignment','middle');
+        xl.Position(2)=xlh.Position(2)*axd_A3.Position(4)/axd_D.Position(4);
+        set(gca,'XTick',[5,10,25,50]);
+        th4 = text('Units','normalized','Position', [-0.31,1.15,0],'String','D',fontstr_l{:});
+        
+        set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'box','off',...
+            'TickDir','out');
+        
+        % Fig 8 is now fig 7, fig 9 is now fig 8
+        print('C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Figures\Fig 9\Fig9.tif','-dtiff',['-r' num2str(figparams.res)]);
+        
     %% Neuron type classification
     case 'Neuron type classification'
     
