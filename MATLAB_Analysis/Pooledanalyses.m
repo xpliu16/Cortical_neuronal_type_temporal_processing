@@ -521,7 +521,7 @@ switch ana_type
         xlim([0,170]);
         ylim([0,1]);
         desiredypos = th1.Position(2)*axd_A1.Position(4)+axd_A1.Position(2);
-        th2 = text('Units','normalized','Position', [-0.31,(desiredypos-axd_B.Position(2))/axd_B.Position(4),0],'String','B',fontstr_l{:});
+        th2 = text('Units','normalized','Position', [-0.32,(desiredypos-axd_B.Position(2))/axd_B.Position(4),0],'String','B',fontstr_l{:});
         
         axd_C = axes(decode_fig,'Position',...
             [lmargin+0.04,0.14,...
@@ -565,7 +565,7 @@ switch ana_type
             'VerticalAlignment','middle');
         xl.Position(2)=xlh.Position(2)*axd_A3.Position(4)/axd_D.Position(4);
         set(gca,'XTick',[5,10,25,50]);
-        th4 = text('Units','normalized','Position', [-0.31,1.15,0],'String','D',fontstr_l{:});
+        th4 = text('Units','normalized','Position', [-0.32,1.15,0],'String','D',fontstr_l{:});
         
         set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'box','off',...
             'TickDir','out');

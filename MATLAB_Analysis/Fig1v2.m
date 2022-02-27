@@ -93,8 +93,8 @@ for i = 1:length(units_std_tuning)
         mfilename_m = strcat(file, '.m');
         D=header_reader_mfile(mfilename_m);    % If file is incomplete so data matrix is irregular shaped, use this alternative reader, ignores final incomplete data line
     end
-    [outputs, centers, N,centers2,N2,log_ISI_list,prestim_total_time,nint,logISIskewness]...
-    = spktr(D,file,channel,stims,reps,0.2,50,'all',0); 
+    [outputs, centers, N,centers2,N2,log_ISI_list,prestim_total_time,nint]...
+    = spktr(D,file,channel,stims,reps,0.2,50,'all',1,0,0); 
     xautocorr = outputs.xautocorr;
     yautocorr = outputs.yautocorr;
     hb = bar(xautocorr,yautocorr,1,'FaceColor',Color_i{i},'FaceAlpha',0.7);

@@ -10,10 +10,10 @@ function plot_cortex_map (monkey_name, hole_location_struct_file, data_log_file,
 RSColor = [0.6350    0.0780    0.1840];
 FSColor = [0    0.1    0.7410];
 Bu1Color = [0.05    0.4    0.0];
-Bu2Color = [0.4    0.8    0.3];
+Bu2Color = [0.45    0.8    0.35];
 BuColor = [0.2392    0.5608    0.0784];
 alpha = 0.65;
-msize = 8;
+msize = 9;
 fsize = 8;
 %msize = 13;
 
@@ -35,7 +35,7 @@ else
     H.ls = [];
 end
 
-if interactive
+if ~exist('interactive') || (interactive==1)
     c = input('Input new data? (1) or (0)');
 else
     c = 0;
@@ -56,7 +56,7 @@ end
 matfilename = fliplr(strtok(fliplr(data_log_file),'\'));
 matfilename = strtok(matfilename,'.');
 
-if interactive
+if ~exist('interactive') || (interactive==1)
     c = input('Load log from .mat file (1) or reload from .xlsx file (0)?'); 
 else
     c = 1
@@ -115,7 +115,7 @@ cd(plot_dir);
 h2 = figure('Color',[1 1 1]);
 [I,map] = imread(P);
 imshow(I,map);   % doubleclick in crop rectangle
-if interactive
+if ~exist('interactive') || (interactive==1)
     c = input('Crop image area (1) or (0)');
 else
     c = 0;
@@ -227,14 +227,10 @@ for n = 1:nHoles
         if isempty(ncoorm)        % missing track on map
             continue
         end
-        %jitr = r*0.2;       % jitter offset to make multiple units on the same track visible
-        %jitoffx = 0.25*r*(2*rand(1)-1);
-        %jitoffy = 0.25*r*(2*rand(1)-1);
+
         jitoffx = randsample([-1, 1],1)*r*(0.1+0.2*(rand(1)));
         jitoffy = randsample([-1, 1],1)*r*(0.1+0.2*(rand(1)));
         unitsintrack = length(find(track_vals_n == track_vals_n(m)));
-        %jitoffx = jitr*cos(-m*2*pi/(unitsintrack));     % made angle negative to offset two points from two tracks that overlaid
-        %jitoffy = jitr*sin(-m*2*pi/(unitsintrack));
         
         xn(m) = (ncoorm(1)*r + xp(n))+jitoffx;
         yn(m) = (-1*(ncoorm(2)*r) + yp(n))+jitoffy; 
@@ -265,15 +261,8 @@ for n = 1:nHoles
                     scatter(xn(m),yn(m),sizes(prop_vals_n{m}),colors(prop_vals_n{m}),...
                         symbols(prop_vals_n{m}),...
                         'filled',...                           
-                        'MarkerFaceAlpha', alpha)    
-                        %'MarkerEdgeColor', colors(prop_vals_n{m})*0.9,...
-                        %'MarkerFaceColor', [1 1 1]-([1 1 1]-colors(prop_vals_n{m}))*0.7,...
-                        %'LineWidth', 1,...
-                               
-                    % x_all = [x_all; ncoorm(1)*r + xp(n)];
-                    % y_all = [y_all; (-1*(ncoorm(2)*r) + yp(n))];
-                    % Pass jitters on so projection is aligned, and also
-                    % fewer overlapping points
+                        'MarkerFaceAlpha', alpha);    
+        
                     x_all = [x_all; xn(m)];
                     y_all = [y_all; yn(m)];
 
@@ -292,8 +281,6 @@ for n = 1:nHoles
             else
                 switch prop_vals_n{m}
                     case 'non'        % Not auditory responsive
-                        %text(xn(m), yn(m),'x','Color','y','FontSize',16)
-                        %scatter(xn(m),yn(m),30,[1 1 1], 'x', 'sizedata',16)
                         plot(xn(m),yn(m),'x','MarkerEdgeColor',[0.7 0.7 0.7], 'MarkerSize',msize-6);
                     case 'non v'   % Non responsive to vocalizations
                         plot(xn(m),yn(m),'x','MarkerEdgeColor',[0.7 0.7 0.7], 'MarkerSize',msize-7);
@@ -318,6 +305,15 @@ for i = 1:length(objlist)
         uistack(objlist(i),'bottom');
     end
 end
+
+% Bring Bu1 to front
+objlist = findobj(ax_this, 'type','Scatter')
+for i = 1:length(objlist)
+    if strcmp(objlist(i).Marker,'^')
+        uistack(objlist(i),'top');
+    end
+end
+
 
 xl(1) = min(x_all)-0.05*(max(x_all)-min(x_all));
 xl(2) = max(x_all)+0.05*(max(x_all)-min(x_all));
@@ -374,17 +370,6 @@ switch prop_name
         midx = mean([max(x_all), min(x_all)]);
         midy = mean([max(y_all), min(y_all)]);
         
-        %{
-        quiver(midx+30,midy+100,grad(1),grad(2), 'LineWidth',2,'MaxHeadSize',0.5, 'Color', 'k');            
-        
-        xl = linspace(min(x_all), max(x_all), 50);
-        yl = grad(2)/grad(1)*xl+(midy-grad(2)/grad(1)*midx);    % Line passing through midx/midy
-        plot(xl, yl);
-        %}
-        % Lateral sulcus line
-        %quiver(midx+30,midy+100,H.ls(2,1)-H.ls(1,1),H.ls(2,2)-H.ls(1,2), 'LineWidth',2,'MaxHeadSize',0.5, 'Color', 'k');
- 
-        %v = [grad(1), grad(2)];
         v = [H.ls(2,1)-H.ls(1,1), H.ls(2,2)-H.ls(1,2)]; 
         normv = norm(v);
         for i = 1:length(x_all)
@@ -405,8 +390,6 @@ switch prop_name
     case 'q_Opt'
         minmax = [0 150];
         ticks = [1, logspace(log10(5),log10(500),3)];   % matched to sigma samples
-        %ticks = ticks(1:end-1); % up to 464 ms 
-        %ticklabels = round(ticks*1000)/1000;   % don't display lots of decimal places
         ticklabels = ticks;
         yunits = 'q_Opt';
         titlestr = 'Optimum cost for classification';    
@@ -438,7 +421,6 @@ switch prop_name
         for i = 1:length(x_all)
             u = [x_all(i),y_all(i)]/(2*r);
             proj_all(i) = dot(u,v);
-            %proj_all(i) = dot(u,v)/normv*sign(v(1));   % Want x direction to be pointing positive
         end
         shift = min(proj_all);
         proj_all = proj_all-shift;
@@ -490,7 +472,7 @@ if ~isnan(minmax)
     set(c,'YTickLabel',ticklabels)
     set(c,'FontSize',fsize)
     cpos = get(c,'Position');
-    cpos = [ax(1).Position(1)+0.86, ax(1).Position(2),...
+    cpos = [ax(1).Position(1)+0.87, ax(1).Position(2),...
         ax(1).Position(3)/26, ax(1).Position(4)];
     set(c,'Position',cpos);
 
@@ -498,9 +480,6 @@ if ~isnan(minmax)
     yl.Position(1)= yl.Position(1)-2;
     
 else
-    %[types, I] = unique(prop_vals_all);
-    %types(types=="Burster_h") = "Bu1";
-    %types(types=="Burster_l") = "Bu2";
     p = flipud(findobj(gca,'Type','Scatter'));
     %legend(p(flipud(I)),flipud(types),'AutoUpdate','off','Location',[0.65, 0.2, 0.2, 0.2]);
     indRS = find(strcmp(prop_vals_all, 'RS'),1);
@@ -514,31 +493,15 @@ else
     lh.FontSize = fsize;
     lh.ItemTokenSize(1) = 8;
     lh.Position(4)= 0.13;
-    %icons(5).Children.MarkerSize = 4;
-    %icons(6).Children.MarkerSize = 4;
-    %icons(7).Children.MarkerSize = 4;
-    %icons(8).Children.MarkerSize = 4;
+ 
     lh.Box = 'off';
-    % set gca 'Color' doesn't work if axes are visible off
     xl = xlim;
     yl = ylim;
 end
 
-%ti = title(titlestr,'FontSize',fsize+2,'Position', [0.5, 1.1, 0]);
-%{
-if fliphem
-    set(ti,'Position',[0.25*scaleup*rect(3), 0.1*scaleup*rect(4)]);
-else 
-    set(ti,'Position',[0.50*scaleup*rect(3), 0.1*scaleup*rect(4)]);
-end
-%}
-
 if exist ('hi')
     set (hi,'visible','off');
 end
-%set(gca, 'visible', 'on')
-%set(gca,'color',[0.9,0.9,0.9]);
-%set(gca, 'TickLength',[0 0]);
 
 % Draw lateral sulcus line
 if ~isempty(H.ls)
@@ -576,8 +539,7 @@ set(gcf, 'PaperPosition', [0 0 6 3.692]);
 set(gcf, 'renderer', 'painters');
 
 % saveas(gcf,[monkey_name '_' prop_name '_map.png']);
-% Somehow this resizes the subplot
-
+% Somehow this resizes the subplot - known bug
 
 
 function H_new = cortex_map_input (H_old, plot_dir)

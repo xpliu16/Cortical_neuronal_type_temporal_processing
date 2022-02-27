@@ -218,7 +218,7 @@ for i = 1:length(units_std_tuning)
     
     if i == 1
         lh4 = ylabel('Spike','FontSize', figparams.fsize_big);
-        txh = annotation('textbox','Position',[ax_row1(1).Position(1)-0.17*ax_row1(1).Position(3),ax_row4(1).Position(2)+ax_row4(1).Position(4)+0.03,0,0],'String','B','FontSize',figparams.fsize+2,'FontName',figparams.fontchoice, 'FontWeight','Bold','EdgeColor','none');       
+        txh = annotation('textbox','Position',[ax_row1(1).Position(1)-0.17*ax_row1(1).Position(3),ax_row4(1).Position(2)+ax_row4(1).Position(4)+0.03,0,0],'String','D','FontSize',figparams.fsize+2,'FontName',figparams.fontchoice, 'FontWeight','Bold','EdgeColor','none');       
         hold on
         %TTP = output.ttp_ms;     % Peakfinder fails on the broad toothy peak here, so calculated using max and min
         an = annotation('doublearrow');
@@ -297,7 +297,7 @@ for i = 1:length(units_call_types)
     
     if i == 1
         lh6 = ylabel('Vocalizations','FontSize', figparams.fsize_big);
-        txh = annotation('textbox','Position',[ax_row1(1).Position(1)-0.17*ax_row1(1).Position(3),ax_row5(1).Position(2)+ax_row5(1).Position(4)+0.03,0,0],'String','E','FontSize',figparams.fsize+2,'FontName',figparams.fontchoice, 'FontWeight','Bold','EdgeColor','none');       
+        txh = annotation('textbox','Position',[ax_row1(1).Position(1)-0.17*ax_row1(1).Position(3),ax_row6(1).Position(2)+ax_row6(1).Position(4)+0.03,0,0],'String','E','FontSize',figparams.fsize+2,'FontName',figparams.fontchoice, 'FontWeight','Bold','EdgeColor','none');       
         txh1n = text(-30,0.3,'1n','HorizontalAlignment','right','FontSize',figparams.fsize,'FontName',figparams.fontchoice);
         txh1r = text(-30,1.5,'1r','HorizontalAlignment','right','FontSize',figparams.fsize,'FontName',figparams.fontchoice);
         txh20n = text(-30,18.5,'10n','HorizontalAlignment','right','FontSize',figparams.fsize,'FontName',figparams.fontchoice);

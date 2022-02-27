@@ -12,6 +12,7 @@ function plot_raster (resp_filename, resp_channel, stiminds, repinds, ylabelstr,
 respSR = 97656.25;    % Circuit SR
 
 aqua = [.9 .95 .95];
+aqua = [.8 .85 .85];
 aqua2 = [.95 .98 .98];
 gray1 = [226 226 226]/256;
 gray2 = [.698 .671 .624];
