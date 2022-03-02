@@ -702,6 +702,8 @@ switch ana_type
     rectangle('Position',[520,(24-11)+0.1*(7-1)-0.2,40,0.1+0.4],'EdgeColor',RSColor,'LineWidth',1);
     rectangle('Position',[509,(22-11)+0.1*(5-1)-0.2,40,0.1+0.4],'EdgeColor',FSColor,'LineWidth',1);
     ylabel('Frequency (kHz)');
+    xticks([200 400]);
+    xlabel('Time (ms)');
     
     ax2_2 = axes(supp_spont,'Position',[ax2_1.Position(1), ax2_1.Position(2)+ax2_1.Position(4)+0.05,ax2_1.Position(3)*0.45, ax2_1.Position(4)*0.15/0.8]);
     plot_raster({'M117B0636'}, 4, '24', '7', '', '', '', 'single', 1, 0, 0, [], ax2_2, 1,'vertical tick',0.5);
