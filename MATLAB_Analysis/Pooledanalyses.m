@@ -61,7 +61,7 @@ switch ana_type
                     'fracmeanISI',              'col_fracmean',                 'num';...
                     'refract',                  'col_refract',                  'num';...
                     'reg_parikh',               'col_reg_parikh',               'num';...
-                    'ISImetric',                'col_ISImetric',                 'num';...
+                    'ISImetric',                'col_ISImetric',                'num';...
                     'percISI5',                 'col_percISI5',                 'num';...
                     'dip_pval',                 'col_dip_p',                    'num';...
                     'percISI5ratio',            'col_percISI5ratio',            'num';...
@@ -816,10 +816,11 @@ switch ana_type
     xshift = lmargin-oldpos(1);
     set(axf2p1,'Position',oldpos.*[1 1 1 1]+[xshift 0 xexpand yshrink]);
     hold on
-    gh1 = scatter(acmetric(burster==1), peakmsISI(burster==1), figparams.msize,'v','MarkerFaceColor','none','MarkerEdgeColor',BuColor);
+    gh1a = scatter(acmetric(groupnumcrit==2), peakmsISI(groupnumcrit==2), figparams.msize,'^','MarkerFaceColor','none','MarkerEdgeColor',BuColor);
+    gh1b = scatter(acmetric(groupnumcrit==6), peakmsISI(groupnumcrit==6), figparams.msize,'d','MarkerFaceColor','none','MarkerEdgeColor',BuColor);
     gh2 = scatter(acmetric(burster==0), peakmsISI(burster==0), figparams.msize,'o','MarkerFaceColor','none','MarkerEdgeColor',nBuColor);
     gh3 = scatter(acmetric(burster==-1), peakmsISI(burster==-1), figparams.msize,'x','MarkerFaceColor','none','MarkerEdgeColor',[0.5 0.5 0.5]);
-
+% Compare to n for Burster == 1
     lh1 = ylabel('Peak ISI (ms)');
     set(gca,'YScale','log');
     set(gca,'ylim',[0.92 80]);      
@@ -833,15 +834,18 @@ switch ana_type
     yl = get(gca,'ylim');
     plot([0.5 0.5], yl, '--', 'Color', [0.6 0.6 0.6]);
     plot(xl, [10 10], '--', 'Color', [0.6 0.6 0.6]);
-    legend('Bursting','Non-bursting','Location',[0.145+xshift 0.585 0.093 0.086]);
-    legend boxoff
+    text(-0.65,2,'Non-bursting','Color',nBuColor,fontstr{:});
+    text(-0.65,sqrt(2),'Bursting','Color',BuColor,fontstr{:});
+    %legend('Bursting','Non-bursting','Location',[0.145+xshift 0.585 0.093 0.086]);
+    %legend boxoff
     
     axf2p2 = subplot(2,3,2);
     oldpos = get(axf2p2,'Position');
     xshift2 = 0.04;   
     set(axf2p2,'Position',oldpos.*[1 1 1 1]+[xshift+xshift2+xexpand-0.04 0 xexpand yshrink]);
     hold on
-    gh4 = scatter(logISIdrop(burster==1), peakmsISI(burster==1), figparams.msize,'v','MarkerFaceColor','none','MarkerEdgeColor',BuColor);
+    gh4a = scatter(logISIdrop(groupnumcrit==2), peakmsISI(groupnumcrit==2), figparams.msize,'^','MarkerFaceColor','none','MarkerEdgeColor',BuColor);
+    gh4b = scatter(logISIdrop(groupnumcrit==6), peakmsISI(groupnumcrit==6), figparams.msize,'d','MarkerFaceColor','none','MarkerEdgeColor',BuColor);
     gh5 = scatter(logISIdrop(burster==0), peakmsISI(burster==0), figparams.msize,'o','MarkerFaceColor','none','MarkerEdgeColor',nBuColor);
     gh6 = scatter(logISIdrop(burster==-1), peakmsISI(burster==-1), figparams.msize,'x','MarkerFaceColor','none','MarkerEdgeColor',[0.5 0.5 0.5]);
     xlabel('logISIdrop'); 
@@ -858,15 +862,29 @@ switch ana_type
     
     oldpos = get(axf2p2,'Position');
     axf2p2b = axes(gcf,'Position',[oldpos(1)+oldpos(3)+0.02, oldpos(2), 0.22*oldpos(3), oldpos(4)]);
-    edges = log(0.92):0.1:log(150);
-    h = histogram(log(peakmsISI(burster==1)),edges,'DisplayStyle','stairs','EdgeColor',BuColor);
+    edges = log(0.92):0.1:log(81.45);
+    %counts(1,:) = histc(log(peakmsISI(burster==1)),edges);
+    %counts(2,:) = histc(log(peakmsISI(burster==0)),edges);
+    %counts(3,:) = histc(log(peakmsISI(burster==-1)),edges);
+    %centers = (edges(1:end-1)+edges(2:end))/2;
+    %bh = bar(centers,counts(:,1:end-1)','stacked');
+    %bh(1).FaceColor = BuColor;
+    %bh(1).EdgeColor = 'none';
+    %bh(2).FaceColor = nBuColor;
+    %bh(2).EdgeColor = 'none';
+    %bh(3).FaceColor = [0.5 0.5 0.5];
+    %bh(3).EdgeColor = 'none';
+    h = histogram(log(peakmsISI),edges,'FaceColor',[0.7 0.7 0.7],'EdgeColor','none');
     hold on;
+    h = histogram(log(peakmsISI(burster==1)),edges,'DisplayStyle','stairs','EdgeColor',BuColor);
     h = histogram(log(peakmsISI(burster==0)),edges,'DisplayStyle','stairs','EdgeColor',nBuColor);
+    
+    
     set(gca,'xlim',[log(0.92) log(80)]);
     view(90,-90);
     [val, indtemp] = find(edges<log(100));
     maxind =max(indtemp);
-    set(gca,'ylim',[0 1.1*max(h.Values(1:maxind))]);
+    %set(gca,'ylim',[0 1.1*max(h.Values(1:maxind))]);
     set(gca,'ytick',[]);
     set(gca,'xtick',[]);
     box off
@@ -875,7 +893,8 @@ switch ana_type
     oldpos = get(axf2p3,'Position');
     set(axf2p3,'Position',oldpos.*[1 1 1 1]+[xshift+2*xshift2+2*xexpand+0.02 0 xexpand yshrink]);
     hold on
-    gh4 = scatter(logISIdrop_prestim(burster==1),logISIdrop(burster==1), figparams.msize,'v','MarkerFaceColor','none','MarkerEdgeColor',BuColor);
+    gh4a = scatter(logISIdrop_prestim(groupnumcrit==2),logISIdrop(groupnumcrit==2), figparams.msize,'^','MarkerFaceColor','none','MarkerEdgeColor',BuColor);
+    gh4b = scatter(logISIdrop_prestim(groupnumcrit==6),logISIdrop(groupnumcrit==6), figparams.msize,'d','MarkerFaceColor','none','MarkerEdgeColor',BuColor);
     gh5 = scatter(logISIdrop_prestim(burster==0), logISIdrop(burster==0), figparams.msize,'o','MarkerFaceColor','none','MarkerEdgeColor',nBuColor);
     gh6 = scatter(logISIdrop_prestim(burster==-1), logISIdrop(burster==-1), figparams.msize,'x','MarkerFaceColor','none','MarkerEdgeColor',[0.5 0.5 0.5]);
     lh3 = ylabel('logISIdrop');
@@ -2995,7 +3014,7 @@ switch ana_type
         refract_plusprestim = [refract; refract([inds; inds2])];
         percISI5_plusprestim = [percISI5; percISI5([inds; inds2])];
         percISI5ratio_plusprestim = [percISI5ratio; percISI5ratio([inds; inds2])];
-        max_burst_length_plusprestim = [max_burst_length; max_burst_length([inds; inds2])];
+        mean_burst_length_plusprestim = [mean_burst_length; mean_burst_length([inds; inds2])];
         fracmeanISI_plusprestim = [fracmeanISI; fracmeanISI([inds; inds2])];
         p2mISI_plusprestim = [p2mISI; p2mISI([inds; inds2])];
         CV_plusprestim = [CV; CV([inds; inds2])];
@@ -3143,11 +3162,12 @@ switch ana_type
 
         s12 = axes(fig3, 'Position', [hmargin+2*(1-2*hmargin)/2.8, vmargin+(nrows-4)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s12;
-        ct_properties_subplot(max_burst_length_plusprestim, groupIDcrit_plusprestim, groupinds, groupord, groupcolors,'linear', 'Max burst length', figparams);
+        ct_properties_subplot(mean_burst_length_plusprestim, groupIDcrit_plusprestim, groupinds, groupord, groupcolors,'linear', 'Mean burst length', figparams);
         s12.Title.Units = 'normalized';
         s12.Title.VerticalAlignment = 'top';
         s12.Title.Position=[0.5 1.2 0];
-        set(gca,'ylim',[0 25]);
+        %set(gca,'ylim',[0 25]);
+        set(gca,'ylim',[1.5 4]);
 
         if split_bu
             s13 = axes(fig3, 'Position', [hmargin, vmargin+(nrows-5)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
