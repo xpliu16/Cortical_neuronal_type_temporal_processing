@@ -3015,6 +3015,7 @@ switch ana_type
         percISI5_plusprestim = [percISI5; percISI5([inds; inds2])];
         percISI5ratio_plusprestim = [percISI5ratio; percISI5ratio([inds; inds2])];
         mean_burst_length_plusprestim = [mean_burst_length; mean_burst_length([inds; inds2])];
+        max_burst_length_plusprestim = [max_burst_length; max_burst_length([inds; inds2])];
         fracmeanISI_plusprestim = [fracmeanISI; fracmeanISI([inds; inds2])];
         p2mISI_plusprestim = [p2mISI; p2mISI([inds; inds2])];
         CV_plusprestim = [CV; CV([inds; inds2])];
@@ -3043,12 +3044,12 @@ switch ana_type
         figparams.fontchoice = 'Arial Narrow';
         hmargin = 0.05;
         vmargin = 0.05;
-        figwidth = 0.28;
-        figheight = 1.8/figheight_tot;
+        figwidth = 0.28*3/4;
+        figheight = 2.2/figheight_tot;
        
         groupord = {'RS','FS','Burster','Prestim burster','Burster_h','Burster_l','Unclassified','Insufficient spikes',};
         groupcolors = [RSColor; FSColor; BuColor; PBuColor; BuColor1; BuColorBright];
-        nrows = 5;
+        nrows = 4;
 
         s1 = axes(fig3, 'Position',[hmargin, vmargin+(nrows-1)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s1;
@@ -3061,7 +3062,7 @@ switch ana_type
         s1.Title.VerticalAlignment = 'top';
         s1.Title.Position=[0.5 1.2 0];
 
-        s2 = axes(fig3, 'Position',[hmargin+1*(1-2*hmargin)/2.8, vmargin+(nrows-1)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+        s2 = axes(fig3, 'Position',[hmargin+1*(1-2*hmargin)/3.8, vmargin+(nrows-1)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s2;
         ct_properties_subplot(acmetric_plusprestim, groupIDcrit_plusprestim, groupinds,groupord, groupcolors, 'linear', 'Autocorrelation metric', figparams);
         hold on
@@ -3071,7 +3072,7 @@ switch ana_type
         s2.Title.VerticalAlignment = 'top';
         s2.Title.Position=[0.5 1.2 0];
               
-        s3 = axes(fig3, 'Position',[hmargin+2*(1-2*hmargin)/2.8, vmargin+(nrows-1)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+        s3 = axes(fig3, 'Position',[hmargin+2*(1-2*hmargin)/3.8, vmargin+(nrows-1)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s3;
         ct_properties_subplot(logISIdrop_plusprestim, groupIDcrit_plusprestim, groupinds, groupord, groupcolors,'linear', 'log(ISI)drop', figparams);
         set(gca,'ylim',[-1 1.15]);
@@ -3083,7 +3084,7 @@ switch ana_type
         s3.Title.VerticalAlignment = 'top';
         s3.Title.Position=[0.5 1.2 0];
         
-        s4 = axes(fig3, 'Position', [hmargin, vmargin+(nrows-2)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+        s4 = axes(fig3, 'Position', [hmargin+3*(1-2*hmargin)/3.8, vmargin+(nrows-1)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s4;
         ct_properties_subplot(TTP_plusprestim, groupIDcrit_plusprestim, groupinds, groupord, groupcolors,'linear', 'Trough-to-peak (ms)', figparams);
         set(gca,'ylim',[0 2.2]);
@@ -3096,7 +3097,7 @@ switch ana_type
         s4.Title.VerticalAlignment = 'top';
         s4.Title.Position=[0.5 1.2 0];
         
-        s5 = axes(fig3, 'Position', [hmargin+1*(1-2*hmargin)/2.8, vmargin+(nrows-2)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+        s5 = axes(fig3, 'Position', [hmargin, vmargin+(nrows-2)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s5;
         ct_properties_subplot(F50_plusprestim/1000, groupIDcrit_plusprestim, groupinds,groupord, groupcolors, 'linear', 'Spike spectrum {\it f}_5_0 (kHz)', figparams);
         set(gca,'ylim',[0 4.6]);
@@ -3107,90 +3108,97 @@ switch ana_type
         s5.Title.VerticalAlignment = 'top';
         s5.Title.Position=[0.5 1.2 0];
         
-        s6 = axes(fig3, 'Position', [hmargin+2*(1-2*hmargin)/2.8, vmargin+(nrows-2)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+        s6 = axes(fig3, 'Position', [hmargin+1*(1-2*hmargin)/3.8, vmargin+(nrows-2)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s6;
-        ct_properties_subplot(spont_plusprestim, groupIDcrit_plusprestim, groupinds, groupord, groupcolors,'linear', 'Spontaneous rate (spk/s)', figparams);
-        hold on
-        xl = get(gca,'xlim');
+        ct_properties_subplot(log10(spont_plusprestim+0.01), groupIDcrit_plusprestim, groupinds, groupord, groupcolors,'linear', 'log10(Spontaneous rate)', figparams);
+        set(gca,'ylim',[-2 2]);
+        yticks(-2:1:2);
+        %plot(xl, [3 3], '--', 'Color', [0.7 0.7 0.7]);
+        %plot(xl, [5 5], '--', 'Color', [0.7 0.7 0.7]);
         plot(xl, [log10(3) log10(3)], '--', 'Color', [0.7 0.7 0.7]);
         plot(xl, [log10(5) log10(5)], '-.', 'Color', [0.7 0.7 0.7]);
         s6.Title.Units = 'normalized';
         s6.Title.VerticalAlignment = 'top';
         s6.Title.Position=[0.5 1.2 0];
         
-        s7 = axes(fig3, 'Position', [hmargin, vmargin+(nrows-3)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+        s7 = axes(fig3, 'Position', [hmargin+2*(1-2*hmargin)/3.8, vmargin+(nrows-2)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s7;
         ct_properties_subplot(max_firing_rate_plusprestim, groupIDcrit_plusprestim, groupinds,groupord, groupcolors, 'linear', 'Max driven rate', figparams);
         s7.Title.Units = 'normalized';
         s7.Title.VerticalAlignment = 'top';
         s7.Title.Position=[0.5 1.2 0];
 
-        s8 = axes(fig3, 'Position', [hmargin+1*(1-2*hmargin)/2.8, vmargin+(nrows-3)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+        s8 = axes(fig3, 'Position', [hmargin+3*(1-2*hmargin)/3.8, vmargin+(nrows-2)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s8;
-        ct_properties_subplot(latency_plusprestim, groupIDcrit_plusprestim, groupinds,groupord, groupcolors, 'linear', 'Latency (ms)', figparams);
-        set(gca,'ylim',[0 180]);
+        ct_properties_subplot(max_burst_length_plusprestim, groupIDcrit_plusprestim, groupinds, groupord, groupcolors,'linear', 'Max burst length', figparams);
+        set(gca,'ylim',[0 25]);
         s8.Title.Units = 'normalized';
         s8.Title.VerticalAlignment = 'top';
         s8.Title.Position=[0.5 1.2 0];
         
-        s9 = axes(fig3, 'Position', [hmargin+2*(1-2*hmargin)/2.8, vmargin+(nrows-3)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+        s9 = axes(fig3, 'Position', [hmargin, vmargin+(nrows-3)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s9;
-        ct_properties_subplot(refract_plusprestim, groupIDcrit_plusprestim, groupinds, groupord, groupcolors,'linear', 'Refractory period (ms)', figparams);      
-        set(gca,'ylim',[0 20]);
+        ct_properties_subplot(mean_burst_length_plusprestim, groupIDcrit_plusprestim, groupinds, groupord, groupcolors,'linear', 'Mean burst length', figparams);
+        set(gca,'ylim',[1.8 4]);
         s9.Title.Units = 'normalized';
         s9.Title.VerticalAlignment = 'top';
         s9.Title.Position=[0.5 1.2 0];
         
-        s10 = axes(fig3, 'Position', [hmargin, vmargin+(nrows-4)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+        s10 = axes(fig3, 'Position', [hmargin+1*(1-2*hmargin)/3.8, vmargin+(nrows-3)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s10;
-        ct_properties_subplot(percISI5_plusprestim, groupIDcrit_plusprestim, groupinds,groupord, groupcolors, 'linear', 'Percent ISI < 5 ms', figparams);      
+        ct_properties_subplot(refract_plusprestim, groupIDcrit_plusprestim, groupinds, groupord, groupcolors,'linear', 'Refractory period (ms)', figparams);      
+        set(gca,'ylim',[0 20]);
         s10.Title.Units = 'normalized';
         s10.Title.VerticalAlignment = 'top';
         s10.Title.Position=[0.5 1.2 0];
-        set(gca,'YTick',[0 0.2 0.4 0.6]);
-        yt = yticks;
-        yticklabels({'0','20','40','60'});
-                
-        s11 = axes(fig3, 'Position', [hmargin+1*(1-2*hmargin)/2.8, vmargin+(nrows-4)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+        
+        s11 = axes(fig3, 'Position', [hmargin+2*(1-2*hmargin)/3.8, vmargin+(nrows-3)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s11;
-        ct_properties_subplot(dip_pval_plusprestim, groupIDcrit_plusprestim, groupinds,groupord, groupcolors, 'linear', 'Hartigans'' dip{\it p}-value', figparams);
-        hold on
-        xl = get(gca,'xlim');
+        ct_properties_subplot(latency_plusprestim, groupIDcrit_plusprestim, groupinds,groupord, groupcolors, 'linear', 'Latency (ms)', figparams);
+        set(gca,'ylim',[0 180]);
         s11.Title.Units = 'normalized';
         s11.Title.VerticalAlignment = 'top';
         s11.Title.Position=[0.5 1.2 0];
 
-        s12 = axes(fig3, 'Position', [hmargin+2*(1-2*hmargin)/2.8, vmargin+(nrows-4)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+        s12 = axes(fig3, 'Position', [hmargin+3*(1-2*hmargin)/3.8, vmargin+(nrows-3)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s12;
-        ct_properties_subplot(mean_burst_length_plusprestim, groupIDcrit_plusprestim, groupinds, groupord, groupcolors,'linear', 'Mean burst length', figparams);
+        ct_properties_subplot(dip_pval_plusprestim, groupIDcrit_plusprestim, groupinds,groupord, groupcolors, 'linear', 'Hartigans'' dip{\it p}-value', figparams);
         s12.Title.Units = 'normalized';
         s12.Title.VerticalAlignment = 'top';
         s12.Title.Position=[0.5 1.2 0];
-        %set(gca,'ylim',[0 25]);
-        set(gca,'ylim',[1.5 4]);
+
+        s13 = axes(fig3, 'Position', [hmargin, vmargin+(nrows-4)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+        figparams.s = s13;
+        ct_properties_subplot(percISI5_plusprestim, groupIDcrit_plusprestim, groupinds,groupord, groupcolors, 'linear', 'Percent ISI < 5 ms', figparams);      
+        set(gca,'YTick',[0 0.2 0.4 0.6]);
+        yt = yticks;
+        yticklabels({'0','20','40','60'});
+        s13.Title.Units = 'normalized';
+        s13.Title.VerticalAlignment = 'top';
+        s13.Title.Position=[0.5 1.2 0];
 
         if split_bu
-            s13 = axes(fig3, 'Position', [hmargin, vmargin+(nrows-5)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
-            figparams.s = s13;
+            s14 = axes(fig3, 'Position', [hmargin+1*(1-2*hmargin)/3.8, vmargin+(nrows-4)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+            figparams.s = s14;
             ct_properties_subplot(percISI5ratio_plusprestim, groupIDcrit_plusprestim, groupinds, groupord, groupcolors,'linear', 'Percent ISI < 5 ms re: Poisson', figparams);
             set(gca,'ylim',[0 250]);
-            s13.Title.Units = 'normalized';
-            s13.Title.VerticalAlignment = 'top';
-            s13.Title.Position=[0.5 1.2 0];
-
-            s14 = axes(fig3, 'Position', [hmargin+1*(1-2*hmargin)/2.8, vmargin+(nrows-5)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
-            figparams.s = s14;
-            ct_properties_subplot(fracmeanISI_plusprestim, groupIDcrit_plusprestim, groupinds,groupord, groupcolors, 'linear', 'Parikh Burstiness', figparams);      
             s14.Title.Units = 'normalized';
             s14.Title.VerticalAlignment = 'top';
             s14.Title.Position=[0.5 1.2 0];
 
-            s15 = axes(fig3, 'Position', [hmargin+2*(1-2*hmargin)/2.8, vmargin+(nrows-5)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+            s15 = axes(fig3, 'Position', [hmargin+2*(1-2*hmargin)/3.8, vmargin+(nrows-4)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
             figparams.s = s15;
-            ct_properties_subplot(reg_parikh_plusprestim, groupIDcrit_plusprestim, groupinds, groupord, groupcolors, 'linear', 'Parikh Regularity', figparams);
+            ct_properties_subplot(fracmeanISI_plusprestim, groupIDcrit_plusprestim, groupinds,groupord, groupcolors, 'linear', 'Parikh Burstiness', figparams);      
             s15.Title.Units = 'normalized';
             s15.Title.VerticalAlignment = 'top';
             s15.Title.Position=[0.5 1.2 0];
+
+            s16 = axes(fig3, 'Position', [hmargin+3*(1-2*hmargin)/3.8, vmargin+(nrows-4)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
+            figparams.s = s16;
+            ct_properties_subplot(reg_parikh_plusprestim, groupIDcrit_plusprestim, groupinds, groupord, groupcolors, 'linear', 'Parikh Regularity', figparams);
+            s16.Title.Units = 'normalized';
+            s16.Title.VerticalAlignment = 'top';
+            s16.Title.Position=[0.5 1.2 0];
             set(gca,'ylim',[0 0.25]);  
         end
         
