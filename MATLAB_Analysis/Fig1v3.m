@@ -9,6 +9,8 @@ units_call_types = {'M7E0499ch1','M7E2130ch1','M7E2254ch1'};
 
 units_type = {'RS','RS','FS','FS','Burster','Burster'};
 
+xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\Fig1\Fig1.xlsx';
+
 RSColor = [0.6350    0.0780    0.1840];
 FSColor = [0    0.4470    0.7410];
 BuColor = [0.4660    0.6740    0.1880];
@@ -132,8 +134,9 @@ for i = 1:length(units_std_tuning)
         xautocorr(j,:) = [-1*fliplr(outputs.xautocorr) outputs.xautocorr];
         yautocorr(j,:) = [fliplr(outputs.yautocorr) outputs.yautocorr];
     end
-    xautocorr = sum(xautocorr,1);
+    xautocorr = mean(xautocorr,1);
     yautocorr= sum(yautocorr,1);
+    
     hb = bar(xautocorr,yautocorr,1,'FaceColor',Color_i{i},'FaceAlpha',0.7);
     ax_row2(i).FontSize = figparams.fsize;
     ax_row2(i).FontName = figparams.fontchoice;
@@ -146,8 +149,17 @@ for i = 1:length(units_std_tuning)
     lh_pos = get(lh,'Position');
     lh_pos(2) = -0.17;
     set(lh,'Position',lh_pos);
-  
     set(gca,'ytick',[]);
+    
+    [val,indsxls] = find((xautocorr>=-50) & (xautocorr<= 50));
+    x = xautocorr(indsxls);
+    y = yautocorr(indsxls);
+    sheetname = 'Autocorrelograms';
+    ID = ['Unit ' num2str(i)];
+    xlab = 'Lag(ms)';
+    ylab = 'Count';
+    
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
     
     if i == 1
          lh2 = ylabel('Autocorrelogram','FontSize',figparams.fsize_big);
@@ -172,6 +184,16 @@ for i = 1:length(units_std_tuning)
   
     set(gca,'ytick',[]);
     
+    [val,indsxls] = find(centers2 < 4);
+    x = centers2(indsxls);
+    y = N2(indsxls);
+    sheetname = 'Log(ISI)';
+    ID = ['Unit ' num2str(i)];
+    xlab = 'Log(Interspike Interval)';
+    ylab = 'Count';
+    
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
+    
     if i == 1
         lh3 = ylabel('Log(ISI)','FontSize',figparams.fsize_big);
         txh = annotation('textbox','Position',[ax_row1(1).Position(1)-0.17*ax_row1(1).Position(3),ax_row3(1).Position(2)+ax_row3(1).Position(4)+0.03,0,0],'String','C','FontSize',figparams.fsize+2,'FontName',figparams.fontchoice, 'FontWeight','Bold','EdgeColor','none');       
@@ -193,6 +215,7 @@ for i = 1:length(units_std_tuning)
         sp_wave(j,:) = output.sp_wave;
         sp_wave_count(j) = output.sp_wave_count;
         ttp(j) = output.ttp_ms;
+        
     end
     
     sp_wave_avg = sp_wave_count*sp_wave./sum(sp_wave_count);
@@ -206,15 +229,32 @@ for i = 1:length(units_std_tuning)
     ymin = min(sp_wave_avg(100:180));
     ymax = max(sp_wave_avg(100:180));
     set(gca,'ylim',[ymin-0.1*(ymax-ymin), ymax+0.1*(ymax-ymin)]);  
-    
     set(gca,'xtick',[0 1]);
     lh = xlabel('ms');
     set(lh,'Units','normalized');
     lh_pos = get(lh,'Position');
     lh_pos(2) = -0.17;
     set(lh,'Position',lh_pos);
-    
     set(gca,'ytick',[]);
+    
+    indsxls = 100:1:180;
+    x = output.t_shifted(indsxls);
+    y = sp_wave_avg(indsxls);
+    ID = ['Unit ' num2str(i)];
+    sheetname = 'Spike';
+    xlab = 'Time(ms)';
+    ylab = 'Amplitude(uV)';
+    
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
+    
+    [vals,indsxls] = find(output.f<=max(output.f)*0.6);
+    x = output.f(indsxls);
+    y = output.pxx_spike(indsxls);
+    sheetname = 'Spike Spectrum';
+    xlab = 'Frequency(kHz)';
+    ylab = 'Baseline-Subtracted Magnitude';
+    
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
     
     if i == 1
         lh4 = ylabel('Spike','FontSize', figparams.fsize_big);
@@ -256,6 +296,16 @@ for i = 1:length(units_std_tuning)
     set(lh,'Position',lh_pos);
     
     set(gca,'ytick',[]);
+    
+    [vals,indsxls] = find(output.f<=max(output.f)*0.6);
+    x = output.f(indsxls);
+    y = output.pxx_spike(indsxls);
+    sheetname = 'Spike Spectrum Isolated Spikes';
+    %ID = ['Unit ' num2str(i)];
+    xlab = 'Frequency(kHz)';
+    ylab = 'Baseline-Subtracted Magnitude';
+    
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
     
     if i == 1
         lh5 = ylabel('Spike spectrum','FontSize', figparams.fsize_big);
