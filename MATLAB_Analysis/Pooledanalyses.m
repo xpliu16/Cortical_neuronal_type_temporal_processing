@@ -4322,6 +4322,31 @@ switch ana_type
         % Not significant
         p4 = anova1(depth(ismember(groupnumcrit,[3,1,2,6])),groupnumcrit(ismember(groupnumcrit,[3,1,2,6])));
        
+        xls_path = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\FigS2\FigS2.xlsx';
+ 
+        group = containers.Map([3,1,2,6], {'RS','FS','Bu1','Bu2'});
+        inds = ismember(groupnumcrit,[3,1,2,6]) & ~isnan(bf);
+        x = values(group,num2cell(groupnumcrit(inds)));
+        y = arrayfun(@(x) sprintf('%.2f',x),bf(inds),'UniformOutput',false);
+        indsxls = 1:length(x);
+        sheetname = 'Best Freq';
+        ID = [''];
+        xlab = 'Unit type';
+        ylab = 'BF';
+    
+        exportxls(xls_path, sheetname, ID, x, y, xlab, ylab, indsxls, 1);
+        
+        inds = ismember(groupnumcrit,[3,1,2,6]) & ~isnan(depth);
+        x = values(group,num2cell(groupnumcrit(inds)));
+        y = depth(inds);
+        indsxls = 1:length(x);
+        sheetname = 'Depth';
+        ID = [''];
+        xlab = 'Unit type';
+        ylab = 'Depth re: first spike (uM)';
+    
+        exportxls(xls_path, sheetname, ID, x, y, xlab, ylab, indsxls, 1);
+        
         figparams.s = ploth(1);
         figparams.boxcolor = [0.3 0.3 0.3];
         ct_properties_subplot(bf, groupIDcrit, groupinds, groupord, groupcolors, 'linear', 'BF (kHz)', figparams);
@@ -4329,11 +4354,6 @@ switch ana_type
         xlim([0.5 4.5]);
         xticks([1,2,3,4]);
         xticklabels({'RS','FS','Bu1','Bu2'});
-        %xl = get(gca,'xlim');
-        %set(gca,'ylim',[0 85]);
-        %s1.Title.Units = 'normalized';
-        %s1.Title.VerticalAlignment = 'top';
-        %s1.Title.Position=[0.5 1.2 0];
         h = findobj(ploth(1),'type','Scatter','MarkerFaceColor', [1 1 1],'Marker','o');
         for i = 1:length(h)
             h(i).SizeData = 6;

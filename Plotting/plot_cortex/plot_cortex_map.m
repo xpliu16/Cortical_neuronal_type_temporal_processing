@@ -1,4 +1,4 @@
-function plot_cortex_map (monkey_name, hole_location_struct_file, data_log_file, ...
+function outputs = plot_cortex_map (monkey_name, hole_location_struct_file, data_log_file, ...
     prop_name, xlsrange, fliphem, cm, plot_circles, showscale, interactive, ax)
 
 % prop_name   Column name of the property in the worksheet that you want
@@ -8,12 +8,14 @@ function plot_cortex_map (monkey_name, hole_location_struct_file, data_log_file,
 % cm          Colormap e.g., 'cool' 'jet'
 
 RSColor = [0.6350    0.0780    0.1840];
+RSColor2 = [0.8350    0.2780    0.3840];  % lighter
 FSColor = [0    0.1    0.7410];
-Bu1Color = [0.05    0.4    0.0];
+FSColor2 = [0.2    0.35    0.9410];   % lighter
+Bu1Color = [0.04    0.3    0.0];
 Bu2Color = [0.45    0.8    0.35];
 BuColor = [0.2392    0.5608    0.0784];
 alpha = 0.65;
-msize = 9;
+msize = 10;
 fsize = 8;
 %msize = 13;
 
@@ -228,8 +230,8 @@ for n = 1:nHoles
             continue
         end
 
-        jitoffx = randsample([-1, 1],1)*r*(0.1+0.2*(rand(1)));
-        jitoffy = randsample([-1, 1],1)*r*(0.1+0.2*(rand(1)));
+        jitoffx = randsample([-1, 1],1)*r*(0.1+0.3*(rand(1)));
+        jitoffy = randsample([-1, 1],1)*r*(0.1+0.3*(rand(1)));
         unitsintrack = length(find(track_vals_n == track_vals_n(m)));
         
         xn(m) = (ncoorm(1)*r + xp(n))+jitoffx;
@@ -252,15 +254,14 @@ for n = 1:nHoles
         else
             if any(strcmp(prop_name,{'groupIDcriteria','groupIDgmm'}))
                 colors = containers.Map({'RS','FS','Burster_h','Burster_l','Burster'}, ...
-                    {RSColor, FSColor, Bu1Color, Bu2Color, BuColor});
+                    {RSColor2, FSColor2, Bu1Color, Bu2Color, BuColor});
                 symbols = containers.Map({'RS','FS','Burster_h','Burster_l','Burster'}, ...
                     {'o','s','^','d','^'});
                 sizes = containers.Map({'RS','FS','Burster_h','Burster_l','Burster'}, ...
-                    [msize-3,msize,msize-1,msize-1,msize-1]);   % circle symbol disproportionately large
+                    [msize-4,msize,msize-1,msize-1,msize-1]);   % circle symbol disproportionately large
                 if isKey (colors, prop_vals_n{m})
                     scatter(xn(m),yn(m),sizes(prop_vals_n{m}),colors(prop_vals_n{m}),...
-                        symbols(prop_vals_n{m}),...
-                        'filled',...                           
+                        symbols(prop_vals_n{m}),... 
                         'MarkerFaceAlpha', alpha);    
         
                     x_all = [x_all; xn(m)];
@@ -313,7 +314,6 @@ for i = 1:length(objlist)
         uistack(objlist(i),'top');
     end
 end
-
 
 xl(1) = min(x_all)-0.05*(max(x_all)-min(x_all));
 xl(2) = max(x_all)+0.05*(max(x_all)-min(x_all));
@@ -431,6 +431,16 @@ switch prop_name
         xl_trans = xl_main/(2*r)-shift;
         ax_main = gca;
         
+        % Return values for data export
+        group = containers.Map({'RS','FS','Burster_h','Burster_l'}, {'RS','FS','Bu1','Bu2'});
+        %inds = ismember(groupIDcrit,{'RS','FS','Burster_h','Burster_l'});
+        
+        outputs.x_loc = x_all/(2*r)-shift;
+        outputs.y_loc = y_all/(2*r);
+        outputs.CImax = CImax_vals_all; 
+        outputs.unit_type = values(group,prop_vals_all);
+        outputs.bf = arrayfun(@(x) sprintf('%.2f',x),BF_vals_all,'UniformOutput',false);
+        
         if exist('ax')
             proj_fig1 = ax(2);
             axes(ax(2));
@@ -439,7 +449,7 @@ switch prop_name
         end
         for i = 1:length(proj_all)    % Can't pass in array of marker symbols
             scatter(proj_all(i), CImax_vals_all(i), sizes_all(i), colors_all(i,:),...
-                symbols_all{i},'filled','MarkerFaceAlpha',alpha);
+                symbols_all{i},'MarkerFaceAlpha',alpha);
             hold on
         end
         xlabel('Sulcal Projection (mm)','FontSize',fsize+1);

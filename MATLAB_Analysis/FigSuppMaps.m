@@ -105,10 +105,6 @@ th_I = annotation('textbox',[ax4(2).Position(1)+letteroffset(1), ...
     'String','I',...
     'FontSize',figparams.fsize,...
     'FontWeight','bold'); 
-%inputs.AID = 'M7E';
-%inputs.tracks = 'C:\Users\Ping\Documents\MATLAB\Xblaster3_Chamber3_GIT\XPL_code\plot_cortex\M7E\M7E_L_tracks_H17.mat';
-%inputs.logfile = 'C:\Users\Ping\Desktop\AC_type_project\data\M7E_unit_log.xlsx';
-%inputs.logrange = 'A1:HG620';
 
 Pooledanalyses ('Neuron type properties subpanel', ax_viol);
 
@@ -116,17 +112,94 @@ plot_cortex_map ('M7E',...
     'C:\Users\Ping\Documents\MATLAB\Xblaster3_Chamber3_GIT\XPL_code\plot_cortex\M7E\M7E_L_tracks_H17.mat', ...
     M7Elog,'bf','A1:HG620',0,'jet',0,0,0,ax1)
 
-plot_cortex_map ('M7E',...
+outputs = plot_cortex_map ('M7E',...
     'C:\Users\Ping\Documents\MATLAB\Xblaster3_Chamber3_GIT\XPL_code\plot_cortex\M7E\M7E_L_tracks_H17.mat', ...
     M7Elog,'groupIDcriteria','A1:HG620',0,'cool',0,0,0,ax2);
+
+xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\FigS2\FigS2.xlsx';
+i = 1;
+ID = 'M7E';
+sheetname = 'Maps';
+indsxls1 = 1:length(outputs.x_loc);
+col1 = outputs.x_loc;
+col2 = outputs.y_loc;
+col3 = outputs.unit_type;
+col4 = outputs.bf;
+col5 = outputs.CImax;
+col1_lab = 'x position(mm)';
+col2_lab = 'y_position(mm)';
+col3_lab = 'Unit type';
+col4_lab = 'Best Freq(kHz)';
+col5_lab = 'CImax';
+range_unit = ['A' num2str((length(indsxls1)+2)*(i-1)+1) ':A' num2str((length(indsxls1)+2)*(i-1)+1)];
+range_col1_lab = ['B' num2str((length(indsxls1)+2)*(i-1)+1) ':B' num2str((length(indsxls1)+2)*(i-1)+1)];
+range_col2_lab = ['C' num2str((length(indsxls1)+2)*(i-1)+1) ':C' num2str((length(indsxls1)+2)*(i-1)+1)];
+range_col3_lab = ['D' num2str((length(indsxls1)+2)*(i-1)+1) ':D' num2str((length(indsxls1)+2)*(i-1)+1)];
+range_col4_lab = ['E' num2str((length(indsxls1)+2)*(i-1)+1) ':E' num2str((length(indsxls1)+2)*(i-1)+1)];
+range_col5_lab = ['F' num2str((length(indsxls1)+2)*(i-1)+1) ':F' num2str((length(indsxls1)+2)*(i-1)+1)];
+xlswrite(xls_filename,{ID},sheetname,range_unit); 
+xlswrite(xls_filename,{col1_lab},sheetname,range_col1_lab);
+xlswrite(xls_filename,{col2_lab},sheetname,range_col2_lab);
+xlswrite(xls_filename,{col3_lab},sheetname,range_col3_lab);
+xlswrite(xls_filename,{col4_lab},sheetname,range_col4_lab);
+xlswrite(xls_filename,{col5_lab},sheetname,range_col5_lab);
+
+range1 = ['B' num2str((length(indsxls1)+2)*(i-1)+2) ':B' num2str((length(indsxls1)+2)*i-1)];
+xlswrite(xls_filename,col1(:),sheetname,range1);
+range2 = ['C' num2str((length(indsxls1)+2)*(i-1)+2) ':C' num2str((length(indsxls1)+2)*i-1)];
+xlswrite(xls_filename,col2(:),sheetname,range2);
+range3 = ['D' num2str((length(indsxls1)+2)*(i-1)+2) ':D' num2str((length(indsxls1)+2)*i-1)];
+xlswrite(xls_filename,col3(:),sheetname,range3);
+range4 = ['E' num2str((length(indsxls1)+2)*(i-1)+2) ':E' num2str((length(indsxls1)+2)*i-1)];
+xlswrite(xls_filename,col4(:),sheetname,range4);
+range5 = ['F' num2str((length(indsxls1)+2)*(i-1)+2) ':F' num2str((length(indsxls1)+2)*i-1)];
+xlswrite(xls_filename,col5(:),sheetname,range5);
 
 plot_cortex_map ('M117B', ...
     'C:\Users\Ping\Documents\MATLAB\Xblaster3_Chamber3_GIT\XPL_code\plot_cortex\M117B\M117B_L_tracks_H14.mat', ...
     M117Blog, 'bf', 'A1:FZ530', 0,'jet',0,0,0,ax3);
 
-plot_cortex_map ('M117B', ...
+outputs = plot_cortex_map ('M117B', ...
     'C:\Users\Ping\Documents\MATLAB\Xblaster3_Chamber3_GIT\XPL_code\plot_cortex\M117B\M117B_L_tracks_H14.mat', ...
     M117Blog,'groupIDcriteria', 'A1:FZ530', 0,'cool',0,0,0,ax4);
+
+i = 2;
+ID = 'M117B';
+sheetname = 'Maps';
+indsxls2 = 1:length(outputs.x_loc);
+col1 = outputs.x_loc;
+col2 = outputs.y_loc;
+col3 = outputs.unit_type;
+col4 = outputs.bf;
+col5 = outputs.CImax;
+col1_lab = 'x position(mm)';
+col2_lab = 'y_position(mm)';
+col3_lab = 'Unit type';
+col4_lab = 'Best Freq(kHz)';
+col5_lab = 'CImax';
+range_unit = ['A' num2str((length(indsxls1)+2)*(i-1)+1) ':A' num2str((length(indsxls1)+2)*(i-1)+1)];
+range_col1_lab = ['B' num2str((length(indsxls1)+2)*(i-1)+1) ':B' num2str((length(indsxls1)+2)*(i-1)+1)];
+range_col2_lab = ['C' num2str((length(indsxls1)+2)*(i-1)+1) ':C' num2str((length(indsxls1)+2)*(i-1)+1)];
+range_col3_lab = ['D' num2str((length(indsxls1)+2)*(i-1)+1) ':D' num2str((length(indsxls1)+2)*(i-1)+1)];
+range_col4_lab = ['E' num2str((length(indsxls1)+2)*(i-1)+1) ':E' num2str((length(indsxls1)+2)*(i-1)+1)];
+range_col5_lab = ['F' num2str((length(indsxls1)+2)*(i-1)+1) ':F' num2str((length(indsxls1)+2)*(i-1)+1)];
+xlswrite(xls_filename,{ID},sheetname,range_unit); 
+xlswrite(xls_filename,{col1_lab},sheetname,range_col1_lab);
+xlswrite(xls_filename,{col2_lab},sheetname,range_col2_lab);
+xlswrite(xls_filename,{col3_lab},sheetname,range_col3_lab);
+xlswrite(xls_filename,{col4_lab},sheetname,range_col4_lab);
+xlswrite(xls_filename,{col5_lab},sheetname,range_col5_lab);
+
+range1 = ['B' num2str((length(indsxls1)+2)*(i-1)+2) ':B' num2str(length(indsxls1)+length(indsxls2)+3)];
+xlswrite(xls_filename,col1(:),sheetname,range1);
+range2 = ['C' num2str((length(indsxls1)+2)*(i-1)+2) ':C' num2str(length(indsxls1)+length(indsxls2)+3)];
+xlswrite(xls_filename,col2(:),sheetname,range2);
+range3 = ['D' num2str((length(indsxls1)+2)*(i-1)+2) ':D' num2str(length(indsxls1)+length(indsxls2)+3)];
+xlswrite(xls_filename,col3(:),sheetname,range3);
+range4 = ['E' num2str((length(indsxls1)+2)*(i-1)+2) ':E' num2str(length(indsxls1)+length(indsxls2)+3)];
+xlswrite(xls_filename,col4(:),sheetname,range4);
+range5 = ['F' num2str((length(indsxls1)+2)*(i-1)+2) ':F' num2str(length(indsxls1)+length(indsxls2)+3)];
+xlswrite(xls_filename,col5(:),sheetname,range5);
 
 % Adjust axis lims to be same scale
 axes(ax2(1));
