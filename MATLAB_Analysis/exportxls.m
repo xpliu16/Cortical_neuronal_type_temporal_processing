@@ -9,5 +9,11 @@ xlswrite(xls_filename,{ylab},sheetname,range_ylab);
 
 range1 = ['B' num2str((length(indsxls)+2)*(i-1)+2) ':B' num2str((length(indsxls)+2)*i-1)];
 xlswrite(xls_filename,x(:),sheetname,range1);
-range2 = ['C' num2str((length(indsxls)+2)*(i-1)+2) ':C' num2str((length(indsxls)+2)*i-1)];
-xlswrite(xls_filename,y(:),sheetname,range2);
+%range2 = ['C' num2str((length(indsxls)+2)*(i-1)+2) ':C' num2str((length(indsxls)+2)*i-1)];
+range2 = ['C' num2str((length(indsxls)+2)*(i-1)+2)];
+if min(size(y))==1
+    % If vector, make a column
+    xlswrite(xls_filename,y(:),sheetname,range2);
+else
+    xlswrite(xls_filename,y,sheetname,range2);
+end

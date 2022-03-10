@@ -1090,6 +1090,67 @@ switch ana_type
     
     print([figdir 'Fig 2/Fig2open.tif'],'-dtiff',['-r' num2str(figparams.res)]); 
     
+    xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\Fig2\Fig2.xlsx';
+    i = 1;
+    ID = '';
+    sheetname = 'Properties';
+    
+    acmetric(burster==0), peakmsISI(burster==0)
+    indsxls1 = find(~isnan(acmetric) | ~isnan(peakmsISI)...
+                  | ~isnan(logISIdrop) | ~isnan(logISIdrop_prestim) ...
+                  | ~isnan(TTP) | ~isnan(F50) | ~isnan(HAD));
+    col1 = burster(indsxls1);
+    col2 = acmetric(indsxls1);
+    col3 = peakmsISI(indsxls1);
+    col4 = logISIdrop(indsxls1);
+    col5 = logISIdrop_prestim(indsxls1);
+    col6 = TTP(indsxls1);
+    col7 = F50(indsxls1);
+    col8 = HAD(indsxls1);
+    col1_lab = 'Bursting Unit';
+    col2_lab = 'Autocorrelogram metric';
+    col3_lab = 'Peak ISI(ms)';
+    col4_lab = 'logISIdrop';
+    col5_lab = 'logISIdrop pre-stimulus';
+    col6_lab = 'Trough-to-peak time(ms)';
+    col7_lab = 'f50';
+    col8_lab = 'Half-amplitude duration(ms)';
+    range_unit = ['A' num2str((length(indsxls1)+2)*(i-1)+1) ':A' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col1_lab = ['B' num2str((length(indsxls1)+2)*(i-1)+1) ':B' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col2_lab = ['C' num2str((length(indsxls1)+2)*(i-1)+1) ':C' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col3_lab = ['D' num2str((length(indsxls1)+2)*(i-1)+1) ':D' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col4_lab = ['E' num2str((length(indsxls1)+2)*(i-1)+1) ':E' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col5_lab = ['F' num2str((length(indsxls1)+2)*(i-1)+1) ':F' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col6_lab = ['G' num2str((length(indsxls1)+2)*(i-1)+1) ':G' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col7_lab = ['H' num2str((length(indsxls1)+2)*(i-1)+1) ':H' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col8_lab = ['I' num2str((length(indsxls1)+2)*(i-1)+1) ':I' num2str((length(indsxls1)+2)*(i-1)+1)];
+    xlswrite(xls_filename,{ID},sheetname,range_unit); 
+    xlswrite(xls_filename,{col1_lab},sheetname,range_col1_lab);
+    xlswrite(xls_filename,{col2_lab},sheetname,range_col2_lab);
+    xlswrite(xls_filename,{col3_lab},sheetname,range_col3_lab);
+    xlswrite(xls_filename,{col4_lab},sheetname,range_col4_lab);
+    xlswrite(xls_filename,{col5_lab},sheetname,range_col5_lab);
+    xlswrite(xls_filename,{col6_lab},sheetname,range_col6_lab);
+    xlswrite(xls_filename,{col7_lab},sheetname,range_col7_lab);
+    xlswrite(xls_filename,{col8_lab},sheetname,range_col8_lab);
+    
+    range1 = ['B' num2str((length(indsxls1)+2)*(i-1)+2) ':B' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col1(:),sheetname,range1);
+    range2 = ['C' num2str((length(indsxls1)+2)*(i-1)+2) ':C' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col2(:),sheetname,range2);
+    range3 = ['D' num2str((length(indsxls1)+2)*(i-1)+2) ':D' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col3(:),sheetname,range3);
+    range4 = ['E' num2str((length(indsxls1)+2)*(i-1)+2) ':E' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col4(:),sheetname,range4);
+    range5 = ['F' num2str((length(indsxls1)+2)*(i-1)+2) ':F' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col5(:),sheetname,range5);
+    range6 = ['G' num2str((length(indsxls1)+2)*(i-1)+2) ':G' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col6(:),sheetname,range6);
+    range7 = ['H' num2str((length(indsxls1)+2)*(i-1)+2) ':H' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col7(:),sheetname,range7);
+    range8 = ['I' num2str((length(indsxls1)+2)*(i-1)+2) ':I' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col8(:),sheetname,range8);
+    
     fig4 = figure
     set(gcf, 'PaperUnits', 'inches');
     set(gcf, 'PaperSize', [17.2*0.3937, 11*0.3937]);
@@ -1120,9 +1181,9 @@ switch ana_type
     cd(data_log_dir);
     writetable(T,'X_classify.csv');  
     
-    % Use a bunch of random seeds, take seed with best AIC
     rng(0,'twister'); 
     [coeff,score,latent,tsquared,explained] = pca(X, 'Algorithm', 'als');
+    %[coeff,score,latent,tsquared,explained] = pca(X, 'rows','pairwise');
     coeff1 = coeff(:,1);
     coeff2 = coeff(:,2);
     coeff3 = coeff(:,3);
@@ -1162,7 +1223,7 @@ switch ana_type
     Xred = [pc1coord,pc2coord,pc3coord];
    
     options = statset('MaxIter',5000,'TolFun',1e-7);
-   
+    % Use a bunch of random seeds, take seed with best AIC
     AIC = zeros(1,20);
     for i = 1:20
         rng(i);
@@ -1421,6 +1482,8 @@ switch ana_type
     nreps = 50;
     temp =nan(1,nreps);
     temp2 =nan(1,nreps);
+    clear BIC;
+    clear AIC;
     for ncomp = 1:7
         for rep = 1:nreps
             
@@ -1488,6 +1551,190 @@ switch ana_type
     haF = annotation(fig4,'textbox',[0.7285 0.32 0.05180 0.0723],'String',{'F'},'LineStyle','none','Units','normalized',fontstr_l{:});
     
     print([figdir 'Fig 4/Fig4.tif'],'-dtiff',['-r' num2str(figparams.res)]);
+    
+    xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\Fig3\Fig3.xlsx';
+    i = 1;
+    ID = 'Features for PCA';
+    sheetname = 'Properties';
+  
+    indsxls1 = find(~isnan(spont_recalc) | ~isnan(acmetric) | ~isnan(peakmsISI)...
+                  | ~isnan(F50) | ~isnan(percISI5) | ~isnan(logISIdrop) ...
+                  | ~isnan(max_burst_length) | ~isnan(max_firing_rate));
+    col1 = spont_recalc(indsxls1);
+    col2 = acmetric(indsxls1);
+    col3 = peakmsISI(indsxls1);
+    col4 = F50(indsxls1);
+    col5 = percISI5(indsxls1);
+    col6 = logISIdrop(indsxls1);
+    col7 = max_burst_length(indsxls1);
+    col8 = max_firing_rate(indsxls1);
+    col1_lab = 'Spontaneous rate(spk/s)';
+    col2_lab = 'Autocorrelogram metric';
+    col3_lab = 'Peak ISI(ms)';
+    col4_lab = 'F50(Hz)';
+    col5_lab = 'Percent ISI < 5 ms';
+    col6_lab = 'logISIdrop';
+    col7_lab = 'Maximum burst length';
+    col8_lab = 'Maximum firing rate (spk/s)';
+    range_unit = ['A' num2str((length(indsxls1)+2)*(i-1)+1) ':A' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col1_lab = ['B' num2str((length(indsxls1)+2)*(i-1)+1) ':B' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col2_lab = ['C' num2str((length(indsxls1)+2)*(i-1)+1) ':C' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col3_lab = ['D' num2str((length(indsxls1)+2)*(i-1)+1) ':D' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col4_lab = ['E' num2str((length(indsxls1)+2)*(i-1)+1) ':E' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col5_lab = ['F' num2str((length(indsxls1)+2)*(i-1)+1) ':F' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col6_lab = ['G' num2str((length(indsxls1)+2)*(i-1)+1) ':G' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col7_lab = ['H' num2str((length(indsxls1)+2)*(i-1)+1) ':H' num2str((length(indsxls1)+2)*(i-1)+1)];
+    range_col8_lab = ['I' num2str((length(indsxls1)+2)*(i-1)+1) ':I' num2str((length(indsxls1)+2)*(i-1)+1)];
+    xlswrite(xls_filename,{ID},sheetname,range_unit); 
+    xlswrite(xls_filename,{col1_lab},sheetname,range_col1_lab);
+    xlswrite(xls_filename,{col2_lab},sheetname,range_col2_lab);
+    xlswrite(xls_filename,{col3_lab},sheetname,range_col3_lab);
+    xlswrite(xls_filename,{col4_lab},sheetname,range_col4_lab);
+    xlswrite(xls_filename,{col5_lab},sheetname,range_col5_lab);
+    xlswrite(xls_filename,{col6_lab},sheetname,range_col6_lab);
+    xlswrite(xls_filename,{col7_lab},sheetname,range_col7_lab);
+    xlswrite(xls_filename,{col8_lab},sheetname,range_col8_lab);
+    
+    range1 = ['B' num2str((length(indsxls1)+2)*(i-1)+2) ':B' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col1(:),sheetname,range1);
+    range2 = ['C' num2str((length(indsxls1)+2)*(i-1)+2) ':C' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col2(:),sheetname,range2);
+    range3 = ['D' num2str((length(indsxls1)+2)*(i-1)+2) ':D' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col3(:),sheetname,range3);
+    range4 = ['E' num2str((length(indsxls1)+2)*(i-1)+2) ':E' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col4(:),sheetname,range4);
+    range5 = ['F' num2str((length(indsxls1)+2)*(i-1)+2) ':F' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col5(:),sheetname,range5);
+    range6 = ['G' num2str((length(indsxls1)+2)*(i-1)+2) ':G' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col6(:),sheetname,range6);
+    range7 = ['H' num2str((length(indsxls1)+2)*(i-1)+2) ':H' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col7(:),sheetname,range7);
+    range8 = ['I' num2str((length(indsxls1)+2)*(i-1)+2) ':I' num2str((length(indsxls1)+2)*i-1)];
+    xlswrite(xls_filename,col8(:),sheetname,range8);
+    
+    ID = 'Principal components';
+    sheetname = 'Principal components';
+    indsxls = 1:size(coeff,1);
+    col1 = coeff(:,1);
+    col2 = coeff(:,2);
+    col3 = coeff(:,3);
+    col4 = coeff(:,4);
+    col5 = coeff(:,5);
+    col6 = coeff(:,6);
+    col7 = coeff(:,7);
+    col8 = coeff(:,8);
+    col1_lab = 'PC1';
+    col2_lab = 'PC2';
+    col3_lab = 'PC3';
+    col4_lab = 'PC4';
+    col5_lab = 'PC5';
+    col6_lab = 'PC6';
+    col7_lab = 'PC7';
+    col8_lab = 'PC8';
+    range_unit = ['A' num2str((length(indsxls)+2)*(i-1)+1) ':A' num2str((length(indsxls)+2)*(i-1)+1)];
+    range_col1_lab = ['B' num2str((length(indsxls)+2)*(i-1)+1) ':B' num2str((length(indsxls)+2)*(i-1)+1)];
+    range_col2_lab = ['C' num2str((length(indsxls)+2)*(i-1)+1) ':C' num2str((length(indsxls)+2)*(i-1)+1)];
+    range_col3_lab = ['D' num2str((length(indsxls)+2)*(i-1)+1) ':D' num2str((length(indsxls)+2)*(i-1)+1)];
+    range_col4_lab = ['E' num2str((length(indsxls)+2)*(i-1)+1) ':E' num2str((length(indsxls)+2)*(i-1)+1)];
+    range_col5_lab = ['F' num2str((length(indsxls)+2)*(i-1)+1) ':F' num2str((length(indsxls)+2)*(i-1)+1)];
+    range_col6_lab = ['G' num2str((length(indsxls)+2)*(i-1)+1) ':G' num2str((length(indsxls)+2)*(i-1)+1)];
+    range_col7_lab = ['H' num2str((length(indsxls)+2)*(i-1)+1) ':H' num2str((length(indsxls)+2)*(i-1)+1)];
+    range_col8_lab = ['I' num2str((length(indsxls)+2)*(i-1)+1) ':I' num2str((length(indsxls)+2)*(i-1)+1)];
+    xlswrite(xls_filename,{ID},sheetname,range_unit); 
+    xlswrite(xls_filename,{col1_lab},sheetname,range_col1_lab);
+    xlswrite(xls_filename,{col2_lab},sheetname,range_col2_lab);
+    xlswrite(xls_filename,{col3_lab},sheetname,range_col3_lab);
+    xlswrite(xls_filename,{col4_lab},sheetname,range_col4_lab);
+    xlswrite(xls_filename,{col5_lab},sheetname,range_col5_lab);
+    xlswrite(xls_filename,{col6_lab},sheetname,range_col6_lab);
+    xlswrite(xls_filename,{col7_lab},sheetname,range_col7_lab);
+    xlswrite(xls_filename,{col8_lab},sheetname,range_col8_lab);
+    
+    range1 = ['B' num2str((length(indsxls)+2)*(i-1)+2) ':B' num2str((length(indsxls)+2)*i-1)];
+    xlswrite(xls_filename,col1(:),sheetname,range1);
+    range2 = ['C' num2str((length(indsxls)+2)*(i-1)+2) ':C' num2str((length(indsxls)+2)*i-1)];
+    xlswrite(xls_filename,col2(:),sheetname,range2);
+    range3 = ['D' num2str((length(indsxls)+2)*(i-1)+2) ':D' num2str((length(indsxls)+2)*i-1)];
+    xlswrite(xls_filename,col3(:),sheetname,range3);
+    range4 = ['E' num2str((length(indsxls)+2)*(i-1)+2) ':E' num2str((length(indsxls)+2)*i-1)];
+    xlswrite(xls_filename,col4(:),sheetname,range4);
+    range5 = ['F' num2str((length(indsxls)+2)*(i-1)+2) ':F' num2str((length(indsxls)+2)*i-1)];
+    xlswrite(xls_filename,col5(:),sheetname,range5);
+    range6 = ['G' num2str((length(indsxls)+2)*(i-1)+2) ':G' num2str((length(indsxls)+2)*i-1)];
+    xlswrite(xls_filename,col6(:),sheetname,range6);
+    range7 = ['H' num2str((length(indsxls)+2)*(i-1)+2) ':H' num2str((length(indsxls)+2)*i-1)];
+    xlswrite(xls_filename,col7(:),sheetname,range7);
+    range8 = ['I' num2str((length(indsxls)+2)*(i-1)+2) ':I' num2str((length(indsxls)+2)*i-1)];
+    xlswrite(xls_filename,col8(:),sheetname,range8);
+    
+    
+    ID = 'Percent variance explained';
+    i = 1;
+    sheetname = 'Var Explained';
+    indsxls = 1:length(explained);
+    x = 1:length(explained);
+    y = explained;
+    xlab = 'Component';
+    ylab = 'Explained';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
+    
+    ID = 'Cumulative percent variance explained';
+    i = 2;
+    sheetname = 'Var Explained';
+    indsxls = 1:length(explained);
+    x = 1:length(explained);
+    y = cumsum(explained);
+    x_lab = 'Component';
+    y_lab = 'Explained';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
+
+    ID = 'Akaike Information Criterion';
+    i = 1;
+    sheetname = 'Model selection';
+    indsxls = ncomp;
+    x = ncomp;
+    y = AIC;
+    xlab = 'Number of Components';
+    ylab = 'Fit AIC';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
+    
+    ID = 'Bayesian Information Criterion';
+    i = 2;
+    sheetname = 'Model selection';
+    indsxls = ncomp;
+    x = ncomp;
+    y = BIC;
+    xlab = 'Number of Components';
+    ylab = 'Fit BIC';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
+    
+    ID = 'Negative log-likelihood on training set';
+    i = 3;
+    sheetname = 'Model selection';
+    indsxls = ncomp;
+    x = ncomp;
+    y = avg_nlogL_train;
+    xlab = 'Number of Components';
+    ylab = 'Neg log-likelihood';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
+    
+    ID = 'Negative log-likelihood on test set';
+    i = 4;
+    sheetname = 'Model selection';
+    indsxls = ncomp;
+    x = ncomp;
+    y = avg_nlogL_test;
+    xlab = 'Number of Components';
+    ylab = 'Neg log-likelihood';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
+    
+    ID = 'Confusion matrix';
+    sheetname = 'Confusion matrix';
+    xlswrite(xls_filename,{ID},sheetname,'A1:A1');
+    range1 = 'B1:D3';
+    xlswrite(xls_filename,conf_norm,sheetname,range1);
+    
+  
         
     %% Response properties for Sinusoidal Amplitude Modulation
     case 'SAM rate'
@@ -1603,6 +1850,52 @@ switch ana_type
     q3(4).LineWidth = 1;
     q3(5).LineWidth = 1;
     
+    xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\Fig5\Fig5.xlsx';
+      
+    indsxls = find(~isnan(maxVS_plusprestim) & ...
+            ismember(groupIDcrit_plusprestim,{'RS','FS','Burster_h','Burster_l'}));
+    group = containers.Map({'RS','FS','Burster_h','Burster_l'}, {'RS','FS','Bu1','Bu2'});
+    i = 1;
+    x = values(group,groupIDcrit_plusprestim(indsxls));
+    y = maxVS_plusprestim(indsxls);
+    sheetname = 'Max VS';
+    ID = 'Maximum Vector Strength'
+    xlab = 'Unit type';
+    ylab = 'Max VS';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
+    xlswrite(xls_filename,{'Welch ANOVA'},sheetname,'F1');
+    xlswrite(xls_filename,{'DF1'},sheetname,'G1');
+    xlswrite(xls_filename,3,sheetname,'H1');
+    xlswrite(xls_filename,{'DF2'},sheetname,'G2');
+    xlswrite(xls_filename,44.4,sheetname,'H2');
+    xlswrite(xls_filename,{'F'},sheetname,'G3');
+    xlswrite(xls_filename,12.9,sheetname,'H3');
+    xlswrite(xls_filename,{'p-val'},sheetname,'G4');
+    xlswrite(xls_filename,0.000003,sheetname,'H4');
+
+    xlswrite(xls_filename,{'Games-Howell'},sheetname,'K1');
+    xlswrite(xls_filename,{'A'},sheetname,'L1');
+    xlswrite(xls_filename,{'B'},sheetname,'M1');
+    xlswrite(xls_filename,{'p-val'},sheetname,'N1');
+    xlswrite(xls_filename,{'Bu1'},sheetname,'L2');
+    xlswrite(xls_filename,{'Bu2'},sheetname,'M2');
+    xlswrite(xls_filename,0.0475,sheetname,'N2');
+    xlswrite(xls_filename,{'Bu1'},sheetname,'L3');
+    xlswrite(xls_filename,{'FS'},sheetname,'M3');
+    xlswrite(xls_filename,0.0010,sheetname,'N3');
+    xlswrite(xls_filename,{'Bu1'},sheetname,'L4');
+    xlswrite(xls_filename,{'RS'},sheetname,'M4');
+    xlswrite(xls_filename,0.0010,sheetname,'N4');
+    xlswrite(xls_filename,{'Bu2'},sheetname,'L5');
+    xlswrite(xls_filename,{'FS'},sheetname,'M5');
+    xlswrite(xls_filename,0.0600,sheetname,'N5');
+    xlswrite(xls_filename,{'Bu2'},sheetname,'L6');
+    xlswrite(xls_filename,{'RS'},sheetname,'M6');
+    xlswrite(xls_filename,0.2196,sheetname,'N6');
+    xlswrite(xls_filename,{'FS'},sheetname,'L7');
+    xlswrite(xls_filename,{'RS'},sheetname,'M7');
+    xlswrite(xls_filename,0.7476,sheetname,'N7');
+    
     nFS_sync = length(find(strcmp(SAMtype4Hz_plusprestim(find(strcmp(groupIDcrit_plusprestim,'FS'))),'Sync')));
     nRS_sync = length(find(strcmp(SAMtype4Hz_plusprestim(find(strcmp(groupIDcrit_plusprestim,'RS'))),'Sync')));
     nBu2_sync = length(find(strcmp(SAMtype4Hz_plusprestim(find(strcmp(groupIDcrit_plusprestim,'Burster_l'))),'Sync')));
@@ -1691,6 +1984,23 @@ switch ana_type
     set(gca,'ylim',[0 1]);
     ax5.Position(4) = 0.97*ax5.Position(4);
    
+    xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\Fig5\Fig5.xlsx';
+    sheetname = 'Fraction sync';
+    xlswrite(xls_filename,{'Fraction sync units(>= 4 Hz)'},sheetname,'B1');
+    xlswrite(xls_filename,{'Fraction sync units(>= 16 Hz)'},sheetname,'C1');
+    xlswrite(xls_filename,{'RS'},sheetname,'A2');
+    xlswrite(xls_filename,{'FS'},sheetname,'A3');
+    xlswrite(xls_filename,{'Bu1'},sheetname,'A4');
+    xlswrite(xls_filename,{'Bu2'},sheetname,'A5');
+    xlswrite(xls_filename,fRS_sync,sheetname,'B2');
+    xlswrite(xls_filename,fFS_sync,sheetname,'B3');
+    xlswrite(xls_filename,fBu1_sync,sheetname,'B4');
+    xlswrite(xls_filename,fBu2_sync,sheetname,'B5');
+    xlswrite(xls_filename,fRS_sync16,sheetname,'C2');
+    xlswrite(xls_filename,fFS_sync16,sheetname,'C3');
+    xlswrite(xls_filename,fBu1_sync16,sheetname,'C4');
+    xlswrite(xls_filename,fBu2_sync16,sheetname,'C5');
+    
     % tBMF
     [val,ind] = max(VS,[],2);
     %ind(val<=13.8) = NaN;   % Nonsignificant
@@ -1790,8 +2100,42 @@ switch ana_type
     set(gca,'XTick',[1E0 1E1 1E2 1E3]);
     set(gca,'xlim',[1E0 1E3]);
     set(gca,'ylim',[-0.05 0.8]);
+    
+    xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\Fig5\Fig5.xlsx';
+    sheetname = 'Vector Strength';
+    indsxls = 1:length(SAMrates);
+    i = 1;
+    x = SAMrates;
+    y = [VS_RS',VS_RS_stderr']; 
+    ID = 'RS';
+    xlab = 'SAM rate(Hz)';
+    ylab1 = 'Vector strength';
+    ylab2 = 'Stderr';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+    xlswrite(xls_filename,{ylab2},sheetname,'D1');
+    
+    i = 2;
+    y = [VS_FS',VS_FS_stderr']; 
+    ID = 'FS';
+    xlab = '';
+    ylab1 = '';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+    xlswrite(xls_filename,{ylab2},sheetname,'D1');
+    
+    i = 3;
+    y = [VS_Bu1',VS_Bu1_stderr']; 
+    ID = 'Bu1';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+       
+    i = 4;
+    y = [VS_Bu2',VS_Bu2_stderr']; 
+    ID = 'Bu2';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
 
-    figure(supp_Bu1_2)
+    % Handle not in scope when run as a function rather than script - reassign the
+    % handle again
+    global supp_Bu1_2;
+    figure(supp_Bu1_2);
     axes('Position',[0.1+2*(0.22+0.11), 0.6, 0.22, 0.35]);  
         
     VS_RS = mean(VS_plusprestim(RSinds_gmm,:),1,'omitnan');
@@ -1831,6 +2175,37 @@ switch ana_type
     text(100,0.75-3*inc,['Bu2 (' num2str(VS_Bu2_n) ')'],'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold','Color',Bu2Color);
     text('Units','normalized','Position',[-0.31,1+0.1*0.15/0.35],'String','C');
     
+    xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\FigS4\FigS4.xlsx';
+    sheetname = 'Vector Strength';
+    indsxls = 1:length(SAMrates);
+    i = 1;
+    x = SAMrates;
+    y = [VS_RS',VS_RS_stderr']; 
+    ID = 'RS';
+    xlab = 'SAM rate(Hz)';
+    ylab1 = 'Vector strength';
+    ylab2 = 'Stderr';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+    xlswrite(xls_filename,{ylab2},sheetname,'D1');
+    
+    i = 2;
+    y = [VS_FS',VS_FS_stderr']; 
+    ID = 'FS';
+    xlab = '';
+    ylab1 = '';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+    xlswrite(xls_filename,{ylab2},sheetname,'D1');
+    
+    i = 3;
+    y = [VS_Bu1',VS_Bu1_stderr']; 
+    ID = 'Bu1';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+       
+    i = 4;
+    y = [VS_Bu2',VS_Bu2_stderr']; 
+    ID = 'Bu2';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+    
     axes('Position',[0.1, 0.1, 0.22, 0.35]);  
     hold on
     y2 = [fRS_sync16; fFS_sync16; fBu1_gmm_sync16; fBu2_gmm_sync16];  
@@ -1852,6 +2227,17 @@ switch ana_type
     th4 = text(4,fBu2_gmm_sync16+0.07,num2str(nBu2_gmm_sync+nBu2_gmm_nsync),'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold','Color',Bu2Color,'HorizontalAlignment','center');
     text('Units','normalized','Position',[-0.31,1+0.1*0.15/0.35],'String','D');
     set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold','TickDir','out','box','off');
+    
+    sheetname = 'Fraction sync';
+    xlswrite(xls_filename,{'Fraction sync units(>= 16 Hz)'},sheetname,'B1');
+    xlswrite(xls_filename,{'RS'},sheetname,'A2');
+    xlswrite(xls_filename,{'FS'},sheetname,'A3');
+    xlswrite(xls_filename,{'Bu1'},sheetname,'A4');
+    xlswrite(xls_filename,{'Bu2'},sheetname,'A5');
+    xlswrite(xls_filename,fRS_sync16,sheetname,'B2');
+    xlswrite(xls_filename,fFS_sync16,sheetname,'B3');
+    xlswrite(xls_filename,fBu1_gmm_sync16,sheetname,'B4');
+    xlswrite(xls_filename,fBu2_gmm_sync16,sheetname,'B5');
     
     A = [groupIDcrit_plusprestim, groupIDgmm_plusprestim, num2cell(maxsync_plusprestim)];
     T = array2table(A);
@@ -1902,6 +2288,51 @@ switch ana_type
     q3(4).LineWidth = 1;
     q3(5).LineWidth = 1;
     
+    xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\Fig5\Fig5.xlsx';
+      
+    indsxls = find(~isnan(maxsync_plusprestim) & ...
+            ismember(groupIDcrit_plusprestim,{'RS','FS','Burster_h','Burster_l'}));
+    i = 1;
+    x = values(group,groupIDcrit_plusprestim(indsxls));
+    y = maxsync_plusprestim(indsxls);
+    sheetname = 'Max Sync Rate';
+    ID = '';
+    xlab = 'Unit type';
+    ylab = 'Max Sync Rate(Hz)';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
+    xlswrite(xls_filename,{'Welch ANOVA'},sheetname,'F1');
+    xlswrite(xls_filename,{'DF1'},sheetname,'G1');
+    xlswrite(xls_filename,3,sheetname,'H1');
+    xlswrite(xls_filename,{'DF2'},sheetname,'G2');
+    xlswrite(xls_filename,31.736907,sheetname,'H2');
+    xlswrite(xls_filename,{'F'},sheetname,'G3');
+    xlswrite(xls_filename,8.207693,sheetname,'H3');
+    xlswrite(xls_filename,{'p-val'},sheetname,'G4');
+    xlswrite(xls_filename,0.000348,sheetname,'H4');
+
+    xlswrite(xls_filename,{'Games-Howell'},sheetname,'K1');
+    xlswrite(xls_filename,{'A'},sheetname,'L1');
+    xlswrite(xls_filename,{'B'},sheetname,'M1');
+    xlswrite(xls_filename,{'p-val'},sheetname,'N1');
+    xlswrite(xls_filename,{'Bu1'},sheetname,'L2');
+    xlswrite(xls_filename,{'Bu2'},sheetname,'M2');
+    xlswrite(xls_filename,0.0277,sheetname,'N2');
+    xlswrite(xls_filename,{'Bu1'},sheetname,'L3');
+    xlswrite(xls_filename,{'FS'},sheetname,'M3');
+    xlswrite(xls_filename,0.6065,sheetname,'N3');
+    xlswrite(xls_filename,{'Bu1'},sheetname,'L4');
+    xlswrite(xls_filename,{'RS'},sheetname,'M4');
+    xlswrite(xls_filename,0.0080,sheetname,'N4');
+    xlswrite(xls_filename,{'Bu2'},sheetname,'L5');
+    xlswrite(xls_filename,{'FS'},sheetname,'M5');
+    xlswrite(xls_filename,0.1830,sheetname,'N5');
+    xlswrite(xls_filename,{'Bu2'},sheetname,'L6');
+    xlswrite(xls_filename,{'RS'},sheetname,'M6');
+    xlswrite(xls_filename,0.5870,sheetname,'N6');
+    xlswrite(xls_filename,{'FS'},sheetname,'L7');
+    xlswrite(xls_filename,{'RS'},sheetname,'M7');
+    xlswrite(xls_filename,0.0214,sheetname,'N7');
+    
     perhist_RS = mean(perhist_plusprestim(RSinds,:),1,'omitnan');
     perhist_FS = mean(perhist_plusprestim(FSinds,:),1,'omitnan');
     perhist_Bu2 = mean(perhist_plusprestim(Bu2inds,:),1,'omitnan');
@@ -1927,7 +2358,7 @@ switch ana_type
     
     ax6sub(3) = axes(fig6,'Position',[ax6.Position(1), ax6.Position(2), (ax6.Position(3)-intercol)/2, (ax6.Position(4)-interrow)/2]); 
     bar(centers,perhist_Bu1(1:end-1),'FaceColor','none','BarWidth',1,'LineWidth',0.5,'EdgeColor',[0.5 0.5 0.5]);
-    lh_rad = xlabel('Period (Rad)');
+    lh_rad = xlabel('Phase (Rad)');
     set(gca,'ylim',[0 8]);
     set(gca,'XTick',[0 pi 2*pi]);
     set(gca,'Xticklabels',{'0','\pi','2\pi'},'FontSize',figparams.fsize)
@@ -1956,6 +2387,31 @@ switch ana_type
     
     linkaxes(ax6sub,'x');
     set(gca,'xlim',[0 2*pi]);
+    
+    sheetname = 'Period Histograms';
+    indsxls = 1:length(centers);
+    i = 1;
+    x = centers;
+    y = perhist_RS(1:end-1); 
+    ID = 'RS';
+    xlab = 'Phase(rad)';
+    ylab1 = 'Count';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+    
+    i = 2;
+    y = perhist_FS(1:end-1); 
+    ID = 'FS';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+    
+    i = 3;
+    y = perhist_Bu1(1:end-1); 
+    ID = 'Bu1';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+       
+    i = 4;
+    y = perhist_Bu2(1:end-1); 
+    ID = 'Bu2';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
     
     units_all = {'M7E0133ch1', 'M7E1468ch1', 'M117B2357ch4', 'M117B3169ch4'};
     ax7d = subplot(3,3,7);   % Dummy axes
@@ -2044,7 +2500,7 @@ switch ana_type
     lh_ns.Position(2) = 10.5;
     lh_rad.Position(1) = 8;
     
-    print([figdir 'Fig 6/Fig6.tif'],'-dtiff',['-r' num2str(figparams.res)]);
+    print([figdir 'Fig 6/Fig6.tif'],'-dtiff',['-r' num2str(figparams.res)]);   
     
     suppl = figure;  
     set(gcf, 'PaperUnits', 'inches');
@@ -2081,7 +2537,7 @@ switch ana_type
     npreburst_maxVS = length(find(~isnan(maxVS_plusprestim(PBuinds))));
     nburst_maxVS = length(find(~isnan(maxVS_plusprestim(Buinds_crit))));
     xticklabels({'RS','FS','Bu','PBu','Bu_c_r_i_t'});
-    set('ylim',[-0.05 1.35]);
+    set(gca,'ylim',[-0.05 1.35]);
     hold on
     sigstar({[2 3],[1 3]},[p1 p2]);   
     set(findobj(ax1,'type','Scatter'),'SizeData',8);
@@ -2103,6 +2559,43 @@ switch ana_type
     q3(3).LineWidth = 1;
     q3(4).LineWidth = 1;
     q3(5).LineWidth = 1;
+    
+    xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\FigS5\FigS5.xlsx';
+      
+    indsxls = find(~isnan(maxVS_plusprestim) & ...
+            ismember(groupIDgmm_plusprestim,{'RS','FS','Burster','Prestim burster','Burster_crit'}));
+    group2 = containers.Map({'RS','FS','Burster','Prestim burster','Burster_crit'}, {'RS','FS','Bu','PBu','BuCrit'});
+    i = 1;
+    x = values(group2,groupIDgmm_plusprestim(indsxls));
+    y = maxVS_plusprestim(indsxls);
+    sheetname = 'Max VS';
+    ID = 'Maximum Vector Strength'
+    xlab = 'Unit type';
+    ylab = 'Max VS';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
+    xlswrite(xls_filename,{'Welch ANOVA'},sheetname,'F1');
+    xlswrite(xls_filename,{'DF1'},sheetname,'G1');
+    xlswrite(xls_filename,2,sheetname,'H1');
+    xlswrite(xls_filename,{'DF2'},sheetname,'G2');
+    xlswrite(xls_filename,96.5,sheetname,'H2');
+    xlswrite(xls_filename,{'F'},sheetname,'G3');
+    xlswrite(xls_filename,15.6,sheetname,'H3');
+    xlswrite(xls_filename,{'p-val'},sheetname,'G4');
+    xlswrite(xls_filename,0.000001,sheetname,'H4');
+
+    xlswrite(xls_filename,{'Games-Howell'},sheetname,'K1');
+    xlswrite(xls_filename,{'A'},sheetname,'L1');
+    xlswrite(xls_filename,{'B'},sheetname,'M1');
+    xlswrite(xls_filename,{'p-val'},sheetname,'N1');
+    xlswrite(xls_filename,{'Bu'},sheetname,'L2');
+    xlswrite(xls_filename,{'FS'},sheetname,'M2');
+    xlswrite(xls_filename,0.0010,sheetname,'N2');
+    xlswrite(xls_filename,{'Bu'},sheetname,'L3');
+    xlswrite(xls_filename,{'RS'},sheetname,'M3');
+    xlswrite(xls_filename,0.0010,sheetname,'N3');
+    xlswrite(xls_filename,{'FS'},sheetname,'L4');
+    xlswrite(xls_filename,{'RS'},sheetname,'M4');
+    xlswrite(xls_filename,0.9000,sheetname,'N4');
        
     nFS_sync_gmm = length(find(strcmp(SAMtype4Hz(find(strcmp(groupIDgmm,'FS'))),'Sync')));
     nRS_sync_gmm = length(find(strcmp(SAMtype4Hz(find(strcmp(groupIDgmm,'RS'))),'Sync')));
@@ -2179,6 +2672,25 @@ switch ana_type
     set(gca,'xlim',[0.5 5.5]);
     set(gca,'ylim',[0 1]);
     set(gca,'YTick',[0 0.2 0.4 0.6 0.8 1]);
+    
+    sheetname = 'Fraction sync';
+    xlswrite(xls_filename,{'Fraction sync units(>= 4 Hz)'},sheetname,'B1');
+    xlswrite(xls_filename,{'Fraction sync units(>= 16 Hz)'},sheetname,'C1');
+    xlswrite(xls_filename,{'RS'},sheetname,'A2');
+    xlswrite(xls_filename,{'FS'},sheetname,'A3');
+    xlswrite(xls_filename,{'Bu(GMM)'},sheetname,'A4');
+    xlswrite(xls_filename,{'Bu(Pre-stim)'},sheetname,'A5');
+    xlswrite(xls_filename,{'Bu(Criteria)'},sheetname,'A6');
+    xlswrite(xls_filename,fRS_sync_gmm,sheetname,'B2');
+    xlswrite(xls_filename,fFS_sync_gmm,sheetname,'B3');
+    xlswrite(xls_filename,fBu_sync_gmm,sheetname,'B4');
+    xlswrite(xls_filename,fPBu_sync,sheetname,'B5');
+    xlswrite(xls_filename,fBuCrit_sync,sheetname,'B6');
+    xlswrite(xls_filename,fRS_sync16_gmm,sheetname,'C2');
+    xlswrite(xls_filename,fFS_sync16_gmm,sheetname,'C3');
+    xlswrite(xls_filename,fBu_sync16_gmm,sheetname,'C4');
+    xlswrite(xls_filename,fPBu_sync16,sheetname,'C5');
+    xlswrite(xls_filename,fBuCrit_sync16,sheetname,'C6');
    
     VS_RS = mean(VS_plusprestim(RSinds_gmm,:),1,'omitnan');
     VS_FS = mean(VS_plusprestim(FSinds_gmm,:),1,'omitnan');
@@ -2219,6 +2731,42 @@ switch ana_type
     set(gca,'XTick',[1E0 1E1 1E2 1E3]);
     set(gca,'xlim',[1E0 1E3]);
     set(gca,'ylim',[-0.05 0.6]);
+    
+    xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\FigS5\FigS5.xlsx';
+    sheetname = 'Vector Strength';
+    indsxls = 1:length(SAMrates);
+    i = 1;
+    x = SAMrates;
+    y = [VS_RS',VS_RS_stderr']; 
+    ID = 'RS (GMM)';
+    xlab = 'SAM rate(Hz)';
+    ylab1 = 'Vector strength';
+    ylab2 = 'Stderr';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+    xlswrite(xls_filename,{ylab2},sheetname,'D1');
+    
+    i = 2;
+    y = [VS_FS',VS_FS_stderr']; 
+    ID = 'FS (GMM)';
+    xlab = '';
+    ylab1 = '';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+    xlswrite(xls_filename,{ylab2},sheetname,'D1');
+    
+    i = 3;
+    y = [VS_Bu',VS_Bu_stderr']; 
+    ID = 'Bursting (GMM)';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+       
+    i = 4;
+    y = [VS_PBu',VS_PBu_stderr']; 
+    ID = 'Pre-stim Bursting';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+    
+    i = 5;
+    y = [VS_BuCrit',VS_BuCrit_stderr']; 
+    ID = 'Bursting (Criteria)';
+    exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
    
     maxsync_RS = maxsync_plusprestim(RSinds_gmm);
     maxsync_FS = maxsync_plusprestim(FSinds_gmm);
@@ -2284,7 +2832,7 @@ switch ana_type
     bar(centers,perhist_Bu_gmm(1:end-1),'FaceColor','none','BarWidth',1,'LineWidth',0.5,'EdgeColor',[0.5 0.5 0.5]);
     set(gca,'ylim',[0 8]);
     set(gca,'XTick',[0 pi 2*pi]);
-    lh_rad = xlabel('Period (Rad)');
+    lh_rad = xlabel('Phase (Rad)');
     set(gca,'Xticklabels',{'0','\pi','2\pi'},'FontSize',figparams.fsize)
     lh_ns = ylabel('Number of spikes','FontSize',figparams.fsize);
     yt = yticks;
@@ -2413,6 +2961,8 @@ switch ana_type
         set(gca,'xlim',[0.5 9],'xtick',[1,2,3,4,5.5,6.5,7.5,8.5],'xticklabels',{'RS','FS','Bu1','Bu2','RS','FS','Bu1','Bu2'},...
             'ytick',[0 0.1 0.2 0.3 0.4 0.5]);
         xl1 = xlabel('Mean rate              PSTH   ',fontstr{:});
+        
+        
         
         axf8p2 = axes(fig8,'Position',[lmargin+axf8p1.Position(3)+2*(intercol+0.011) tmargin-ywidth axf8p1.Position(3) ywidth]);
           
@@ -2903,7 +3453,8 @@ switch ana_type
         text(tif8p1.Position(1)*axf8p1.Position(3)/axvp4.Position(3)*0.7,1.15,'G','Units','normalized',fontstr_l{:}); 
         
         print([figdir 'Fig 8/Fig8.tif'],'-dtiff',['-r' num2str(figparams.res)]);    
-         
+        
+        global supp_Bu1_2;
         figure(supp_Bu1_2);
         axes('Position',[0.1+0.22+0.11, 0.1, 0.22, 0.35]);
         CImax_RS = CImax_plusprestim(strcmp(groupIDcrit_plusprestim,'RS'));
@@ -2937,6 +3488,7 @@ switch ana_type
         set(gca,'xlim',[0.5,4.5]);        
         text('Units','normalized','Position',[-0.31,1+0.1*0.15/0.35],'String','E');
         
+        global supp_Bu1_2;
         figure(supp_Bu1_2);
         axes('Position',[0.1+2*(0.22+0.11), 0.1, 0.22, 0.35]);
         RS_H = H((groupnumcrit == 3) & (z_score>zthresh),:);
@@ -3494,19 +4046,6 @@ switch ana_type
             if i == 3
                 text(0.88,maxFS*1.5*0.8,{'FS'},'Color',FSColor,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
             end
-
-            %{
-            old_pos = get(ax2(i),'Position');
-            temp = old_pos(3);
-            old_pos(3) = old_pos(3)*(showmsmax(i)-0.150)/(0.800-0.150);
-            old_pos(1) = old_pos(1)-prev_shrink-xshift;
-            prev_shrink = prev_shrink + temp-old_pos(3);
-            old_pos(1) = old_pos(1)*frac_x+0.05;
-            old_pos(2) = 1-(1-old_pos(2))*frac_y+0.02;
-            old_pos(3) = old_pos(3)*frac_x;
-            old_pos(4) = old_pos(4)*frac_y;
-            set(ax2(i),'Position',old_pos);
-            %}
         end
         PSTH_FS_n = length(find(~isnan(PSTH.FS{1}(:,1))));
         
@@ -3534,18 +4073,6 @@ switch ana_type
             
             box off
             
-            %{
-            old_pos = get(ax3(i),'Position');
-            temp = old_pos(3);
-            old_pos(3) = old_pos(3)*(showmsmax(i)-0.150)/(0.800-0.150);
-            old_pos(1) = old_pos(1)-prev_shrink-xshift;
-            prev_shrink = prev_shrink + temp-old_pos(3);
-            old_pos(1) = old_pos(1)*frac_x+0.05;
-            old_pos(2) = 1-(1-old_pos(2))*frac_y+0.02;
-            old_pos(3) = old_pos(3)*frac_x;
-            old_pos(4) = old_pos(4)*frac_y;
-            set(ax3(i),'Position',old_pos);
-            %}
             if i == 3
                 text(0.88,maxBu1*1.5*0.8,{'Bu1'},'Color',Bu1Color,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
             end
@@ -3580,34 +4107,20 @@ switch ana_type
             
             box off
             
-            %{
-            old_pos = get(ax4(i),'Position');
-            temp = old_pos(3);
-            old_pos(3) = old_pos(3)*(showmsmax(i)-0.150)/(0.800-0.150);
-            old_pos(1) = old_pos(1)-prev_shrink-xshift;
-            prev_shrink = prev_shrink + temp-old_pos(3);
-            old_pos(1) = old_pos(1)*frac_x+0.05;
-            old_pos(2) = 1-(1-old_pos(2))*frac_y+0.02;
-            old_pos(3) = old_pos(3)*frac_x;
-            old_pos(4) = old_pos(4)*frac_y;
-            set(ax4(i),'Position',old_pos);
-            %}
             if i == 3
                 text(0.88,maxBu2*1.5*0.8,{'Bu2'},'Color',Bu2Color,'HorizontalAlignment','left','FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold'); 
             end
         end
         PSTH_Bu2_n = length(find(~isnan(PSTH.Bu2{1}(:,1))));
-        %linkaxes([ax(1),ax2(1),ax3(1),ax4(1)],'x');
-        %linkaxes([ax(2),ax2(2),ax3(2),ax4(2)],'x');
-        %linkaxes([ax(3),ax2(3),ax3(3),ax4(3)],'x');
+
         set(findobj(gcf,'type','axes'), 'TickLength',[0.04 0.025]);
         
         set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold','TickDir','out','box','off');      
         print([figdir 'Fig 5/sub1.tif'],'-dtiff',['-r' num2str(figparams.res)]);
         
         fig5 = figure;
-        set(gcf, 'PaperUnits', 'inches');
-        set(gcf, 'PaperSize', [17.2*0.3937, 17*0.3937]);
+        set(gcf,'PaperUnits', 'inches');
+        set(gcf,'PaperSize', [17.2*0.3937, 17*0.3937]);
         set(gcf,'PaperPositionMode','manual')
         set(gcf,'PaperPosition', [0 0 17.2*0.3937, 17*0.3937]);
         set(gcf,'Units','inches');
@@ -3945,6 +4458,7 @@ switch ana_type
         temp = ax4(3).Position;
         temp2 = ax(3).Position;
         
+        global supp_Bu1_2;
         supp_Bu1_2 = figure;
         set(gcf,'PaperUnits', 'inches');
         set(gcf,'PaperSize', [17.2*0.3937, 9*0.3937]);
@@ -3990,8 +4504,8 @@ switch ana_type
         hold on
         errorbar(ramprates,PSTHramp.RS_max_mean,PSTHramp.RS_max_stderr,'Color',RSColor,'CapSize',3,'LineWidth',1.2);
         errorbar(ramprates,PSTHramp.FS_max_mean,PSTHramp.FS_max_stderr,'Color',FSColor,'CapSize',3,'LineWidth',1.2);
-        errorbar(ramprates,PSTHramp.Bu2_max_mean,PSTHramp.Bu2_max_stderr_GMM,'Color',Bu2Color,'CapSize',3,'LineWidth',1.2);
-        errorbar(ramprates,PSTHramp.Bu1_max_mean,PSTHramp.Bu1_max_stderr_GMM,'Color',Bu1Color,'CapSize',3,'LineWidth',1.2);
+        errorbar(ramprates,PSTHramp.Bu2_max_mean_GMM,PSTHramp.Bu2_max_stderr_GMM,'Color',Bu2Color,'CapSize',3,'LineWidth',1.2);
+        errorbar(ramprates,PSTHramp.Bu1_max_mean_GMM,PSTHramp.Bu1_max_stderr_GMM,'Color',Bu1Color,'CapSize',3,'LineWidth',1.2);
         set(gca, 'Xtick', ramprates);
         set(gca, 'TickLength',[0.04 0.025]);
         xlabel('Onset ramp duration (ms)');
@@ -4300,6 +4814,244 @@ switch ana_type
         
         print([figdir 'Fig 5/Fig5.tif'],'-dtiff',['-r' num2str(figparams.res)]);
 
+        xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\Fig4\Fig4.xlsx';
+        ID = 'RS';
+        sheetname = 'PSTH Duration Protocol';
+        xlswrite(xls_filename,{ID},sheetname,'A1');
+        xlswrite(xls_filename,{'Time(s)'},sheetname,'B2');
+        xlswrite(xls_filename,RS_t4,sheetname,'C2'); 
+        xlswrite(xls_filename,{'50 ms Stimulus'},sheetname,'B3');
+        xlswrite(xls_filename,{'100 ms Stimulus (not shown)'},sheetname,'B4');
+        xlswrite(xls_filename,{'200 ms Stimulus'},sheetname,'B5');
+        xlswrite(xls_filename,{'400 ms Stimulus'},sheetname,'B6');
+        xlswrite(xls_filename,PSTH.RS_avg{1},sheetname,'C3'); 
+        xlswrite(xls_filename,PSTH.RS_avg{2},sheetname,'C4'); 
+        xlswrite(xls_filename,PSTH.RS_avg{3},sheetname,'C5'); 
+        xlswrite(xls_filename,PSTH.RS_avg{4},sheetname,'C6'); 
+      
+        ID = 'FS';
+        xlswrite(xls_filename,{ID},sheetname,'A8');
+        xlswrite(xls_filename,{'Time(s)'},sheetname,'B9');
+        xlswrite(xls_filename,RS_t4,sheetname,'C9'); 
+        xlswrite(xls_filename,{'50 ms Stimulus'},sheetname,'B10');
+        xlswrite(xls_filename,{'100 ms Stimulus (not shown)'},sheetname,'B11');
+        xlswrite(xls_filename,{'200 ms Stimulus'},sheetname,'B12');
+        xlswrite(xls_filename,{'400 ms Stimulus'},sheetname,'B13');
+        xlswrite(xls_filename,PSTH.FS_avg{1},sheetname,'C10'); 
+        xlswrite(xls_filename,PSTH.FS_avg{2},sheetname,'C11'); 
+        xlswrite(xls_filename,PSTH.FS_avg{3},sheetname,'C12'); 
+        xlswrite(xls_filename,PSTH.FS_avg{4},sheetname,'C13'); 
+        
+        ID = 'Bu1';
+        xlswrite(xls_filename,{ID},sheetname,'A15');
+        xlswrite(xls_filename,{'Time(s)'},sheetname,'B16');
+        xlswrite(xls_filename,RS_t4,sheetname,'C16'); 
+        xlswrite(xls_filename,{'50 ms Stimulus'},sheetname,'B17');
+        xlswrite(xls_filename,{'100 ms Stimulus (not shown)'},sheetname,'B18');
+        xlswrite(xls_filename,{'200 ms Stimulus'},sheetname,'B19');
+        xlswrite(xls_filename,{'400 ms Stimulus'},sheetname,'B20');
+        xlswrite(xls_filename,PSTH.Bu1_avg{1},sheetname,'C17'); 
+        xlswrite(xls_filename,PSTH.Bu1_avg{2},sheetname,'C18'); 
+        xlswrite(xls_filename,PSTH.Bu1_avg{3},sheetname,'C19'); 
+        xlswrite(xls_filename,PSTH.Bu1_avg{4},sheetname,'C20'); 
+    
+        ID = 'Bu2';
+        xlswrite(xls_filename,{ID},sheetname,'A22');
+        xlswrite(xls_filename,{'Time(s)'},sheetname,'B23');
+        xlswrite(xls_filename,RS_t4,sheetname,'C23'); 
+        xlswrite(xls_filename,{'50 ms Stimulus'},sheetname,'B24');
+        xlswrite(xls_filename,{'100 ms Stimulus (not shown)'},sheetname,'B25');
+        xlswrite(xls_filename,{'200 ms Stimulus'},sheetname,'B26');
+        xlswrite(xls_filename,{'400 ms Stimulus'},sheetname,'B27');
+        xlswrite(xls_filename,PSTH.Bu2_avg{1},sheetname,'C24'); 
+        xlswrite(xls_filename,PSTH.Bu2_avg{2},sheetname,'C25'); 
+        xlswrite(xls_filename,PSTH.Bu2_avg{3},sheetname,'C26'); 
+        xlswrite(xls_filename,PSTH.Bu2_avg{4},sheetname,'C27'); 
+        
+        indsxls = find(~isnan(adaptratio) & ...
+            ismember(groupIDcrit_plusprestim,{'RS','FS','Burster_h','Burster_l'}));
+        group = containers.Map({'RS','FS','Burster_h','Burster_l'}, {'RS','FS','Bu1','Bu2'});
+        i = 1;
+        x = values(group,groupIDcrit_plusprestim(indsxls));
+        y = adaptratio(indsxls);
+        sheetname = 'Adaptation Index';
+        ID = 'Adaptation Index'
+        xlab = 'Unit type';
+        ylab = 'AI';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
+        xlswrite(xls_filename,{'Welch ANOVA'},sheetname,'F1');
+        xlswrite(xls_filename,{'DF1'},sheetname,'G1');
+        xlswrite(xls_filename,3,sheetname,'H1');
+        xlswrite(xls_filename,{'DF2'},sheetname,'G2');
+        xlswrite(xls_filename,79.908559,sheetname,'H2');
+        xlswrite(xls_filename,{'F'},sheetname,'G3');
+        xlswrite(xls_filename,8.484508,sheetname,'H3');
+        xlswrite(xls_filename,{'p-val'},sheetname,'G4');
+        xlswrite(xls_filename,0.000058,sheetname,'H4');
+    
+        xlswrite(xls_filename,{'Games-Howell'},sheetname,'K1');
+        xlswrite(xls_filename,{'A'},sheetname,'L1');
+        xlswrite(xls_filename,{'B'},sheetname,'M1');
+        xlswrite(xls_filename,{'p-val'},sheetname,'N1');
+        xlswrite(xls_filename,{'Bu1'},sheetname,'L2');
+        xlswrite(xls_filename,{'Bu2'},sheetname,'M2');
+        xlswrite(xls_filename,0.477822,sheetname,'N2');
+        xlswrite(xls_filename,{'Bu1'},sheetname,'L3');
+        xlswrite(xls_filename,{'FS'},sheetname,'M3');
+        xlswrite(xls_filename,0.001000,sheetname,'N3');
+        xlswrite(xls_filename,{'Bu1'},sheetname,'L4');
+        xlswrite(xls_filename,{'RS'},sheetname,'M4');
+        xlswrite(xls_filename,0.009811,sheetname,'N4');
+        xlswrite(xls_filename,{'Bu2'},sheetname,'L5');
+        xlswrite(xls_filename,{'FS'},sheetname,'M5');
+        xlswrite(xls_filename,0.003740,sheetname,'N5');
+        xlswrite(xls_filename,{'Bu2'},sheetname,'L6');
+        xlswrite(xls_filename,{'RS'},sheetname,'M6');
+        xlswrite(xls_filename,0.101964,sheetname,'N6');
+        xlswrite(xls_filename,{'FS'},sheetname,'L7');
+        xlswrite(xls_filename,{'RS'},sheetname,'M7');
+        xlswrite(xls_filename,0.367406,sheetname,'N7');
+
+        sheetname = 'Bu 400 ms PSTH';
+        xlswrite(xls_filename,{'Intraburst Frequency(Hz)'},sheetname,'A1');
+        xlswrite(xls_filename,{'Normalized PSTH'},sheetname,'C1');
+        xlswrite(xls_filename,[Bu1_r_burst_freq_desc,Bu2_r_burst_freq_desc]',sheetname,'A2');
+        xlswrite(xls_filename,PSTH_Bu_sort,sheetname,'C2');
+        
+
+        sheetname = 'Rel mean rate';
+        indsxls = 1:length(durations_ext);
+        i = 1;
+        x = durations_ext;
+        y = [RS_dur_rate',RS_dur_rate_stderr']; 
+        ID = 'RS';
+        xlab = 'Duration(ms)';
+        ylab1 = 'Rate';
+        ylab2 = 'Stderr';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+        xlswrite(xls_filename,{ylab2},sheetname,'D1');
+        
+        i = 2;
+        x = durations_ext;
+        y = [FS_dur_rate',FS_dur_rate_stderr'];
+        ID = 'FS';
+        xlab = '';
+        ylab1 = '';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+        
+        i = 3;
+        x = durations_ext;
+        y = [Bu1_dur_rate',Bu1_dur_rate_stderr'];
+        ID = 'Bu1';
+        xlab = '';
+        ylab1 = '';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+        
+        i = 4;
+        x = durations_ext;
+        y = [Bu2_dur_rate',Bu2_dur_rate_stderr']; 
+        ID = 'Bu2';
+        xlab = '';
+        ylab1 = '';
+        ylab2 = '';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+        
+        sheetname = 'Max PSTH rate';
+        indsxls = 1:length(ramprates);
+        i = 1;
+        x = ramprates;
+        y = [PSTHramp.RS_max_mean',PSTHramp.RS_max_stderr']; 
+        ID = 'RS';
+        xlab = 'Ramp duration(ms)';
+        ylab1 = 'Max(PSTH)';
+        ylab2 = 'Stderr';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+        xlswrite(xls_filename,{ylab2},sheetname,'D1');
+        
+        i = 2;
+        x = ramprates;
+        y = [PSTHramp.FS_max_mean',PSTHramp.FS_max_stderr'];
+        ID = 'FS';
+        xlab = '';
+        ylab1 = '';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+        
+        i = 3;
+        x = ramprates;
+        y = [PSTHramp.Bu1_max_mean',PSTHramp.Bu1_max_stderr'];
+        ID = 'Bu1';
+        xlab = '';
+        ylab1 = '';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+        
+        i = 4;
+        x = ramprates;
+        y = [PSTHramp.Bu2_max_mean',PSTHramp.Bu2_max_stderr']; 
+        ID = 'Bu2';
+        xlab = '';
+        ylab1 = '';
+        ylab2 = '';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+        
+        xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\FigS4\FigS4.xlsx'
+        sheetname = 'PSTH';
+        x = Bu1_t4(1:end-1)*1000;
+        y = mean(PSTH.Bu1_GMM_non_nan,1);
+        ID = 'Bu1';
+        xlswrite(xls_filename,{ID},sheetname,'A1');
+        xlswrite(xls_filename,{'Time(s)'},sheetname,'B2');
+        xlswrite(xls_filename,x,sheetname,'C2'); 
+        xlswrite(xls_filename,{'PSTH(spk/s)'},sheetname,'B3');  
+        xlswrite(xls_filename,y,sheetname,'C3'); 
+       
+        x = Bu2_t4(1:end-1)*1000;
+        y = mean(PSTH.Bu2_GMM_non_nan,1);
+        ID = 'Bu2';
+        xlswrite(xls_filename,{ID},sheetname,'A5');
+        xlswrite(xls_filename,{'Time(s)'},sheetname,'B6');
+        xlswrite(xls_filename,x,sheetname,'C6'); 
+        xlswrite(xls_filename,{'PSTH(spk/s)'},sheetname,'B7');  
+        xlswrite(xls_filename,y,sheetname,'C7'); 
+        
+        sheetname = 'Max PSTH rate';
+        indsxls = 1:length(ramprates);
+        i = 1;
+        x = ramprates;
+        y = [PSTHramp.RS_max_mean',PSTHramp.RS_max_stderr']; 
+        ID = 'RS';
+        xlab = 'Ramp duration(ms)';
+        ylab1 = 'Max(PSTH)';
+        ylab2 = 'Stderr';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+        xlswrite(xls_filename,{ylab2},sheetname,'D1');
+        
+        i = 2;
+        x = ramprates;
+        y = [PSTHramp.FS_max_mean',PSTHramp.FS_max_stderr'];
+        ID = 'FS';
+        xlab = '';
+        ylab1 = '';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+        
+        i = 3;
+        x = ramprates;
+        y = [PSTHramp.Bu1_max_mean_GMM',PSTHramp.Bu1_max_stderr_GMM'];
+        ID = 'Bu1';
+        xlab = '';
+        ylab1 = '';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+        
+        i = 4;
+        x = ramprates;
+        y = [PSTHramp.Bu2_max_mean_GMM',PSTHramp.Bu2_max_stderr_GMM']; 
+        ID = 'Bu2';
+        xlab = '';
+        ylab1 = '';
+        ylab2 = '';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
+  
+   
+              
     case 'Neuron type properties subpanel'
         figparams.fsize = 7;
         figparams.msize = 3;
