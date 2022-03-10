@@ -23,6 +23,8 @@ figdir = 'C:/Users/Ping/Desktop/Wang_lab/Paper_writing/Figures/';
 xlsrange = {'A1:JZ657','A1:JZ400'};
 animalID = {'M7E', 'M117B'};
 
+global params
+
 clear eval;
 
 pool_protocols = 1;    % Pool up to first 5 protocols per unit for AP waveform 
@@ -407,6 +409,7 @@ switch ana_type
     %% Simple population decoding
     case 'Vocalization pop decode'
        
+        %{
         conf_all = popdecode(callhist_all, size(callhist_all,4), 0);
     
         % Subset Bu units
@@ -427,6 +430,7 @@ switch ana_type
         for k = 1:length(n_units)
             conf_bu = popdecode(callhist_bu, n_units(k), 0);
         end
+        %}
         
         % Ended up going to Python
         % Load outputs from Python to make consistent figures in MATLAB
@@ -445,6 +449,11 @@ switch ana_type
         width = height;
         intermini = 0.025;
        
+        conf54_RS_mcc = conf54_RS_mcc./repmat(sum(conf54_RS_mcc,2),[1,size(conf54_RS_mcc,2)]);
+        conf54_RS_lda = conf54_RS_lda./repmat(sum(conf54_RS_lda,2),[1,size(conf54_RS_lda,2)]);
+        conf54_bu_mcc = conf54_bu_mcc./repmat(sum(conf54_bu_mcc,2),[1,size(conf54_bu_mcc,2)]);
+        conf54_bu_lda = conf54_bu_lda./repmat(sum(conf54_bu_lda,2),[1,size(conf54_bu_lda,2)]);
+        
         axd_A1 = axes(decode_fig,'Position',...
             [lmargin+0.04,0.55+(height-intermini)/2+intermini,...
             (width-intermini)/2,(height-intermini)/2]);
@@ -495,6 +504,27 @@ switch ana_type
         set(gca,'XTick',[1,10,20]);
         set(gca,'YTick',[]);
         
+        xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\Fig8\Fig8.xlsx';
+        ID = 'RS units with MCC decoding';
+        sheetname = 'Confusion matrices norm';
+        xlswrite(xls_filename,{ID},sheetname,'A1');
+        xlswrite(xls_filename,conf54_RS_mcc,sheetname,'B1'); 
+        
+        next = 1+3+size(conf54_RS_mcc,1);
+        ID = 'RS units with LDA decoding';
+        xlswrite(xls_filename,{ID},sheetname,['A' num2str(next)]);
+        xlswrite(xls_filename,conf54_RS_lda,sheetname,['B' num2str(next)]); 
+        
+        next = next+3+size(conf54_RS_mcc,1);
+        ID = 'Bursting units with MCC decoding';
+        xlswrite(xls_filename,{ID},sheetname,['A' num2str(next)]);
+        xlswrite(xls_filename,conf54_bu_mcc,sheetname,['B' num2str(next)]);
+        
+        next = next+3+size(conf54_RS_mcc,1);
+        ID = 'Bursting units with LDA decoding';
+        xlswrite(xls_filename,{ID},sheetname,['A' num2str(next)]);
+        xlswrite(xls_filename,conf54_bu_lda,sheetname,['B' num2str(next)]);
+        
         axd_B = axes(decode_fig,'Position',...
             [lmargin+width+intercol+0.06,0.55,...
             width-0.02, height]);
@@ -523,6 +553,28 @@ switch ana_type
         desiredypos = th1.Position(2)*axd_A1.Position(4)+axd_A1.Position(2);
         th2 = text('Units','normalized','Position', [-0.32,(desiredypos-axd_B.Position(2))/axd_B.Position(4),0],'String','B',fontstr_l{:});
         
+        sheetname = 'Accu vs number of units';
+        ID = 'RS units';
+        xlab = 'Number of units';
+        ylab = 'Accuracy';
+        xlswrite(xls_filename,{ID},sheetname,'A1');
+        xlswrite(xls_filename,{xlab},sheetname,'B1');
+        xlswrite(xls_filename,{ylab},sheetname,'C1');
+        xlswrite(xls_filename,nunits_list(1:length(accu_RS))',sheetname,'B2');
+        xlswrite(xls_filename,accu_RS',sheetname,'C2'); 
+        
+        next = 1+3+ length(accu_RS);
+        ID = 'Bursting units';
+        xlswrite(xls_filename,{ID},sheetname,['A' num2str(next)]);
+        xlswrite(xls_filename,nunits_list(1:length(accu_bu))',sheetname,['B' num2str(next+1)]);
+        xlswrite(xls_filename,accu_bu',sheetname,['C' num2str(next+1)]); 
+        
+        next = next+3+ length(accu_bu);
+        ID = 'Mixed (RS and Bursting) units';
+        xlswrite(xls_filename,{ID},sheetname,['A' num2str(next)]);
+        xlswrite(xls_filename,nunits_list(1:length(accu_mixed))',sheetname,['B' num2str(next+1)]);
+        xlswrite(xls_filename,accu_mixed',sheetname,['C' num2str(next+1)]); 
+        
         axd_C = axes(decode_fig,'Position',...
             [lmargin+0.04,0.14,...
             width, height-0.12]);
@@ -547,6 +599,25 @@ switch ana_type
         th3 = text('Units','normalized','Position', [(desiredxpos-axd_C.Position(1))/axd_C.Position(3),1.15,0],'String','C',fontstr_l{:});
         xlim([0.5 7.5]);
         
+        sheetname = 'Accu averaged';
+        ID = 'RS units';
+        xlswrite(xls_filename,{ID},sheetname,'A1');
+        xlswrite(xls_filename,{'Original'},sheetname,'B1');
+        xlswrite(xls_filename,{'Avg across time bins'},sheetname,'B2');
+        xlswrite(xls_filename,{'Avg across units'},sheetname,'B3');
+        xlswrite(xls_filename,accu_RS(3),sheetname,'C1');
+        xlswrite(xls_filename,accu_RS_t_collapse(3),sheetname,'C2');
+        xlswrite(xls_filename,accu_RS_unit_collapse,sheetname,'C3');
+        
+        ID = 'Bursting units';
+        xlswrite(xls_filename,{ID},sheetname,'A5');
+        xlswrite(xls_filename,{'Original'},sheetname,'B6');
+        xlswrite(xls_filename,{'Avg across time bins'},sheetname,'B7');
+        xlswrite(xls_filename,{'Avg across units'},sheetname,'B8');
+        xlswrite(xls_filename,accu_bu(3),sheetname,'C6');
+        xlswrite(xls_filename,accu_bu_t_collapse(3),sheetname,'C7');
+        xlswrite(xls_filename,accu_bu_unit_collapse,sheetname,'C8');
+        
         axd_D = axes(decode_fig,'Position',...
             [lmargin+width+intercol+0.06,0.14,...
             width-0.02, height-0.12]);
@@ -566,6 +637,25 @@ switch ana_type
         xl.Position(2)=xlh.Position(2)*axd_A3.Position(4)/axd_D.Position(4);
         set(gca,'XTick',[5,10,25,50]);
         th4 = text('Units','normalized','Position', [-0.32,1.15,0],'String','D',fontstr_l{:});
+        
+        sheetname = 'Accu vs time bin';
+        ID = 'RS units';
+        xlab = 'Bin size(ms)';
+        ylab = 'Accuracy';
+        x = [5;10;25;50];
+        y = [accu_RS5ms;accu_RS(3);accu_RS25ms;accu_RS50ms];
+        xlswrite(xls_filename,{ID},sheetname,'A1');
+        xlswrite(xls_filename,{xlab},sheetname,'B1');
+        xlswrite(xls_filename,{ylab},sheetname,'C1');
+        xlswrite(xls_filename,x,sheetname,'B2');
+        xlswrite(xls_filename,y,sheetname,'C2');
+  
+        next = 1+3+length(x);
+        ID = 'Bursting units';
+        xlswrite(xls_filename,{ID},sheetname,['A' num2str(next)]);
+        y = [accu_bu5ms;accu_bu(3);accu_bu25ms;accu_bu50ms];
+        xlswrite(xls_filename,x,sheetname,['B' num2str(next+1)]);
+        xlswrite(xls_filename,y,sheetname,['C' num2str(next+1)]);
         
         set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'box','off',...
             'TickDir','out');
@@ -1958,7 +2048,7 @@ switch ana_type
     H.FaceAlpha = 0.4;
     H.EdgeColor = [0.5 0.5 0.5];    
     set(gca,'XTick',[1,2,3,4,5],'xticklabels',{'RS','FS','Bu1','Bu2','PBu','Unclassified'});
-    lh1 = ylabel('Fraction sync units (\geq 4Hz)');
+    lh1 = ylabel('indsxls units (\geq 4Hz)');
     set(gca,'xlim',[0.5 4.5]);
     set(gca,'ylim',[0 1]);
     set(gca,'YTick',[0 0.2 0.4 0.6 0.8 1]);
@@ -1979,15 +2069,15 @@ switch ana_type
     set(gca,'ylim',[0 1]);
     set(gca,'YTick',[0 0.2 0.4 0.6 0.8 1]);
     set(gca,'Xticklabels',{'RS','FS','Bu1','Bu2','PBu','Unclassified'});
-    lh2 = ylabel('Fraction sync units (\geq16 Hz)');
+    lh2 = ylabel('indsxls units (\geq16 Hz)');
     set(gca,'xlim',[0.5 4.5]);
     set(gca,'ylim',[0 1]);
     ax5.Position(4) = 0.97*ax5.Position(4);
    
     xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\Fig5\Fig5.xlsx';
-    sheetname = 'Fraction sync';
-    xlswrite(xls_filename,{'Fraction sync units(>= 4 Hz)'},sheetname,'B1');
-    xlswrite(xls_filename,{'Fraction sync units(>= 16 Hz)'},sheetname,'C1');
+    sheetname = 'indsxls';
+    xlswrite(xls_filename,{'indsxls units(>= 4 Hz)'},sheetname,'B1');
+    xlswrite(xls_filename,{'indsxls units(>= 16 Hz)'},sheetname,'C1');
     xlswrite(xls_filename,{'RS'},sheetname,'A2');
     xlswrite(xls_filename,{'FS'},sheetname,'A3');
     xlswrite(xls_filename,{'Bu1'},sheetname,'A4');
@@ -2218,7 +2308,7 @@ switch ana_type
     set(gca,'ylim',[0 1]);
     set(gca,'xlim',[0.5 4.5]);
     set(gca,'YTick',[0 0.2 0.4 0.6 0.8 1]);
-    lh3 = ylabel('Fraction sync (\geq16 Hz)');
+    lh3 = ylabel('indsxls (\geq16 Hz)');
     lh3.Position(2) = 0.45;
     
     th1 = text(1,fRS_sync16+0.07,num2str(nRS_sync16+nRS_nsync16),'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold','Color',RSColor,'HorizontalAlignment','center');
@@ -2228,8 +2318,8 @@ switch ana_type
     text('Units','normalized','Position',[-0.31,1+0.1*0.15/0.35],'String','D');
     set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold','TickDir','out','box','off');
     
-    sheetname = 'Fraction sync';
-    xlswrite(xls_filename,{'Fraction sync units(>= 16 Hz)'},sheetname,'B1');
+    sheetname = 'indsxls';
+    xlswrite(xls_filename,{'indsxls units(>= 16 Hz)'},sheetname,'B1');
     xlswrite(xls_filename,{'RS'},sheetname,'A2');
     xlswrite(xls_filename,{'FS'},sheetname,'A3');
     xlswrite(xls_filename,{'Bu1'},sheetname,'A4');
@@ -2652,7 +2742,7 @@ switch ana_type
     H.EdgeColor = [0.5 0.5 0.5];    
     set(gca,'XTick',[1,2,3,4,5]);
     xticklabels({'RS','FS','Bu','PBu','Bu_c_r_i_t'});
-    lh1 = ylabel('Fraction sync units (\geq 4Hz)');
+    lh1 = ylabel('indsxls units (\geq 4Hz)');
     set(gca,'xlim',[0.5 5.5]);
     set(gca,'ylim',[0 1]);
     set(gca,'YTick',[0 0.2 0.4 0.6 0.8 1]);
@@ -2668,14 +2758,14 @@ switch ana_type
     H2.EdgeColor = [0.5 0.5 0.5];
     set(gca,'XTick',[1,2,3,4,5]);
     xticklabels({'RS','FS','Bu','PBu','Bu_c_r_i_t'});
-    lh2 = ylabel('Fraction sync units (\geq16 Hz)');
+    lh2 = ylabel('indsxls units (\geq16 Hz)');
     set(gca,'xlim',[0.5 5.5]);
     set(gca,'ylim',[0 1]);
     set(gca,'YTick',[0 0.2 0.4 0.6 0.8 1]);
     
-    sheetname = 'Fraction sync';
-    xlswrite(xls_filename,{'Fraction sync units(>= 4 Hz)'},sheetname,'B1');
-    xlswrite(xls_filename,{'Fraction sync units(>= 16 Hz)'},sheetname,'C1');
+    sheetname = 'indsxls';
+    xlswrite(xls_filename,{'indsxls units(>= 4 Hz)'},sheetname,'B1');
+    xlswrite(xls_filename,{'indsxls units(>= 16 Hz)'},sheetname,'C1');
     xlswrite(xls_filename,{'RS'},sheetname,'A2');
     xlswrite(xls_filename,{'FS'},sheetname,'A3');
     xlswrite(xls_filename,{'Bu(GMM)'},sheetname,'A4');
@@ -2962,7 +3052,37 @@ switch ana_type
             'ytick',[0 0.1 0.2 0.3 0.4 0.5]);
         xl1 = xlabel('Mean rate              PSTH   ',fontstr{:});
         
+        xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\Fig7\Fig7.xlsx';
+        sheetname = 'Fraction responsive';
+        xlswrite(xls_filename,{'Fraction calls responsive by mean rate'},sheetname,'B1');
+        xlswrite(xls_filename,{'Stderr'},sheetname,'C1');
+        xlswrite(xls_filename,{'Fraction calls responsive by PSTH'},sheetname,'E1');
+        xlswrite(xls_filename,{'Stderr'},sheetname,'F1');
         
+        xlswrite(xls_filename,{'RS'},sheetname,'A2');
+        xlswrite(xls_filename,{'FS'},sheetname,'A3');
+        xlswrite(xls_filename,{'Bu1'},sheetname,'A4');
+        xlswrite(xls_filename,{'Bu2'},sheetname,'A5');
+        
+        xlswrite(xls_filename,nanmean(resp_len_RS),sheetname,'B2');
+        xlswrite(xls_filename,nanstd(resp_len_RS)/sqrt(length(find(~isnan(resp_len_RS)))),sheetname,'C2');
+        xlswrite(xls_filename,nanmean(resp_len2_RS),sheetname,'E2');   
+        xlswrite(xls_filename,nanstd(resp_len2_RS)/sqrt(length(find(~isnan(resp_len2_RS)))),sheetname,'F2');
+        
+        xlswrite(xls_filename,nanmean(resp_len_FS),sheetname,'B3');
+        xlswrite(xls_filename,nanstd(resp_len_FS)/sqrt(length(find(~isnan(resp_len_RS)))),sheetname,'C3');
+        xlswrite(xls_filename,nanmean(resp_len2_FS),sheetname,'E3');   
+        xlswrite(xls_filename,nanstd(resp_len2_FS)/sqrt(length(find(~isnan(resp_len2_RS)))),sheetname,'F3');
+        
+        xlswrite(xls_filename,nanmean(resp_len_Bu1),sheetname,'B4');
+        xlswrite(xls_filename,nanstd(resp_len_Bu1)/sqrt(length(find(~isnan(resp_len_Bu1)))),sheetname,'C4');
+        xlswrite(xls_filename,nanmean(resp_len2_Bu1),sheetname,'E4');   
+        xlswrite(xls_filename,nanstd(resp_len2_Bu1)/sqrt(length(find(~isnan(resp_len2_Bu1)))),sheetname,'F4');
+        
+        xlswrite(xls_filename,nanmean(resp_len_Bu2),sheetname,'B5');
+        xlswrite(xls_filename,nanstd(resp_len_Bu2)/sqrt(length(find(~isnan(resp_len_Bu2)))),sheetname,'C5');
+        xlswrite(xls_filename,nanmean(resp_len2_Bu2),sheetname,'E5');   
+        xlswrite(xls_filename,nanstd(resp_len2_Bu2)/sqrt(length(find(~isnan(resp_len2_Bu2)))),sheetname,'F5');
         
         axf8p2 = axes(fig8,'Position',[lmargin+axf8p1.Position(3)+2*(intercol+0.011) tmargin-ywidth axf8p1.Position(3) ywidth]);
           
@@ -3010,7 +3130,97 @@ switch ana_type
         test1 = [CImax(ismember(groupnumcrit,[3,1,2,6])&~isnan(CImax)) groupnumcrit(ismember(groupnumcrit,[3,1,2,6])&~isnan(CImax))]
         test1(test1(:,2)==6,2) = 4;
         welchanova(test1,0.05);
-
+        
+        indsxls = find(~isnan(CImax_plusprestim) & ...
+        ismember(groupIDcrit_plusprestim,{'RS','FS','Burster_h','Burster_l'}));
+        group = containers.Map({'RS','FS','Burster_h','Burster_l'}, {'RS','FS','Bu1','Bu2'});
+        i = 1;
+        x = values(group,groupIDcrit_plusprestim(indsxls));
+        y = CImax_plusprestim(indsxls);
+        sheetname = 'CImax';
+        ID = 'Labeled by criteria'
+        xlab = 'Unit type';
+        ylab = 'CImax';
+        exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab, indsxls, i);
+        xlswrite(xls_filename,{'Welch''s ANOVA'},sheetname,'F1');
+        xlswrite(xls_filename,{'DF1'},sheetname,'G1');
+        xlswrite(xls_filename,3,sheetname,'H1');
+        xlswrite(xls_filename,{'DF2'},sheetname,'G2');
+        xlswrite(xls_filename,48.5,sheetname,'H2');
+        xlswrite(xls_filename,{'F'},sheetname,'G3');
+        xlswrite(xls_filename,18.0,sheetname,'H3');
+        xlswrite(xls_filename,{'p-val'},sheetname,'G4');
+        xlswrite(xls_filename,5.6e-8,sheetname,'H4');
+    
+        xlswrite(xls_filename,{'Games-Howell'},sheetname,'K1');
+        xlswrite(xls_filename,{'A'},sheetname,'L1');
+        xlswrite(xls_filename,{'B'},sheetname,'M1');
+        xlswrite(xls_filename,{'p-val'},sheetname,'N1');
+        xlswrite(xls_filename,{'Bu1'},sheetname,'L2');
+        xlswrite(xls_filename,{'Bu2'},sheetname,'M2');
+        xlswrite(xls_filename,0.0346,sheetname,'N2');
+        xlswrite(xls_filename,{'Bu1'},sheetname,'L3');
+        xlswrite(xls_filename,{'FS'},sheetname,'M3');
+        xlswrite(xls_filename,0.0038,sheetname,'N3');
+        xlswrite(xls_filename,{'Bu1'},sheetname,'L4');
+        xlswrite(xls_filename,{'RS'},sheetname,'M4');
+        xlswrite(xls_filename,0.0089,sheetname,'N4');
+        xlswrite(xls_filename,{'Bu2'},sheetname,'L5');
+        xlswrite(xls_filename,{'FS'},sheetname,'M5');
+        xlswrite(xls_filename,0.0010,sheetname,'N5');
+        xlswrite(xls_filename,{'Bu2'},sheetname,'L6');
+        xlswrite(xls_filename,{'RS'},sheetname,'M6');
+        xlswrite(xls_filename,0.0625,sheetname,'N6');
+        xlswrite(xls_filename,{'FS'},sheetname,'L7');
+        xlswrite(xls_filename,{'RS'},sheetname,'M7');
+        xlswrite(xls_filename,0.0010,sheetname,'N7');        
+        
+        next = length(indsxls)+3;
+        indsxls = find(~isnan(CImax_plusprestim) & ...
+        ismember(groupIDcrit_plusprestim,{'Prestim burster'}));
+        group = containers.Map({'Prestim burster'}, {'PBu'});
+        x = groupIDcrit_plusprestim(indsxls);
+        y = CImax_plusprestim(indsxls);
+        ID = 'Labeled by pre-stimulus logISIdrop';
+        xlswrite(xls_filename,{ID},sheetname,['A' num2str(next)]);
+        xlswrite(xls_filename,x,sheetname,['B' num2str(next)]);
+        xlswrite(xls_filename,y,sheetname,['C' num2str(next)]);
+        
+        next = next+length(indsxls)+2;
+        indsxls = find(~isnan(CImax_plusprestim) & ...
+        ismember(groupIDgmm_plusprestim,{'RS','FS','Burster'}));
+        group = containers.Map({'RS','FS','Burster'}, {'RS','FS','Bu'});
+        x = groupIDgmm_plusprestim(indsxls);
+        y = CImax_plusprestim(indsxls);
+        ID = 'Labeled by GMM'
+        xlswrite(xls_filename,{ID},sheetname,['A' num2str(next)]);
+        xlswrite(xls_filename,x,sheetname,['B' num2str(next)]);
+        xlswrite(xls_filename,y,sheetname,['C' num2str(next)]);
+        
+        xlswrite(xls_filename,{'Welch''s ANOVA'},sheetname,['F' num2str(next+1)]);
+        xlswrite(xls_filename,{'DF1'},sheetname,['G' num2str(next+1)]);
+        xlswrite(xls_filename,2,sheetname,['H' num2str(next+1)]);
+        xlswrite(xls_filename,{'DF2'},sheetname,['G' num2str(next+2)]);
+        xlswrite(xls_filename,90.4,sheetname,['H' num2str(next+2)]);
+        xlswrite(xls_filename,{'F'},sheetname,['G' num2str(next+3)]);
+        xlswrite(xls_filename,22.9,sheetname,['H' num2str(next+3)]);
+        xlswrite(xls_filename,{'p-val'},sheetname,['G' num2str(next+4)]);
+        xlswrite(xls_filename,9.03e-9,sheetname,['H' num2str(next+4)]);
+    
+        xlswrite(xls_filename,{'Games-Howell'},sheetname,['K' num2str(next+1)]);
+        xlswrite(xls_filename,{'A'},sheetname,['L' num2str(next+1)]);
+        xlswrite(xls_filename,{'B'},sheetname,['M' num2str(next+1)]);
+        xlswrite(xls_filename,{'p-val'},sheetname,['N' num2str(next+1)]);
+        xlswrite(xls_filename,{'Bu'},sheetname,['L' num2str(next+2)]);
+        xlswrite(xls_filename,{'FS'},sheetname,['M' num2str(next+2)]);
+        xlswrite(xls_filename,0.001,sheetname,['N' num2str(next+2)]);
+        xlswrite(xls_filename,{'Bu'},sheetname,['L' num2str(next+3)]);
+        xlswrite(xls_filename,{'RS'},sheetname,['M' num2str(next+3)]);
+        xlswrite(xls_filename,0.001,sheetname,['N' num2str(next+3)]);
+        xlswrite(xls_filename,{'FS'},sheetname,['L' num2str(next+4)]);
+        xlswrite(xls_filename,{'RS'},sheetname,['M' num2str(next+4)]);
+        xlswrite(xls_filename,0.001,sheetname,['N' num2str(next+4)]);  
+        
         figure(fig8)
         % From Python Pingouin Games-Howell post-hoc test
         p1 = 0.0088;
@@ -3392,6 +3602,31 @@ switch ana_type
         text(1.3,0.55,['Bu2 (' num2str(Bu2_H_norm_n) ')'],'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold','Color',Bu2Color);
         box off;
         
+        xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\Fig7\Fig7.xlsx';
+        sheetname = 'Victor-Purpura decoding';
+        ID = 'Labeled by Criteria';
+        xlswrite(xls_filename,{ID},sheetname,'A1');
+        xlswrite(xls_filename,{'RS'},sheetname,'B2');
+        xlswrite(xls_filename,{'Cost(q)'},sheetname,'C2');
+        xlswrite(xls_filename,{'Normalized Information(H)'},sheetname,'C3');
+        xlswrite(xls_filename,q',sheetname,'D2');
+        xlswrite(xls_filename,RS_H_norm,sheetname,'D3');
+        
+        next = 4+size(RS_H_norm,1);
+        xlswrite(xls_filename,{'FS'},sheetname,['B' num2str(next)]);
+        xlswrite(xls_filename,{'Normalized Information(H)'},sheetname,['C' num2str(next+1)]);
+        xlswrite(xls_filename,FS_H_norm,sheetname,['D' num2str(next+1)]);
+        
+        next = next+3+size(FS_H_norm,1);
+        xlswrite(xls_filename,{'Bu1'},sheetname,['B' num2str(next)]);
+        xlswrite(xls_filename,{'Normalized Information(H)'},sheetname,['C' num2str(next+1)]);
+        xlswrite(xls_filename,Bu1_H_norm,sheetname,['D' num2str(next+1)]);
+        
+        next = next+3+size(Bu1_H_norm,1);
+        xlswrite(xls_filename,{'Bu2'},sheetname,['B' num2str(next)]);
+        xlswrite(xls_filename,{'Normalized Information(H)'},sheetname,['C' num2str(next+1)]);
+        xlswrite(xls_filename,Bu2_H_norm,sheetname,['D' num2str(next+1)]);
+        
         axvp4 = axes(fig8,'Position',[lmargin+2*xwidth+2*intercol2, bmargin, xwidth, ywidth]);   
         hold on
         RS_H_gmm = H(strcmp(groupIDgmm,'RS') & (z_score>zthresh),:);
@@ -3432,6 +3667,23 @@ switch ana_type
         text(1.3,0.61,['FS (' num2str(FS_H_norm_gmm_n) ')'],'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold','Color',FSColor2);
         text(1.3,0.56,['Bu (' num2str(Bu_H_norm_gmm_n) ')'],'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold','Color',BuColor1);
          
+        next = next+3+size(Bu2_H_norm,1);
+        ID = 'Labeled by GMM';
+        xlswrite(xls_filename,{ID},sheetname,['A' num2str(next-1)]);
+        xlswrite(xls_filename,{'RS'},sheetname,['B' num2str(next)]);
+        xlswrite(xls_filename,{'Normalized Information(H)'},sheetname,['C' num2str(next+1)]);
+        xlswrite(xls_filename,RS_H_norm_gmm,sheetname,['D' num2str(next+1)]);
+        
+        next = next+3+size(RS_H_norm_gmm,1);
+        xlswrite(xls_filename,{'FS'},sheetname,['B' num2str(next)]);
+        xlswrite(xls_filename,{'Normalized Information(H)'},sheetname,['C' num2str(next+1)]);
+        xlswrite(xls_filename,FS_H_norm_gmm,sheetname,['D' num2str(next+1)]);
+        
+        next = next+3+size(FS_H_norm_gmm,1);
+        xlswrite(xls_filename,{'Bu'},sheetname,['B' num2str(next)]);
+        xlswrite(xls_filename,{'Normalized Information(H)'},sheetname,['C' num2str(next+1)]);
+        xlswrite(xls_filename,Bu_H_norm_gmm,sheetname,['D' num2str(next+1)]);
+        
         set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold','TickDir','out','box','off','TickLength',[0.03 0.025]);
   
         lh1.Position(2) = 0.23;
@@ -3488,7 +3740,40 @@ switch ana_type
         set(gca,'xlim',[0.5,4.5]);        
         text('Units','normalized','Position',[-0.31,1+0.1*0.15/0.35],'String','E');
         
-        global supp_Bu1_2;
+        xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\FigS4\FigS4.xlsx';
+        sheetname = 'CImax';
+        indsxls = find(~isnan(CImax_RS));
+        y = CImax_RS(indsxls);
+        ID = 'RS'
+        ylab = 'CImax';
+        xlswrite(xls_filename,{ID},sheetname,'A1');
+        xlswrite(xls_filename,{ylab},sheetname,'B1');
+        xlswrite(xls_filename,y,sheetname,'B2');
+        
+        next = 4+length(y);
+        indsxls = find(~isnan(CImax_FS));
+        y = CImax_FS(indsxls);
+        ID = 'FS'
+        ylab = 'CImax';
+        xlswrite(xls_filename,{ID},sheetname,['A' num2str(next)]);
+        xlswrite(xls_filename,y,sheetname,['B' num2str(next)]);
+        
+        next = next+2+length(y);
+        indsxls = find(~isnan(CImax_Bu1));
+        y = CImax_Bu1(indsxls);
+        ID = 'Bu1'
+        ylab = 'CImax';
+        xlswrite(xls_filename,{ID},sheetname,['A' num2str(next)]);
+        xlswrite(xls_filename,y,sheetname,['B' num2str(next)]);
+
+        next = next+2+length(y);
+        indsxls = find(~isnan(CImax_Bu2));
+        y = CImax_Bu2(indsxls);
+        ID = 'Bu2'
+        ylab = 'CImax';
+        xlswrite(xls_filename,{ID},sheetname,['A' num2str(next)]);
+        xlswrite(xls_filename,y,sheetname,['B' num2str(next)]);
+        
         figure(supp_Bu1_2);
         axes('Position',[0.1+2*(0.22+0.11), 0.1, 0.22, 0.35]);
         RS_H = H((groupnumcrit == 3) & (z_score>zthresh),:);
@@ -3540,6 +3825,31 @@ switch ana_type
         box off;
         
         text('Units','normalized','Position',[-0.31,1+0.1*0.15/0.35],'String','F');
+        
+        xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\FigS4\FigS4.xlsx';
+        sheetname = 'Victor-Purpura decoding';
+        ID = 'Labeled by Criteria';
+        xlswrite(xls_filename,{ID},sheetname,'A1');
+        xlswrite(xls_filename,{'RS'},sheetname,'B2');
+        xlswrite(xls_filename,{'Cost(q)'},sheetname,'C2');
+        xlswrite(xls_filename,{'Normalized Information(H)'},sheetname,'C3');
+        xlswrite(xls_filename,q',sheetname,'D2');
+        xlswrite(xls_filename,RS_H_norm,sheetname,'D3');
+        
+        next = 4+size(RS_H_norm,1);
+        xlswrite(xls_filename,{'FS'},sheetname,['B' num2str(next)]);
+        xlswrite(xls_filename,{'Normalized Information(H)'},sheetname,['C' num2str(next+1)]);
+        xlswrite(xls_filename,FS_H_norm,sheetname,['D' num2str(next+1)]);
+        
+        next = next+3+size(FS_H_norm,1);
+        xlswrite(xls_filename,{'Bu1'},sheetname,['B' num2str(next)]);
+        xlswrite(xls_filename,{'Normalized Information(H)'},sheetname,['C' num2str(next+1)]);
+        xlswrite(xls_filename,Bu1_H_norm,sheetname,['D' num2str(next+1)]);
+        
+        next = next+3+size(Bu1_H_norm,1);
+        xlswrite(xls_filename,{'Bu2'},sheetname,['B' num2str(next)]);
+        xlswrite(xls_filename,{'Normalized Information(H)'},sheetname,['C' num2str(next+1)]);
+        xlswrite(xls_filename,Bu2_H_norm,sheetname,['D' num2str(next+1)]);        
         
         set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold','TickDir','out','box','off');
         
