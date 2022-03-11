@@ -3891,6 +3891,99 @@ switch ana_type
         groupinds.Bu1inds = strcmp(groupIDcrit_plusprestim,'Burster_h');
         groupinds.PBuinds = strcmp(groupIDcrit_plusprestim,'Prestim burster');
         groupinds.Buinds = strcmp(groupIDcrit_plusprestim,'Burster');
+        
+        xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\FigS3\FigS3.xlsx';
+        sheetname = 'Properties';
+        indsxls = find((~isnan(spont_plusprestim) | ... 
+                ~isnan(acmetric_plusprestim) | ...
+                ~isnan(peakmsISI_plusprestim) | ...
+                ~isnan(F50_plusprestim) | ...
+                ~isnan(percISI5_plusprestim) | ...
+                ~isnan(logISIdrop_plusprestim) | ...
+                ~isnan(max_burst_length_plusprestim) | ...
+                ~isnan(max_firing_rate_plusprestim) | ...
+                ~isnan(TTP_plusprestim) | ...
+                ~isnan(mean_burst_length_plusprestim) | ...
+                ~isnan(refract_plusprestim) | ...
+                ~isnan(latency_plusprestim) | ...
+                ~isnan(dip_pval_plusprestim) | ...
+                ~isnan(percISI5ratio_plusprestim) | ...
+                ~isnan(reg_parikh_plusprestim) | ...
+                ~isnan(fracmeanISI_plusprestim)) ...
+                & ismember(groupIDcrit_plusprestim,{'RS','FS','Burster_h','Burster_l','Prestim burster'}));
+            
+        group = containers.Map({'RS','FS','Burster_h','Burster_l','Prestim burster'}, {'RS','FS','Bu1','Bu2','PBu'});
+        x = groupIDcrit_plusprestim(indsxls);
+        col1 = peakmsISI_plusprestim(indsxls);
+        col2 = acmetric_plusprestim(indsxls);
+        col3 = logISIdrop_plusprestim(indsxls);
+        col4 = TTP_plusprestim(indsxls);
+        col5 = F50_plusprestim(indsxls);
+        col6 = spont_plusprestim(indsxls);
+        col7 = max_firing_rate_plusprestim(indsxls);
+        col8 = max_burst_length_plusprestim(indsxls);
+        col9 = mean_burst_length_plusprestim(indsxls);
+        col10 = refract_plusprestim(indsxls);
+        col11 = latency_plusprestim(indsxls);
+        col12 = dip_pval_plusprestim(indsxls);
+        col13 = percISI5_plusprestim(indsxls);
+        col14 = percISI5ratio_plusprestim(indsxls);
+        col15 = fracmeanISI_plusprestim(indsxls);
+        col16 = reg_parikh_plusprestim(indsxls);
+        x_lab = 'Unit type';
+        col1_lab = 'Peak ISI(ms)';
+        col2_lab = 'Autocorrelation metric';
+        col3_lab = 'log(ISI)drop';
+        col4_lab = 'Trough-to-peak time(ms)';
+        col5_lab = 'Spike spectrum f50(kHz)';
+        col6_lab = 'Spontaneous rate(spk/s)';
+        col7_lab = 'Max driven rate(spk/s)';
+        col8_lab = 'Max burst length';
+        col9_lab = 'Mean burst length';
+        col10_lab = 'Refractory period(ms)';
+        col11_lab = 'Latency(ms)';
+        col12_lab = 'Hartigans'' dip p-value';
+        col13_lab = 'Percent ISI < 5 ms';
+        col14_lab = 'Percent ISI < 5 ms re: Poisson';
+        col15_lab = 'Parikh Burstiness';
+        col16_lab = 'Parikh Regularity';
+        xlswrite(xls_filename,{x_lab},sheetname,'A1');
+        xlswrite(xls_filename,{col1_lab},sheetname,'B1');
+        xlswrite(xls_filename,{col2_lab},sheetname,'C1');
+        xlswrite(xls_filename,{col3_lab},sheetname,'D1');
+        xlswrite(xls_filename,{col4_lab},sheetname,'E1');
+        xlswrite(xls_filename,{col5_lab},sheetname,'F1');
+        xlswrite(xls_filename,{col6_lab},sheetname,'G1');
+        xlswrite(xls_filename,{col7_lab},sheetname,'H1');
+        xlswrite(xls_filename,{col8_lab},sheetname,'I1');
+        xlswrite(xls_filename,{col9_lab},sheetname,'J1');
+        xlswrite(xls_filename,{col10_lab},sheetname,'K1');
+        xlswrite(xls_filename,{col11_lab},sheetname,'L1');
+        xlswrite(xls_filename,{col12_lab},sheetname,'M1');
+        xlswrite(xls_filename,{col13_lab},sheetname,'N1');
+        xlswrite(xls_filename,{col14_lab},sheetname,'O1');
+        xlswrite(xls_filename,{col15_lab},sheetname,'P1');
+        xlswrite(xls_filename,{col16_lab},sheetname,'Q1');
+        
+        xlswrite(xls_filename,x,sheetname,'A2');
+        xlswrite(xls_filename,col1(:),sheetname,'B2');
+        xlswrite(xls_filename,col2(:),sheetname,'C2');
+        xlswrite(xls_filename,col3(:),sheetname,'D2');
+        xlswrite(xls_filename,col4(:),sheetname,'E2');
+        xlswrite(xls_filename,col5(:),sheetname,'F2');
+        xlswrite(xls_filename,col6(:),sheetname,'G2');
+        xlswrite(xls_filename,col7(:),sheetname,'H2');
+        xlswrite(xls_filename,col8(:),sheetname,'I2');
+        xlswrite(xls_filename,col9(:),sheetname,'J2');
+        xlswrite(xls_filename,col10(:),sheetname,'K2');
+        xlswrite(xls_filename,col11(:),sheetname,'L2');
+        xlswrite(xls_filename,col12(:),sheetname,'M2');
+        xlswrite(xls_filename,col13(:),sheetname,'N2');
+        xlswrite(xls_filename,col14(:),sheetname,'O2');
+        xlswrite(xls_filename,col15(:),sheetname,'P2');
+        xlswrite(xls_filename,col16(:),sheetname,'Q2');
+
+      
         figheight_tot = 15;
         
         fig3 = figure;
