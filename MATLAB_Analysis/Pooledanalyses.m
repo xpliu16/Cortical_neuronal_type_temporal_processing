@@ -2742,7 +2742,7 @@ switch ana_type
     H.EdgeColor = [0.5 0.5 0.5];    
     set(gca,'XTick',[1,2,3,4,5]);
     xticklabels({'RS','FS','Bu','PBu','Bu_c_r_i_t'});
-    lh1 = ylabel('indsxls units (\geq 4Hz)');
+    lh1 = ylabel('Fraction sync units (\geq 4Hz)');
     set(gca,'xlim',[0.5 5.5]);
     set(gca,'ylim',[0 1]);
     set(gca,'YTick',[0 0.2 0.4 0.6 0.8 1]);
@@ -2758,14 +2758,14 @@ switch ana_type
     H2.EdgeColor = [0.5 0.5 0.5];
     set(gca,'XTick',[1,2,3,4,5]);
     xticklabels({'RS','FS','Bu','PBu','Bu_c_r_i_t'});
-    lh2 = ylabel('indsxls units (\geq16 Hz)');
+    lh2 = ylabel('Fraction sync units (\geq16 Hz)');
     set(gca,'xlim',[0.5 5.5]);
     set(gca,'ylim',[0 1]);
     set(gca,'YTick',[0 0.2 0.4 0.6 0.8 1]);
     
-    sheetname = 'indsxls';
-    xlswrite(xls_filename,{'indsxls units(>= 4 Hz)'},sheetname,'B1');
-    xlswrite(xls_filename,{'indsxls units(>= 16 Hz)'},sheetname,'C1');
+    sheetname = 'Fraction sync';
+    xlswrite(xls_filename,{'Fraction sync units(>= 4 Hz)'},sheetname,'B1');
+    xlswrite(xls_filename,{'Fraction sync units(>= 16 Hz)'},sheetname,'C1');
     xlswrite(xls_filename,{'RS'},sheetname,'A2');
     xlswrite(xls_filename,{'FS'},sheetname,'A3');
     xlswrite(xls_filename,{'Bu(GMM)'},sheetname,'A4');
@@ -3706,8 +3706,9 @@ switch ana_type
         
         print([figdir 'Fig 8/Fig8.tif'],'-dtiff',['-r' num2str(figparams.res)]);    
         
-        global supp_Bu1_2;
-        figure(supp_Bu1_2);
+        %global supp_Bu1_2;
+        %figure(supp_Bu1_2);
+        figure;
         axes('Position',[0.1+0.22+0.11, 0.1, 0.22, 0.35]);
         CImax_RS = CImax_plusprestim(strcmp(groupIDcrit_plusprestim,'RS'));
         hb1 = bar(1, mean(CImax_RS,'omitnan'),0.6);
@@ -3774,7 +3775,8 @@ switch ana_type
         xlswrite(xls_filename,{ID},sheetname,['A' num2str(next)]);
         xlswrite(xls_filename,y,sheetname,['B' num2str(next)]);
         
-        figure(supp_Bu1_2);
+        %figure(supp_Bu1_2);
+        figure;
         axes('Position',[0.1+2*(0.22+0.11), 0.1, 0.22, 0.35]);
         RS_H = H((groupnumcrit == 3) & (z_score>zthresh),:);
         Bu1_H = H((Bu_sub==1) & (z_score>zthresh),:);
@@ -3854,7 +3856,7 @@ switch ana_type
         set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold','TickDir','out','box','off');
         
         print([figdir 'Supp/Supp_Bu1_2.tif'],'-dtiff',['-r' num2str(figparams.res)]);
-
+        
     %% Basic properties of types 
     case 'Neuron type properties'
         inds = find(burster_prestim==1);
@@ -3913,7 +3915,7 @@ switch ana_type
                 & ismember(groupIDcrit_plusprestim,{'RS','FS','Burster_h','Burster_l','Prestim burster'}));
             
         group = containers.Map({'RS','FS','Burster_h','Burster_l','Prestim burster'}, {'RS','FS','Bu1','Bu2','PBu'});
-        x = groupIDcrit_plusprestim(indsxls);
+        x = values(group,groupIDcrit_plusprestim(indsxls));
         col1 = peakmsISI_plusprestim(indsxls);
         col2 = acmetric_plusprestim(indsxls);
         col3 = logISIdrop_plusprestim(indsxls);
@@ -4078,7 +4080,7 @@ switch ana_type
         
         s7 = axes(fig3, 'Position', [hmargin+2*(1-2*hmargin)/3.8, vmargin+(nrows-2)*(1-2*vmargin)/(0.95*nrows), figwidth, figheight]);
         figparams.s = s7;
-        ct_properties_subplot(max_firing_rate_plusprestim, groupIDcrit_plusprestim, groupinds,groupord, groupcolors, 'linear', 'Max driven rate', figparams);
+        ct_properties_subplot(max_firing_rate_plusprestim, groupIDcrit_plusprestim, groupinds,groupord, groupcolors, 'linear', 'Max firing rate', figparams);
         s7.Title.Units = 'normalized';
         s7.Title.VerticalAlignment = 'top';
         s7.Title.Position=[0.5 1.2 0];
