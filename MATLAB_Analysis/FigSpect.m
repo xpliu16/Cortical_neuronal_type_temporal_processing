@@ -15,10 +15,10 @@ figparams.fsize_big = figparams.fsize+2;
 figparams.msize = 7;
 figparams.res = 300;   % DPI
 figparams.fontchoice = 'Arial';
-lmargin = 0.1;
+lmargin = 0.06;
 bmargin =0.08;
 intercol = 0.07;
-width = 0.4;
+width = 0.42;
 
 fontstr_l = {'FontSize',figparams.fsize+2,'FontWeight','bold','FontName',figparams.fontchoice};
 
@@ -44,9 +44,9 @@ callnames = {'phee',...
              'dpeep string rev'};
 
 pos1 = [lmargin, bmargin, width, 0.86];
-[xl1,tih(1)] = plot_stimspecs(stimlist1, '1:20',figspec, pos1, figparams, callnames,...
+[xl1,tih(1)] = plot_stimspecs(stimlist1, '1:20',figspec, pos1, figparams,{},...
     'Mixed Vocalizations List', 1, 1);
-xshift = 0.08;
+xshift = 0.02;
 annotation('textbox',[pos1(1)-xshift, pos1(2)+pos1(4), .05, .05],...
     'String','A','EdgeColor','none',fontstr_l{:});
 
@@ -74,4 +74,4 @@ for i = 1:length(tih)
     set(tih(i), 'Position', postemp);
 end
 
-print('C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Figures\Supp\Spectall.png','-dpng','-painters');
+%print('C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Figures\Supp\Spectall.png','-dpng','-painters');

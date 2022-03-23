@@ -846,6 +846,8 @@ switch ana_type
     title('All epochs');
     [peaks(1),peakinds(1)] = max(outputs.yautocorr);
     
+    
+    
     [outputs, centers, N, centers2,N2,log_ISI_list,prestim_total_time,...
     nint] = spktr(D,mfilename,ch,stims,reps,0.2,50,'pre',1,0,0); 
     ax2_5 = axes(supp_spont,'Position',[lmargin+2*ax2_1.Position(3)+2*intercol, 0.2,(1-lmargin-rmargin-ax2_1.Position(3))/3-0.05, 0.65]); 
@@ -1308,7 +1310,7 @@ switch ana_type
     hold on
     plot(cumsum(explained),'o-','Color', [0.7 0.7 0.7],'LineWidth',1.5,'MarkerSize',figparams.msize);
     text(2.5,60,'Component',fontstr{:});
-    text(2.5,50,'Cumulative','Color',[0.8 0.8 0.8],fontstr{:});
+    text(2.5,50,'Cumulative','Color',[0.6 0.6 0.6],fontstr{:});
     
     Xred = [pc1coord,pc2coord,pc3coord];
    
@@ -1611,7 +1613,7 @@ switch ana_type
     
     plot (ncomp, BIC(ncomp),'o-','LineWidth',1.5,'MarkerSize',figparams.msize,'Color','k');
     text(0.78,0.9,'BIC','Units','normalized',fontstr{:});
-    text(0.78,0.8,'AIC','Color',[0.8 0.8 0.8],'Units','normalized',fontstr{:});
+    text(0.78,0.8,'AIC','Color',[0.6 0.6 0.6],'Units','normalized',fontstr{:});
     
     ax(5) = axes('Position',[0.0850+0.24*2, 0.087, 0.158, 0.238]); 
     hold on
@@ -1623,7 +1625,7 @@ switch ana_type
     xlabel('Number of clusters',fontstr{:});
     ylabel('Neg log-likelihood',fontstr{:});
     text(0.41,0.9,'Training set','Units','normalized',fontstr{:});
-    text(0.58,0.8,'Test set','Color',[0.8 0.8 0.8],'Units','normalized',fontstr{:});
+    text(0.58,0.8,'Test set','Color',[0.6 0.6 0.6],'Units','normalized',fontstr{:});
     ax = gca;
     ax.YAxis.Exponent = 3;
     %legend('Training set', 'Test set');
@@ -2069,15 +2071,15 @@ switch ana_type
     set(gca,'ylim',[0 1]);
     set(gca,'YTick',[0 0.2 0.4 0.6 0.8 1]);
     set(gca,'Xticklabels',{'RS','FS','Bu1','Bu2','PBu','Unclassified'});
-    lh2 = ylabel('indsxls units (\geq16 Hz)');
+    lh2 = ylabel('Fraction sync units (\geq16 Hz)');
     set(gca,'xlim',[0.5 4.5]);
     set(gca,'ylim',[0 1]);
     ax5.Position(4) = 0.97*ax5.Position(4);
    
     xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\Fig5\Fig5.xlsx';
     sheetname = 'indsxls';
-    xlswrite(xls_filename,{'indsxls units(>= 4 Hz)'},sheetname,'B1');
-    xlswrite(xls_filename,{'indsxls units(>= 16 Hz)'},sheetname,'C1');
+    xlswrite(xls_filename,{'Fraction sync units(>= 4 Hz)'},sheetname,'B1');
+    xlswrite(xls_filename,{'Fraction sync units(>= 16 Hz)'},sheetname,'C1');
     xlswrite(xls_filename,{'RS'},sheetname,'A2');
     xlswrite(xls_filename,{'FS'},sheetname,'A3');
     xlswrite(xls_filename,{'Bu1'},sheetname,'A4');
@@ -2308,7 +2310,7 @@ switch ana_type
     set(gca,'ylim',[0 1]);
     set(gca,'xlim',[0.5 4.5]);
     set(gca,'YTick',[0 0.2 0.4 0.6 0.8 1]);
-    lh3 = ylabel('indsxls (\geq16 Hz)');
+    lh3 = ylabel('Fraction sync (\geq16 Hz)');
     lh3.Position(2) = 0.45;
     
     th1 = text(1,fRS_sync16+0.07,num2str(nRS_sync16+nRS_nsync16),'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'FontWeight','bold','Color',RSColor,'HorizontalAlignment','center');
@@ -2319,7 +2321,7 @@ switch ana_type
     set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold','TickDir','out','box','off');
     
     sheetname = 'indsxls';
-    xlswrite(xls_filename,{'indsxls units(>= 16 Hz)'},sheetname,'B1');
+    xlswrite(xls_filename,{'Fraction sync units(>= 16 Hz)'},sheetname,'B1');
     xlswrite(xls_filename,{'RS'},sheetname,'A2');
     xlswrite(xls_filename,{'FS'},sheetname,'A3');
     xlswrite(xls_filename,{'Bu1'},sheetname,'A4');
@@ -2996,6 +2998,8 @@ switch ana_type
         Bu2inds = strcmp(groupIDcrit_plusprestim,'Burster_l');
         RSinds = strcmp(groupIDcrit_plusprestim,'RS');
         FSinds = strcmp(groupIDcrit_plusprestim,'FS');
+        
+        global params;
         
         fig8 = figure;
 
@@ -3706,9 +3710,9 @@ switch ana_type
         
         print([figdir 'Fig 8/Fig8.tif'],'-dtiff',['-r' num2str(figparams.res)]);    
         
-        %global supp_Bu1_2;
-        %figure(supp_Bu1_2);
-        figure;
+        global supp_Bu1_2;
+        figure(supp_Bu1_2);
+        
         axes('Position',[0.1+0.22+0.11, 0.1, 0.22, 0.35]);
         CImax_RS = CImax_plusprestim(strcmp(groupIDcrit_plusprestim,'RS'));
         hb1 = bar(1, mean(CImax_RS,'omitnan'),0.6);
@@ -3775,8 +3779,8 @@ switch ana_type
         xlswrite(xls_filename,{ID},sheetname,['A' num2str(next)]);
         xlswrite(xls_filename,y,sheetname,['B' num2str(next)]);
         
-        %figure(supp_Bu1_2);
-        figure;
+        figure(supp_Bu1_2);
+   
         axes('Position',[0.1+2*(0.22+0.11), 0.1, 0.22, 0.35]);
         RS_H = H((groupnumcrit == 3) & (z_score>zthresh),:);
         Bu1_H = H((Bu_sub==1) & (z_score>zthresh),:);

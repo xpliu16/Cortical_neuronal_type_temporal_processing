@@ -27,8 +27,8 @@ end
 figure(figh);
 set(gca,'visible','off');
 
-lmargin = 0.15;
-
+%lmargin = 0.15;
+lmargin = 0.08;
 Stimulus_Total = size(filenames,1);
 if plotup
     pos_b = [lmargin, 0, 0.84, 0.9*(1/Stimulus_Total)];

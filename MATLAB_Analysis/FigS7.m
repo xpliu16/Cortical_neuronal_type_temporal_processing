@@ -75,12 +75,12 @@ end
 
 set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'box','off');
  
-print('C:\Users\Ping\Desktop\Wang lab\Paper writing\Figures\Supp\Bu_call_rasters.tif','-dtiff',['-r' num2str(figparams.res)]);
+print('C:\Users\Ping\Desktop\Wang_lab\Paperwriting\Figures\Supp\Bu_call_rasters.tif','-dtiff',['-r' num2str(figparams.res)]);
 
 papersize = [0 0 8*0.3937, 16*0.3937];
 
-%papersize = [0 0 7.6 15.78];
 
+%{
 %pos = [0.05 0.08 0.9  0.87];
 %plot_stimspecs2('C:\Users\Ping\Documents\MATLAB\Xblaster3_Chamber3_GIT\Stimulus_Files\Call_Types\Call_Types_list.txt', '1:20',figS3,pos,1)
 %delete(ax)
@@ -106,4 +106,5 @@ colormap('jet');
 set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'box','off');
 
 %print([savepath 'Spectrograms.png'],'-dpng','-painters',['-r' num2str(figparams.res)]);
-print('C:\Users\Ping\Desktop\Wang lab\Paper writing\Figures\Supp\Spectrograms.tif','-dtiff',['-r' num2str(figparams.res)]);
+print('C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Figures\Supp\Spectrograms.tif','-dtiff',['-r' num2str(figparams.res)]);
+%}
