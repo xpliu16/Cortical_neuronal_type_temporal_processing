@@ -213,7 +213,6 @@ axes(ax2(2));
 xl_3_1 = xlim;
 axes(ax4(2));
 xl_3_2 = xlim;
-%xlim(xl_3_1);
 xl_3_2_range = xl_3_2(2)-xl_3_2(1);
 xl_shift = (xl_3_2(1)-xl_3_1(1))/xl_3_2_range;
 x2_shift = (xl_3_2(2)-xl_3_1(2))/xl_3_2_range;

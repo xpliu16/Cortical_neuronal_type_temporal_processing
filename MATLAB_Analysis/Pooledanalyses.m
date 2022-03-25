@@ -409,30 +409,6 @@ switch ana_type
     %% Simple population decoding
     case 'Vocalization pop decode'
        
-        %{
-        conf_all = popdecode(callhist_all, size(callhist_all,4), 0);
-    
-        % Subset Bu units
-        
-        n_units = [5,10,25,50,54];
-
-        callhist_bu = [];
-        for i = 1:size(callhist_all,4)
-            if any(strcmp(callhist_type_all{i}, {'Burster_h','Burster_l'}))
-                callhist_bu = cat(4,callhist_bu, callhist_all(:,:,:,i));
-            end
-        end
-        temp = mean(callhist_bu(7,:,:,:),2);
-        temp = squeeze(temp);
-        figure;
-        heatmap(temp');
-            
-        for k = 1:length(n_units)
-            conf_bu = popdecode(callhist_bu, n_units(k), 0);
-        end
-        %}
-        
-        % Ended up going to Python
         % Load outputs from Python to make consistent figures in MATLAB
         load('C:\Users\Ping\Desktop\AC_type_project\MAT\decode_figdata.mat');
         decode_fig = figure;
@@ -703,12 +679,12 @@ switch ana_type
             % May also be it didn't have tone tuning protocol
             groupnumcrit(i) = 5;
         elseif burster(i) == -1
-            %groupIDcrit{i} = 'Bursting ambiguous';
+            % groupIDcrit{i} = 'Bursting ambiguous';
             groupIDcrit{i} = 'Unclassified';
             groupnumcrit(i) = 4;
         elseif (burster(i)==0) &(burster_prestim(i) == 1)    
-            % contradiction - inspection shows at least many of these are missed bursters
-            %groupIDcrit{i} = 'Bursting ambiguous';
+            % contradiction - inspection shows many of these are missed bursters
+            % groupIDcrit{i} = 'Bursting ambiguous';
             burster(i) = -1;
             groupIDcrit{i} = 'Unclassified';
             groupnumcrit(i) = 4;
@@ -722,7 +698,7 @@ switch ana_type
                 groupIDcrit{i} = 'RS';
                 groupnumcrit(i) = 3;
             else
-                %groupIDcrit{i} = 'FS/RS ambiguous';
+                % groupIDcrit{i} = 'FS/RS ambiguous';
                 groupIDcrit{i} = 'Unclassified';
                 groupnumcrit(i) = 4;
             end
@@ -805,7 +781,6 @@ switch ana_type
     set(ax2_2,'ytick',[]);
     ax2_2.LineWidth = 1;
     box on
-    %rectangle('Position',[534,(24-11)+0.1*7,12,0.1]);
     
     ax2_3 = axes(supp_spont,'Position',[ax2_1.Position(1)+ax2_1.Position(3)*0.55, ax2_1.Position(2)+ax2_1.Position(4)+0.05,ax2_1.Position(3)*0.45, ax2_1.Position(4)*0.15/0.8]);
     plot_raster({'M117B0636'}, 4, '22', '5', '', '', '', 'single', 1, 0, 0, [], ax2_3, 1,'vertical tick',0.5);
@@ -846,18 +821,13 @@ switch ana_type
     title('All epochs');
     [peaks(1),peakinds(1)] = max(outputs.yautocorr);
     
-    
-    
     [outputs, centers, N, centers2,N2,log_ISI_list,prestim_total_time,...
     nint] = spktr(D,mfilename,ch,stims,reps,0.2,50,'pre',1,0,0); 
     ax2_5 = axes(supp_spont,'Position',[lmargin+2*ax2_1.Position(3)+2*intercol, 0.2,(1-lmargin-rmargin-ax2_1.Position(3))/3-0.05, 0.65]); 
     bar([-1*fliplr(outputs.xautocorr) outputs.xautocorr],[fliplr(outputs.yautocorr) outputs.yautocorr],...
         1,'FaceColor',FSColor,'FaceAlpha',0.7,'EdgeColor','none');
-    %xlim([0 log(16)]);
     xlim([-20 20]);
     xticks(0:10:20);
-    %yl = ylim;
-    %ylim([yl(1) yl(2)*1.15]);
     xlabel('Time (ms)');
     title('Pre-stimulus only');
     [peaks(2),peakinds(2)] = max(outputs.yautocorr);
@@ -874,8 +844,6 @@ switch ana_type
     %xlim([0 log(16)]);
     xlim([-20 20]);
     xticks(0:10:20);
-    %yl = ylim;
-    %ylim([yl(1) yl(2)*1.15]);
     xlabel('Time (ms)');
     title('100 s spontaneous');
     [peaks(3),peakinds(3)] = max(outputs.yautocorr);
@@ -928,8 +896,6 @@ switch ana_type
     plot(xl, [10 10], '--', 'Color', [0.6 0.6 0.6]);
     text(-0.65,2,'Non-bursting','Color',nBuColor,fontstr{:});
     text(-0.65,sqrt(2),'Bursting','Color',BuColor,fontstr{:});
-    %legend('Bursting','Non-bursting','Location',[0.145+xshift 0.585 0.093 0.086]);
-    %legend boxoff
     
     axf2p2 = subplot(2,3,2);
     oldpos = get(axf2p2,'Position');
@@ -955,28 +921,16 @@ switch ana_type
     oldpos = get(axf2p2,'Position');
     axf2p2b = axes(gcf,'Position',[oldpos(1)+oldpos(3)+0.02, oldpos(2), 0.22*oldpos(3), oldpos(4)]);
     edges = log(0.92):0.1:log(81.45);
-    %counts(1,:) = histc(log(peakmsISI(burster==1)),edges);
-    %counts(2,:) = histc(log(peakmsISI(burster==0)),edges);
-    %counts(3,:) = histc(log(peakmsISI(burster==-1)),edges);
-    %centers = (edges(1:end-1)+edges(2:end))/2;
-    %bh = bar(centers,counts(:,1:end-1)','stacked');
-    %bh(1).FaceColor = BuColor;
-    %bh(1).EdgeColor = 'none';
-    %bh(2).FaceColor = nBuColor;
-    %bh(2).EdgeColor = 'none';
-    %bh(3).FaceColor = [0.5 0.5 0.5];
-    %bh(3).EdgeColor = 'none';
+    
     h = histogram(log(peakmsISI),edges,'FaceColor',[0.7 0.7 0.7],'EdgeColor','none');
     hold on;
     h = histogram(log(peakmsISI(burster==1)),edges,'DisplayStyle','stairs','EdgeColor',BuColor);
     h = histogram(log(peakmsISI(burster==0)),edges,'DisplayStyle','stairs','EdgeColor',nBuColor);
     
-    
     set(gca,'xlim',[log(0.92) log(80)]);
     view(90,-90);
     [val, indtemp] = find(edges<log(100));
     maxind =max(indtemp);
-    %set(gca,'ylim',[0 1.1*max(h.Values(1:maxind))]);
     set(gca,'ytick',[]);
     set(gca,'xtick',[]);
     box off
@@ -1454,8 +1408,7 @@ switch ana_type
         +length(find(ismember(Y_PCA_AIC(strcmp(groupIDcrit,'RS')),[Bu_GMM_num, FS_GMM_num])));
     accu_best_AIC = corr/(corr+incorr)      
     
-    % First index is criteria label, Second index is
-    % GMM label
+    % First index is criteria label, Second index is GMM label
     conf = [];
     conf(1,1) = length(find(Y_PCA_AIC(groupnumcrit==3)==RS_GMM_num));
     conf(1,2) = length(find(Y_PCA_AIC(groupnumcrit==3)==FS_GMM_num));
@@ -1628,8 +1581,6 @@ switch ana_type
     text(0.58,0.8,'Test set','Color',[0.6 0.6 0.6],'Units','normalized',fontstr{:});
     ax = gca;
     ax.YAxis.Exponent = 3;
-    %legend('Training set', 'Test set');
-    %legend boxoff
     
     set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'FontWeight','Bold','TickDir','out','box','off','TickLength',[0.04 0.025]);
     axes(ax(1));
@@ -2095,8 +2046,6 @@ switch ana_type
     
     % tBMF
     [val,ind] = max(VS,[],2);
-    %ind(val<=13.8) = NaN;   % Nonsignificant
-    %ptfcolor = [FSColor;Bu1Color;RSColor;[1 1 1];[1 1 1];Bu2Color];
     ptfcolor = {FSColor;Bu1Color;RSColor;'none';'none';Bu2Color};
     VS_sig = nan(size(VS));
     tBMF = nan(size(rayleigh,1),1);
@@ -2106,9 +2055,7 @@ switch ana_type
             indmin = max(ind(i)-1,1);
             indmax = min(ind(i)+1,length(SAMrates));
             weights{i} = VS_sig(i,indmin:indmax);
-            %weighted = nan(1,length(VS_sub{i}));
             SAMind = indmin:indmax;
-            %weights = VS_sub{i}(~isnan(VS_sub{i}));
             weighted = SAMind.*weights{i};
             indBMF(i) = sum(weighted,'omitnan')/sum(weights{i},'omitnan');
             tBMF(i) = 2^(indBMF(i));
@@ -2224,8 +2171,6 @@ switch ana_type
     ID = 'Bu2';
     exportxls(xls_filename, sheetname, ID, x, y, xlab, ylab1, indsxls, i);
 
-    % Handle not in scope when run as a function rather than script - reassign the
-    % handle again
     global supp_Bu1_2;
     figure(supp_Bu1_2);
     axes('Position',[0.1+2*(0.22+0.11), 0.6, 0.22, 0.35]);  
@@ -3260,19 +3205,6 @@ switch ana_type
         set(gca,'xlim',[0.5,9]);
         xlabel('   Criteria                      GMM  ',fontstr{:});
 
-        % Doesn't fit on shortest bars
-        %{
-        text(1,3,num2str(length(find(~isnan(CImax_RS)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
-        text(2,3,num2str(length(find(~isnan(CImax_FS)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
-        text(3,3,num2str(length(find(~isnan(CImax_Bu1)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
-        text(4,3,num2str(length(find(~isnan(CImax_Bu2)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
-        text(5,3,num2str(length(find(~isnan(CImax_PBu)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
-
-        text(7,3,num2str(length(find(~isnan(CImax_RS_GMM)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);   
-        text(8,3,num2str(length(find(~isnan(CImax_FS_GMM)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
-        text(9,3,num2str(length(find(~isnan(CImax_Bu_GMM)))),'FontSize',figparams.fsize-1,'HorizontalAlignment','center','Color',[0.2 0.2 0.2]);
-        %}
-        
         axf8p3 = axes(fig8,'Position',[lmargin+axf8p1.Position(3)+axf8p2.Position(3)+3*(intercol+0.025) tmargin-ywidth 0.26 ywidth]);
         [B,CImaxsortind] = sort(CImax,'descend','MissingPlacement','last');
 
@@ -3303,8 +3235,7 @@ switch ana_type
         set(gca,'xlim',[0 280]);
 
         axf8p1.XAxis.FontWeight = 'normal'; 
-        
-        
+                
         suppl = figure;
 
         set(gcf, 'PaperUnits', 'inches');
@@ -4052,8 +3983,6 @@ switch ana_type
         hold on
         xl = get(gca,'xlim');
         plot(xl, [0.5 0.5], '--', 'Color', [0.7 0.7 0.7]);
-        %plot(xlim, [0.45 0.45], '--', 'Color', [0.7 0.7 0.7]);
-        %plot(xlim, [0.55 0.55], '-.', 'Color', [0.7 0.7 0.7]);
         s4.Title.Units = 'normalized';
         s4.Title.VerticalAlignment = 'top';
         s4.Title.Position=[0.5 1.2 0];
@@ -4074,8 +4003,6 @@ switch ana_type
         ct_properties_subplot(log10(spont_plusprestim+0.01), groupIDcrit_plusprestim, groupinds, groupord, groupcolors,'linear', 'log10(Spontaneous rate)', figparams);
         set(gca,'ylim',[-2 2]);
         yticks(-2:1:2);
-        %plot(xl, [3 3], '--', 'Color', [0.7 0.7 0.7]);
-        %plot(xl, [5 5], '--', 'Color', [0.7 0.7 0.7]);
         plot(xl, [log10(3) log10(3)], '--', 'Color', [0.7 0.7 0.7]);
         plot(xl, [log10(5) log10(5)], '-.', 'Color', [0.7 0.7 0.7]);
         s6.Title.Units = 'normalized';
@@ -4390,7 +4317,6 @@ switch ana_type
             eval(['resp_temp = PSTH.RS_avg{' num2str(showdurs(i)) '}']);
             eval(['stderr_temp = PSTH.RS_stderr{' num2str(showdurs(i)) '}']);
             p = plot(t_temp, resp_temp);
-            %eval(['p = plot(RS_t' num2str(showdurs(i)) '(1:end-1),PSTH.RS_avg{' num2str(showdurs(i)) '})']);
             set(p,'LineWidth',1,'Color',RSColor);
             hold on
             plot([0.2 0.2+durations(showdurs(i))/1000],[maxRS*1.45 maxRS*1.45],'k-','LineWidth',2);
@@ -4569,9 +4495,6 @@ switch ana_type
                  set(gca,'YColor','none');
             end
             ax(i).XAxis.Visible = 'off';
-            %set(gca,'xtick',[0.2,0.4,0.6],'Tickdir','out');
-            %set(gca,'xticklabels',[]);
-            %thdur(i) = text(0.2+0.5*durations(showdurs(i))/1000,maxRS*1.8,[num2str(durations(showdurs(i))) ' ms'],'HorizontalAlignment','center',fontstr{:});
             thdur(i) = text(0.2,maxRS*1.8,[num2str(durations(showdurs(i))) ' ms'],'HorizontalAlignment','left',fontstr{:});
             if i == 3
                 th = text(0.66,maxRS*1.5*0.8,'RS','Color',RSColor,...
@@ -4606,7 +4529,6 @@ switch ana_type
             p = plot(t_temp, resp_temp);
             set(p,'LineWidth',0.7,'Color',FSColor);
             hold on
-            %plot([0.2 0.2+durations(showdurs(i))/1000],[maxFS*1.45 maxFS*1.45],'k-','LineWidth',2);
             fill([t_temp';flipud(t_temp')],[resp_temp'-stderr_temp';flipud(resp_temp'+stderr_temp')],FSColor,'linestyle','none'); 
             alpha(0.4);
             set(gca,'xlim',[0.150 showmsmax(i)]);
@@ -4615,8 +4537,7 @@ switch ana_type
                  set(gca,'YColor','none');
             end
             ax2(i).XAxis.Visible = 'off';
-            %set(gca,'xtick',[0.2,0.4,0.6]);
-            %set(gca,'xticklabels',[]);
+            
             if i ==1
                 ylh1 = ylabel('PSTH (spk/s)','FontSize',figparams.fsize);
                 pos = get(ylh1,'Position');
@@ -4651,7 +4572,6 @@ switch ana_type
             p = plot(t_temp, resp_temp);
             set(p,'LineWidth',0.7,'Color',Bu1Color);
             hold on
-            %plot([0.2 0.2+durations(showdurs(i))/1000],[maxBu1*1.45 maxBu1*1.45],'k-','LineWidth',2);
             fill([t_temp';flipud(t_temp')],[resp_temp'-stderr_temp';flipud(resp_temp'+stderr_temp')],Bu1Color,'linestyle','none'); 
             alpha(0.4);
             set(gca,'xlim',[0.150 showmsmax(i)]);
@@ -4660,8 +4580,6 @@ switch ana_type
                 set(gca,'YColor','none');
             end
             ax3(i).XAxis.Visible = 'off';
-            %set(gca,'xtick',[0.2,0.4,0.6]);
-            %set(gca,'xticklabels',[]);
             
             box off
             
@@ -4693,7 +4611,6 @@ switch ana_type
             p = plot(t_temp, resp_temp);
             set(p,'LineWidth',0.7,'Color',Bu2Color);
             hold on
-            %plot([0.2 0.2+durations(showdurs(i))/1000],[maxBu2*1.45 maxBu2*1.45],'k-','LineWidth',2);
             fill([t_temp';flipud(t_temp')],[resp_temp'-stderr_temp';flipud(resp_temp'+stderr_temp')],Bu2Color,'linestyle','none'); 
             alpha(0.4);
             set(gca,'xlim',[0.150 showmsmax(i)]);
@@ -5583,13 +5500,12 @@ function conf = popdecode(callhist_all, nunits, plotornot)
         leftin = nan(size(callhist_all,1),size(callhist_all,2)-1,size(callhist_all,3),nunits);
         for unit = 1:length(rand_units)
             leftout(:,:,:,unit) = callhist_all(:,rand_rep(unit),:,rand_units(unit));
-            %leftout = callhist_all(:,i,:,:);
             temp = callhist_all(:,:,:,rand_units(unit));
             temp(:,rand_rep(unit),:) = [];
             leftin (:,:,:,unit) = temp;
         end
         % Average
-        leftin = mean(leftin, 2);   % Should we just average?
+        leftin = mean(leftin, 2);  
 
         % Vectorize as time-unit features
         leftout = reshape(leftout,[size(leftout,3)*size(leftout,4),size(leftout,1)]);
@@ -5605,7 +5521,6 @@ function conf = popdecode(callhist_all, nunits, plotornot)
             for k = 1:nstims
                 dist(j,k) = sqrt(sum((leftout(:,j)-leftin(:,k)).^2));
                 % Checked against norm(leftout(:,1)-leftin(:,3))
-                % dist(j,k) = dtw(leftout(:,j),leftin(:,k));
             end
         end
         if plotornot
@@ -5621,7 +5536,6 @@ function conf = popdecode(callhist_all, nunits, plotornot)
         end
 
         % Find nearest neighbor and assign
-
         for j = 1:nstims
             val = min(dist(j,:));   
             % If multiple equal minimums, MATLAB "min" will take only first index, but we want to distribute credit evenly   

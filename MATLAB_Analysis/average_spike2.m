@@ -12,8 +12,7 @@ function  [spike_avg, spike_t_shifted, spike_t_shifted2, spike_count] = average_
 %   spike_t_shifted2 : shifted traces of each spike, filtered 100 Hz to 5 kHz (matrix)
 %   spike_count      : number of qualifying spikes (scalar)
 
-% set window around the peak
-
+% Set window around the peak
 file_n = size(traces,1);
 align_win = options.align_win;
 multispikes = options.multispikes;

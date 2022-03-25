@@ -9,8 +9,6 @@ units_all = {...
  'M117B2080ch4', '476', 'M117B2050ch4';...  
  'M7E1461ch1', '667', 'M7E1459ch1'}       
 
-%M7E1027ch2?
-%M117B0372ch6?
 RSColor = [0.6350    0.0780    0.1840];
 FSColor = [0    0.4470    0.7410];
 BuColor = [0.4660    0.6740    0.1880];
@@ -54,8 +52,6 @@ for i = 1:size(units_all,1)
     stims = '1:20';
     plot_raster ({unit(1:end-3)}, str2num(unit(end)), stims, '1:10', '', '', '', 'single', 0, 0, 0, '', figS4, 1,'vertical tick',0.7);
     xlim([100,2500]);
-    %xticks([300]);
-    %set(gca,'xticklabel',{'0.3'});
     xl = xlim;
     yl = ylim;
     text(0.84*xl(2), 0.97*yl(2), [units_all{i,2} ' Hz'],'FontSize',figparams.fsize,'FontName',figparams.fontchoice);
@@ -78,33 +74,3 @@ set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figpar
 print('C:\Users\Ping\Desktop\Wang_lab\Paperwriting\Figures\Supp\Bu_call_rasters.tif','-dtiff',['-r' num2str(figparams.res)]);
 
 papersize = [0 0 8*0.3937, 16*0.3937];
-
-
-%{
-%pos = [0.05 0.08 0.9  0.87];
-%plot_stimspecs2('C:\Users\Ping\Documents\MATLAB\Xblaster3_Chamber3_GIT\Stimulus_Files\Call_Types\Call_Types_list.txt', '1:20',figS3,pos,1)
-%delete(ax)
-savepath = 'C:\Users\Ping\Desktop\Wang lab\Paper writing\Figures\Supp\';
-
-plot_stimspecs('C:\Users\Ping\Documents\MATLAB\Xblaster3_Chamber3_GIT\Stimulus_Files\Call_Types\Call_Types_list.txt', '1:20',savepath,papersize,1,0)
-ax_spect = gca;
-ax_spect.Position(1) = ax_spect.Position(1)+0.03;
-%axh.Position(2) = axh.Position(2)+0.03;
-set(gcf, 'PaperUnits', 'inches');
-set(gcf, 'PaperSize', [7.6*0.3937, 16*0.3937]);
-set(gcf,'PaperPositionMode','manual')
-set(gcf,'PaperPosition', [0 0 7.6*0.3937, 16*0.3937]);
-set(gcf,'Units','inches');
-set(gcf,'Position',[0 0 7.6*0.3937, 16*0.3937]);
-figparams.fsize = 8;
-figparams.msize = 7;
-figparams.res = 300;   % DPI
-figparams.fontchoice = 'Arial';
-%ax_spect.YLabel.Position(1) = ax_spect.YLabel.Position(1)*0.95
-
-colormap('jet');
-set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'box','off');
-
-%print([savepath 'Spectrograms.png'],'-dpng','-painters',['-r' num2str(figparams.res)]);
-print('C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Figures\Supp\Spectrograms.tif','-dtiff',['-r' num2str(figparams.res)]);
-%}

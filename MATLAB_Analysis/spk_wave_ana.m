@@ -33,9 +33,6 @@ if exist('sp_input','var')
     % only needed for plotting individual spikes
 else
     [traces, t, SR_ms, spk_ms, pre_stim, post_stim, stim_len, spont_rate] = get_traces (filename, stims, reps, ch); 
-    %if size(traces,1) > 1   % More than one file, currently don't need this case
-    %    error('Cannot process more than one file at a time in spk_wave_ana');
-    %end
     
     options.long = 0;
     [spike_avg, spike_t_shifted, spike_t_shifted2, spike_count] ...

@@ -287,7 +287,7 @@ start1 = strfind([0,((ISI_list < cutoffhigh)&(ISI_list > cutofflow))],[0 1]);
 end1 = strfind([((ISI_list < cutoffhigh)&(ISI_list > cutofflow)),0],[1 0]);
 burst_lengths = end1 - start1 + 1 + 1;   
 % 1 is due to offset from adding 0 to beginning of start1 search list, 1 due to 1 ISI being 2 spikes
-%burst_lengths = burst_lengths(burst_lengths>1); 
+% burst_lengths = burst_lengths(burst_lengths>1); 
 mean_burst_length = mean(burst_lengths);
 if plotornot
     figure
@@ -300,12 +300,8 @@ else
     max_burst_length = max(burst_lengths);
 end
 
-%length(find(burst_lengths>2))/length(find(burst_lengths==2))
-
 % Percent in bursts
 percburst = sum(burst_lengths)/spk_count;  
-
-%length(find((ISI_list>10)&(ISI_list<40)))/spk_count
 
 % Percent of ISI less than 5 ms (Katai et al., 2010)
 
@@ -328,16 +324,12 @@ end
 logISIskewness = (mean(log_ISI_list)-median(log_ISI_list))/std(log_ISI_list);
 
 % Autocorrelogram
-%edges = 1/2*binsize_ms:binsize_ms:range_ms;
 edges = ac_shift*binsize_ms:binsize_ms:range_ms;
 autocorr_list = autocorr_list(autocorr_list~=0);
 [N_ac,edges] = histcounts(autocorr_list(:),edges);
 
-%yautocorr = N_ac/((spk_count/(tot_time/1000))^2);    
 yautocorr = N_ac; 
 xautocorr = mean([edges(1:end-1);edges(2:end)]);
-%[foo,zerobin] = find(xautocorr == 0);
-%yautocorr(zerobin) = 0;    
 
 if plotornot
     figure

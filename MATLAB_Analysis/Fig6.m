@@ -83,10 +83,6 @@ set(gca,'xticklabel',[]);
 text(-0.2,27,'kHz','FontSize',figparams.fsize,'FontName','Times New Roman','FontAngle','italic');
 title('Phee call #1');
 
-%set(axsp(1),'FontSize',figparams.fsize);
-%text(-0.23,1.24,'A','Units','normalized','FontWeight','bold');
-%text(-0.12,-1.15,'B','Units','normalized','FontWeight','bold');
-
 axsp(2) = axes('Position', [lmargin+3*(xwidth+intercol)-0.01, tmargin-0.66*ywidth, 0.35, ywidth*0.33]);
 pos1b = get(axsp(2),'Position');
 pos1b(3) = xaxis_scale*t_max_phee;
@@ -135,7 +131,7 @@ t_max_trill = 0.47;
 [spect,f,t_spect] = spectrogram(g(3:end),200,180,1000,stimSR,'yaxis');
 f = f/1000;     % to show kHz instead of scientific notation
 surf(t_spect,f,log10(abs(spect)),'EdgeColor','none');  
-axis xy; %colormap(jet); 
+axis xy;  
 caxis('auto');
 view(0,90); axis tight;
 set(gca, 'YTick', [10 20]);
@@ -202,8 +198,6 @@ for i = 1:size(units_all,1)
     plot_raster ({unit(1:end-3)}, str2num(unit(end)), stims, '1:10', '', '', '', 'single', 0, 0, 0, '', fig7, 1,'vertical tick',0.8);
 
     xlim([100,2500]);
-    %xticks([300]);
-    %set(gca,'xticklabel',{'0.3'});
     if (row == 1) && (column == 1)
         text(-0.23,1.17,'A','Units','normalized','FontWeight','bold');
     elseif (row == 5) && (column == 1)
@@ -234,7 +228,6 @@ for i = 1:size(units_all,1)
     end
     
     text(0.5,1.05,['Unit ' units_all{i,4}],'Units','normalized','Color',[0.4 0.4 0.4],'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'HorizontalAlignment','center'); 
-    %text(0,1.05,['Unit ' units_all{i,4}],'Units','normalized','Color',[0.4 0.4 0.4],'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'HorizontalAlignment','left'); 
     
     if (row>1)&(row<5)&(column==3)
         rh1 = rectangle('Position',[xl_inset(row-1,1),(inset_stim(row-1)-1), xl_inset(row-1,2)-xl_inset(row-1,1),1],'EdgeColor',[0.9 0 0 0.5],'LineWidth',0.5);
@@ -243,13 +236,11 @@ for i = 1:size(units_all,1)
         rh1p = rh1.Position;
         
         ax_ins = axes('Position',[lmargin+3*(xwidth+intercol), pos(2)+0.025, xwidth*0.77, ywidth*0.55]);
-        %ax_ins = axes('Position',[lmargin+3*(xwidth+intercol), pos(2)+0.01-(4-row)*0.01, xwidth*0.75, ywidth*0.5]);
         stims = num2str(inset_stim(row-1));
         plot_raster ({unit(1:end-3)}, str2num(unit(end)), stims, '1:10', '', '', '', 'single', 0, 0, 0, '', fig7, 1,'vertical tick',0.5);
         xlim(xl_inset(row-1,:));
         ylim([0 1]);
         pos2 = ax_ins.Position;
-        %box on  % Axes end up behind patch on right and top
         xl2 = xlim;
         yl2 = ylim;
         rh2 = rectangle('Position',[xl2(1), yl2(1), xl2(2)-xl2(1), yl2(2)-yl2(1)],'EdgeColor',[0.8 0.1 0.1],'LineWidth',1);

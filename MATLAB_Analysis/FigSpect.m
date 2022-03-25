@@ -74,4 +74,4 @@ for i = 1:length(tih)
     set(tih(i), 'Position', postemp);
 end
 
-%print('C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Figures\Supp\Spectall.png','-dpng','-painters');
+print('C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Figures\Supp\Spectall.png','-dpng','-painters');
