@@ -181,7 +181,7 @@ for i = 1:size(units_all,1)
     calltype = units_all{i,3};
     
     pos(1) = 0.055 +(column-1)*(xwidth+intercol);
-    if strcmp(calltype,'phee')
+    if strcmp(calltype,'Phee')
         pos(2) = tmargin-ywidth-(row-1)*(ywidth+interrow);
     else
         pos(2) = tmargin-ywidth-(row-1)*(ywidth+interrow)-interrow3;
@@ -217,7 +217,7 @@ for i = 1:size(units_all,1)
         oldposti(2) = oldposti(2)*1.1;
         set(ti,'Position',oldposti);
     end
-    if (strcmp(calltype,'trill')) && (column==1)
+    if (strcmp(calltype,'Trill')) && (column==1)
         shortprestim = i;
     end
     if row == 5
