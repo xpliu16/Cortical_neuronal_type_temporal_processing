@@ -832,6 +832,22 @@ switch ana_type
     title('Pre-stimulus only');
     [peaks(2),peakinds(2)] = max(outputs.yautocorr);
     
+    xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\FigS1\FigS1.xlsx';
+    sheetname = 'A-C';
+     
+    spk_ms_cont = (100000/97656.25) *D.data(D.data(:,3)~=7,4)/1000;
+    stimstarts = D.data(D.data(:,3)==7,[1,2,4]);
+    stimstarts(:,3) = (100000/97656.25)*stimstarts(:,3)/1000;
+    
+    xlswrite(xls_filename,{'Spike times (ms)'},sheetname,'A1');
+    xlswrite(xls_filename,spk_ms_cont,sheetname,'A2');
+    next = length(spk_ms_cont)+3;
+    xlswrite(xls_filename,{'Stimulus'},sheetname,['A' num2str(next)]);
+    xlswrite(xls_filename,{'Repetition'},sheetname,['B' num2str(next)]);
+    xlswrite(xls_filename,{'Stim Start Time (ms)'},sheetname,['C' num2str(next)]);
+    xlswrite(xls_filename,stimstarts,sheetname,['A' num2str(next+1)]);
+    xlswrite(xls_filename,{'Raster plot cropped to stimuli 11 through 26'},sheetname,['G' num2str(next)]);
+    
     mfilename = 'M117B0645';
     D = eval (mfilename);
     stims = 1;
@@ -847,6 +863,11 @@ switch ana_type
     xlabel('Time (ms)');
     title('100 s spontaneous');
     [peaks(3),peakinds(3)] = max(outputs.yautocorr);
+    
+    sheetname = 'D';
+    xlswrite(xls_filename,{'Spike times (ms)'},sheetname,'A1');
+    spk_ms_cont = (100000/97656.25) *D.data(D.data(:,3)~=7,4)/1000; 
+    xlswrite(xls_filename,spk_ms_cont,sheetname,'A2');
     
     xshift = 0.06;
     yshift = 0.03;
@@ -3337,6 +3358,15 @@ switch ana_type
         stims = 3;
         reps = 1:10;
 
+        [spk_ms] = get_spikes_xpl (file,ch,stims,reps);
+        xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\FigS8\FigS8.xlsx';
+        sheetname = 'B-C';
+        spk_ms = spk_ms(:,[2,4]);
+        spk_ms = spk_ms(spk_ms(:,2)>0,:);
+        xlswrite(xls_filename,{'Trial #'},sheetname,'A1');
+        xlswrite(xls_filename,{'Spike times (ms)'},sheetname,'B1');
+        xlswrite(xls_filename,spk_ms,sheetname,'A2');
+        
         axsp2= axes(suppl, 'Position', [0.07+0.21+intercol, tmargin-ywidth, 0.22, ywidth]);
         set(gca,'xtick',[]);
         set(gca,'xticklabel',[]);

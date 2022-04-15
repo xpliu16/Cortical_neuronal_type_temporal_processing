@@ -1,4 +1,4 @@
-function plot_raster (resp_filename, resp_channel, stiminds, repinds, ylabelstr, titlestr, savepath, multifile, scaleby1000, papersize, showyticks, customyticks, plothandle, displaymini, symb_type, tickwidth)
+function [spk_ms] = plot_raster (resp_filename, resp_channel, stiminds, repinds, ylabelstr, titlestr, savepath, multifile, scaleby1000, papersize, showyticks, customyticks, plothandle, displaymini, symb_type, tickwidth)
 % plot_raster makes a raster plot with either vertical ticks or dots
 
 % symb_type: ‘dot’, ‘diamond,’ or ‘vertical tick’ 

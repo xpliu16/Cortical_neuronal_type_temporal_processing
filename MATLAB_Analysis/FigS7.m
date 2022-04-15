@@ -38,6 +38,15 @@ xaxis_scale = 0.13;   % Between normalized width of spectrogram and time in s
 
 ncols=3;
    
+xls_filename = 'C:\Users\Ping\Desktop\Wang_lab\Paper_writing\Final_figures\FigS7\FigS7.xlsx';
+sheetname = 'Spike times';
+col = 1;
+
+col_list = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',...
+    'Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG',...
+    'AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV',...
+    'AW','AX','AY','AZ'};
+
 for i = 1:size(units_all,1)
     row = ceil((i)/ncols); 
     column = i-(row-1)*ncols;
@@ -50,13 +59,22 @@ for i = 1:size(units_all,1)
     ax(i) = axes('Position',pos);
     unit = units_all{i,1};
     stims = '1:20';
-    plot_raster ({unit(1:end-3)}, str2num(unit(end)), stims, '1:10', '', '', '', 'single', 0, 0, 0, '', figS4, 1,'vertical tick',0.7);
+    [spk_ms] = plot_raster ({unit(1:end-3)}, str2num(unit(end)), stims, '1:10', '', '', '', 'single', 0, 0, 0, '', figS4, 1,'vertical tick',0.7);
     xlim([100,2500]);
     xl = xlim;
     yl = ylim;
     text(0.84*xl(2), 0.97*yl(2), [units_all{i,2} ' Hz'],'FontSize',figparams.fsize,'FontName',figparams.fontchoice);
     text(0.5,1.05,['Unit ' units_all{i,3}],'Units','normalized','Color',[0.4 0.4 0.4],'FontSize',figparams.fsize,'FontName',figparams.fontchoice,'HorizontalAlignment','center'); 
 
+    spk_ms = spk_ms(:,[1,2,4]);
+    xlswrite(xls_filename,{units_all{i,3}},sheetname,[col_list{col} '1']);
+    xlswrite(xls_filename,{'Stimulus #'},sheetname,[col_list{col} '2']);
+    xlswrite(xls_filename,{'Trial #'},sheetname,[col_list{col+1} '2']);
+    xlswrite(xls_filename,{'Spike times relative to trial start (ms)'},sheetname,[col_list{col+2} '2']);
+    xlswrite(xls_filename,spk_ms,sheetname,[col_list{col} '3']);
+    
+    col = col+4;
+    
     if column ==1
         ylabel('Vocalization #');
         set(gca,'YTick',[0.5,1.5,18.5, 19.5],'YTickLabel',{'1n','1r','10n','10r'});
@@ -68,6 +86,9 @@ for i = 1:size(units_all,1)
         end
     end
 end
+
+
+
 
 set(findobj(gcf,'type','axes'),'FontName',figparams.fontchoice,'FontSize',figparams.fsize,'box','off');
  
